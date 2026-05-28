@@ -8,6 +8,7 @@ import {
   House,
   MessageCircleHeart,
   Smile,
+  Book,
   type LucideIcon,
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
@@ -61,6 +62,8 @@ type ArticleFolderRecord = {
 type ArticleRegistry = {
   folders: ArticleFolderRecord[];
   pageLoaderById: Map<string, () => Promise<MdxModule>>;
+  folderLoaderById: Map<string, () => Promise<MdxModule>>;
+  rootLoader: (() => Promise<MdxModule>) | null;
 };
 
 const staticMenuItems: MenuNode[] = [
@@ -74,20 +77,6 @@ const staticMenuItems: MenuNode[] = [
   {
     id: "about",
     label: "About",
-    source: "static",
-    kind: "root",
-    items: [
-      {
-        id: "about-links",
-        label: "Links",
-        source: "static",
-        kind: "page",
-      },
-    ],
-  },
-  {
-    id: "slippery-button",
-    label: "Slippery Button",
     source: "static",
     kind: "root",
   },
@@ -109,10 +98,6 @@ const menuComponentItemsById: Record<string, MenuComponentItem> = {
     icon: MessageCircleHeart,
     component: <About />,
   },
-  "slippery-button": {
-    icon: Smile,
-    component: <Sliding />,
-  },
   "hidock-manager": {
     icon: HardDrive,
     component: <HiDockManagerPage />,
@@ -125,14 +110,14 @@ const menu404Component: MenuComponentItem = {
 
 const articleModules = import.meta.glob("../content/articles/**/*.mdx");
 
-function toTitleCase(value: string): string {
+function formatArticleLabel(value: string): string {
   return value
     .replace(/[-_]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .split(" ")
     .filter(Boolean)
-    .map((token) => token.charAt(0).toUpperCase() + token.slice(1).toLowerCase())
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
     .join(" ");
 }
 
@@ -164,10 +149,17 @@ function parseDatePrefix(baseName: string): {
 function buildArticleRegistry(): ArticleRegistry {
   const folderById = new Map<string, ArticleFolderRecord>();
   const pageLoaderById = new Map<string, () => Promise<MdxModule>>();
+  const folderLoaderById = new Map<string, () => Promise<MdxModule>>();
+  let rootLoader: (() => Promise<MdxModule>) | null = null;
 
   Object.entries(articleModules).forEach(([rawPath, loader]) => {
     const normalizedPath = rawPath.replace(/\\/g, "/");
     const relative = normalizedPath.replace(/^.*\/content\/articles\//, "");
+    const typedLoader = loader as () => Promise<MdxModule>;
+    if (relative.toLowerCase() === "index.mdx") {
+      rootLoader = typedLoader;
+      return;
+    }
     const segments = relative.split("/").filter(Boolean);
     if (segments.length < 2) {
       return;
@@ -178,26 +170,29 @@ function buildArticleRegistry(): ArticleRegistry {
     const pagePath = segments.join("/");
     const baseName = fileName.replace(/\.mdx$/i, "");
     const { dateSortKey, labelBase } = parseDatePrefix(baseName);
-    const pageLabel = toTitleCase(labelBase);
+    const pageLabel = formatArticleLabel(labelBase);
     const folderId = `${ARTICLE_ID_PREFIX}${folderKey}`;
 
     if (!folderById.has(folderId)) {
       folderById.set(folderId, {
         id: folderId,
-        label: toTitleCase(folderKey),
+        label: formatArticleLabel(folderKey),
         pages: [],
       });
     }
 
     const pageId = `${ARTICLE_ID_PREFIX}${pagePath.replace(/\.mdx$/i, "")}`;
-    const typedLoader = loader as () => Promise<MdxModule>;
-    folderById.get(folderId)?.pages.push({
-      id: pageId,
-      label: pageLabel,
-      folderId,
-      loader: typedLoader,
-      dateSortKey,
-    });
+    if (baseName.toLowerCase() === "index") {
+      folderLoaderById.set(folderId, typedLoader);
+    } else {
+      folderById.get(folderId)?.pages.push({
+        id: pageId,
+        label: pageLabel,
+        folderId,
+        loader: typedLoader,
+        dateSortKey,
+      });
+    }
     pageLoaderById.set(pageId, typedLoader);
   });
 
@@ -219,7 +214,7 @@ function buildArticleRegistry(): ArticleRegistry {
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  return { folders, pageLoaderById };
+  return { folders, pageLoaderById, folderLoaderById, rootLoader };
 }
 
 const articleRegistry = buildArticleRegistry();
@@ -281,8 +276,23 @@ export function buildMenuIndex(tree: MenuNode[]): MenuIndex {
 }
 
 export function getComponentById(id: string): MenuComponentItem {
+  if (id === ARTICLES_ROOT_ID) {
+    if (!articleRegistry.rootLoader) {
+      return {
+        icon: Book,
+        component: menu404Component.component,
+      };
+    }
+    return {
+      icon: Book,
+      component: <LazyArticlePage loader={articleRegistry.rootLoader} />,
+    };
+  }
+
   if (id.startsWith(ARTICLE_ID_PREFIX)) {
-    const articleLoader = articleRegistry.pageLoaderById.get(id);
+    const articleLoader =
+      articleRegistry.pageLoaderById.get(id) ??
+      articleRegistry.folderLoaderById.get(id);
     if (!articleLoader) {
       return menu404Component;
     }

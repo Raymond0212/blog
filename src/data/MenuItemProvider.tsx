@@ -40,7 +40,7 @@ type LegacyMenuSelection = {
 
 type MenuAction =
   | { type: "select"; id: string; ancestors: string[] }
-  | { type: "toggle"; id: string };
+  | { type: "toggle"; id: string; descendantsToCollapse: string[] };
 
 export interface MenuItemProviderInterface {
   menuItems: MenuNode[];
@@ -68,10 +68,35 @@ function menuReducer(state: MenuState, action: MenuAction): MenuState {
   const nextExpanded = new Set(state.expandedIds);
   if (nextExpanded.has(action.id)) {
     nextExpanded.delete(action.id);
+    action.descendantsToCollapse.forEach((descendantId) =>
+      nextExpanded.delete(descendantId)
+    );
   } else {
     nextExpanded.add(action.id);
   }
   return { ...state, expandedIds: nextExpanded };
+}
+
+function getDescendantIds(
+  rootId: string,
+  childrenById: Map<string, string[]>
+): string[] {
+  const descendants: string[] = [];
+  const stack = [...(childrenById.get(rootId) ?? [])];
+
+  while (stack.length) {
+    const current = stack.pop();
+    if (!current) {
+      continue;
+    }
+    descendants.push(current);
+    const children = childrenById.get(current) ?? [];
+    for (let i = 0; i < children.length; i += 1) {
+      stack.push(children[i]);
+    }
+  }
+
+  return descendants;
 }
 
 function nodeByIndexPath(
@@ -192,7 +217,10 @@ export const MenuItemProvider = ({
   children,
   storageKey = storageKeyDefault,
 }: MenuProviderProps) => {
-  const { nodeById, parentById } = useMemo(() => buildMenuIndex(menuItems), []);
+  const { nodeById, parentById, childrenById } = useMemo(
+    () => buildMenuIndex(menuItems),
+    []
+  );
   const validIds = useMemo(() => new Set(nodeById.keys()), [nodeById]);
   const initial = useMemo(
     () => parseInitialState(localStorage.getItem(storageKey), menuItems, validIds),
@@ -244,6 +272,9 @@ export const MenuItemProvider = ({
       const nextExpanded = new Set(state.expandedIds);
       if (nextExpanded.has(id)) {
         nextExpanded.delete(id);
+        getDescendantIds(id, childrenById).forEach((descendantId) =>
+          nextExpanded.delete(descendantId)
+        );
       } else {
         nextExpanded.add(id);
       }
@@ -252,9 +283,13 @@ export const MenuItemProvider = ({
         expandedIds: nextExpanded,
       };
       persist(nextState);
-      dispatch({ type: "toggle", id });
+      dispatch({
+        type: "toggle",
+        id,
+        descendantsToCollapse: getDescendantIds(id, childrenById),
+      });
     },
-    [nodeById, persist, selectedId, state.expandedIds]
+    [childrenById, nodeById, persist, selectedId, state.expandedIds]
   );
 
   const visibleMenuItems = useMemo<VisibleMenuNode[]>(() => {

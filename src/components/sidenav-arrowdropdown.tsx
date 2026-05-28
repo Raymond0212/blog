@@ -17,22 +17,41 @@ import SidebarMenuIcon from "@/MyComponents/SidebarComponents/SidebarMenuIcon";
 
 type MenuRowProps = {
   item: VisibleMenuNode;
+  selectedId: string;
   onSelect: (id: string) => void;
   onToggle: (id: string) => void;
 };
 
 const MenuRow = React.memo(function MenuRow({
   item,
+  selectedId,
   onSelect,
   onToggle,
 }: MenuRowProps) {
+  const handleClick = () => {
+    if (!item.hasChildren) {
+      onSelect(item.id);
+      return;
+    }
+
+    if (selectedId === item.id) {
+      onToggle(item.id);
+      return;
+    }
+
+    onSelect(item.id);
+    if (!item.isExpanded) {
+      onToggle(item.id);
+    }
+  };
+
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
         asChild
         tooltip={item.label}
         isActive={item.isActive}
-        onClick={() => onSelect(item.id)}
+        onClick={handleClick}
       >
         <a
           href={item.url ?? "#"}
@@ -56,7 +75,8 @@ const MenuRow = React.memo(function MenuRow({
 });
 
 export function NavMain() {
-  const { visibleMenuItems, selectItem, toggleItemCollapsed } = useMenuItem();
+  const { visibleMenuItems, selectedId, selectItem, toggleItemCollapsed } =
+    useMenuItem();
 
   return (
     <SidebarGroup>
@@ -66,6 +86,7 @@ export function NavMain() {
           <MenuRow
             key={item.id}
             item={item}
+            selectedId={selectedId}
             onSelect={selectItem}
             onToggle={toggleItemCollapsed}
           />

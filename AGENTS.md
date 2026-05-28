@@ -30,6 +30,10 @@ Run commands from the repository root:
 - Styling: use Tailwind utilities and shared primitives from `src/components/ui/*`.
 - Keep global style changes limited to `src/index.css` and `src/mdx.css`.
 
+## Content Writing Guidelines
+- For any mdx files or article/index copy, use a general-reader tone.
+- In any mdx or article descriptions, refer to menu names (for example `Articles`, `AI News`, `Useful Prompts`) instead of filesystem paths or folder structures.
+
 ## Runtime Notes
 - Client-facing environment variables must use the `VITE_` prefix.
 - `VITE_WEBSITE_LINK` controls the sidebar brand link; it falls back to `#`.

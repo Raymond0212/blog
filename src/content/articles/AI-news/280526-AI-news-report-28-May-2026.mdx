@@ -1,0 +1,1208 @@
+# AI News Report - 28 May 2026
+
+tags: #ai/anthropic,#ai/openai,#ai/management,#ai/dev,#ai/security
+
+**Report period:** 1 April 2026 to 22 May 2026  
+**Generated on:** 28 May 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This reporting period was dominated by agentic AI moving from experimentation into managed enterprise deployment. Anthropic and OpenAI both shipped agent platforms, coding-agent workflows, managed agents, enterprise connectors, deployment services, and governance controls intended to make autonomous tool use usable inside regulated organizations.
+
+**Key updates:**
+
+- Anthropic expanded Claude Code, Claude Managed Agents, Claude Cowork, Microsoft 365 integrations, legal and financial services deployments, and security/compliance integrations.
+- OpenAI launched GPT-5.5 and GPT-5.5 Instant updates, expanded Codex across desktop, mobile, enterprise, AWS, Dell, and deployment-company channels, and introduced new domain offerings for clinicians, finance, cyber defense, life sciences, and voice APIs.
+- Both companies made security and safety a product-level theme, with sandboxing, compliance APIs, provenance, child/youth safety, account hardening, supply-chain incident disclosures, and specialized cyber access programs.
+- Anthropic introduced major Managed Agents capabilities, including self-hosted sandboxes, MCP tunnels, memory, dreaming, outcomes, webhooks, and multiagent orchestration.
+- OpenAI broadened Codex from a coding assistant into a general work agent with mobile review, browser workflows, background computer use, plugins, SSH/devbox support, enterprise sandboxing, and workspace agents.
+- OpenAI and Anthropic both deepened cloud and enterprise distribution through AWS, Dell, Microsoft 365, legal/financial services playbooks, global systems integrators, and dedicated deployment support.
+- OpenAI released multiple safety and policy artifacts, including GPT-5.5 system cards, a GPT-5.5 Instant system card, youth and child safety blueprints, the Safety Fellowship, and Trusted Contact.
+- Anthropic published extensive Claude Code operating guidance covering large codebases, subagents, 1M context, prompt caching, computer/browser use, tool design, and multi-agent coordination.
+
+**Key trends:**
+
+- Agent platforms are becoming operational infrastructure, with memory, orchestration, sandboxes, MCP/connectors, audit logs, and managed deployment services.
+- Coding agents are broadening into general work agents that can operate across browsers, terminals, office files, cloud environments, mobile review flows, and enterprise systems.
+- AI safety is shifting toward layered governance: model system cards, account controls, provenance, telemetry, trusted access, youth safeguards, and enterprise compliance integrations.
+- Enterprise adoption is moving from pilots to deployment playbooks, with both vendors emphasizing governance, budget controls, observability, identity, compliance, and vertical-specific rollout patterns.
+- MCP and connectors are becoming a common integration layer for letting agents reach production systems, SaaS tools, office documents, legal platforms, financial workflows, and consumer services.
+- Security teams are both a target customer and a control point: vendors are shipping cyber-defense products while also documenting supply-chain incidents, sandbox controls, account hardening, and abuse-prevention models.
+- Frontier model releases are increasingly paired with public safety documentation, specialized access programs, and red-team or bug-bounty structures rather than simple capability announcements.
+- Domain-specific AI is accelerating in regulated sectors, especially legal, finance, healthcare, life sciences, cyber defense, and education.
+
+---
+
+## Managers
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [How Anthropic's finance team uses Claude to shape the narrative behind the numbers](https://claude.com/blog/how-anthropics-finance-team-uses-claude-to-shape-the-narrative-behind-the-numbers)
+**Source:** Claude Blog  
+**Published:** 2026-05-22
+
+Anthropic's finance team uses Claude Cowork and Claude for Excel to reconcile board-deck numbers, maintain narrative consistency, draft monthly review commentary, and diagnose financial models. The management takeaway is that Claude shifts finance work away from repetitive validation and formatting toward judgment, scenario framing, and executive communication.
+
+### [Claude now works with more security and compliance tools](https://claude.com/blog/compliance-api-security-partners)
+**Source:** Claude Blog  
+**Published:** 2026-05-21
+
+Anthropic announced 28 integrations powered by the Claude Compliance API, giving enterprise security and compliance teams visibility into Claude Enterprise conversation content and activity events. The integrations connect Claude usage to DLP, SIEM, SASE, eDiscovery, identity, observability, and security posture workflows, reducing governance friction for enterprise adoption.
+
+### [How our partners are putting Opus to work for cybersecurity](https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity)
+**Source:** Claude Blog  
+**Published:** 2026-05-21
+
+Anthropic describes how partners including Wiz, Palo Alto Networks, and Accenture use Claude Opus for defensive security workflows such as continuous pentesting, vulnerability validation, remediation, and governed deployment. The article is strategically relevant because it frames advanced models as force multipliers for security services and enterprise risk reduction.
+
+### [How an Anthropic sales leader uses Claude Cowork to run a 4,000-account book](https://claude.com/blog/how-an-anthropic-sales-leader-uses-claude-cowork-to-run-a-4-000-account-book)
+**Source:** Claude Blog  
+**Published:** 2026-05-20
+
+An Anthropic sales leader uses Claude Cowork for scheduled meeting preparation, forecast reports, and overnight scoring of a 4,000-account book using Salesforce, BigQuery, and web research. The article shows Claude Cowork as a sales-operations layer that automates data assembly while leaving account strategy to humans.
+
+### [Deploying Claude across the legal industry](https://claude.com/blog/deploying-claude-across-the-legal-industry)
+**Source:** Claude Blog  
+**Published:** 2026-05-15
+
+Anthropic frames legal AI adoption around product selection, connectors, practice-area plugins, and a three-phase deployment roadmap for law firms and in-house teams. It emphasizes privilege protection, SSO, audit, retention, governance, and legal use cases such as contract review, diligence, regulatory monitoring, privacy assessments, and litigation prep.
+
+### [The founder's playbook: Building an AI-native startup](https://claude.com/blog/the-founders-playbook)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+Anthropic recasts the startup lifecycle into Idea, MVP, Launch, and Scale stages, with Claude supporting validation, building, workflow automation, and operating leverage. The article is useful for founders and operators because it treats AI-native execution as an organizational design problem, not just a tooling choice.
+
+### [How Claude Code works in large codebases: Best practices and where to start](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+Anthropic explains how Claude Code handles large monorepos, legacy systems, and distributed multi-repo environments through live agentic search rather than stale centralized indexes. For leaders, the key point is that enterprise coding-agent rollout requires governance ownership, context conventions, and scoped testing practices.
+
+### [Code w/ Claude SF 2026 recap: Building on the AI exponential](https://claude.com/blog/code-w-claude-sf-2026-sf)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+Anthropic recaps its SF developer conference, highlighting higher Claude Code and Opus API rate limits plus Managed Agents capabilities such as Dreaming, multiagent orchestration, Outcomes, and webhooks. The strategic theme is that teams are shortening the path from idea to production by designing around agentic development.
+
+### [Claude for the legal industry](https://claude.com/blog/claude-for-the-legal-industry)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+Anthropic announced more than 20 legal MCP connectors and 12 legal practice-area plugins for Claude Cowork. The update positions Claude as a connected legal work platform, with emphasis on authoritative content, trusted workflows, security, accuracy, grounding, and access-to-justice partnerships.
+
+### [Introducing the Claude Platform on AWS](https://claude.com/blog/claude-platform-on-aws)
+**Source:** Claude Blog  
+**Published:** 2026-05-11
+
+Anthropic made the Claude Platform generally available through AWS, adding AWS IAM authentication, CloudTrail audit logging, unified AWS billing, and access to native Claude Platform features. The article clarifies the choice between Claude Platform on AWS for day-one native features and Claude on Bedrock for stricter AWS-resident processing.
+
+### [Collaborate with Claude across Excel, PowerPoint, Word and Outlook](https://claude.com/blog/collaborate-with-claude-across-excel-powerpoint-word-and-outlook)
+**Source:** Claude Blog  
+**Published:** 2026-05-07
+
+Claude for Excel, PowerPoint, and Word became generally available, while Claude for Outlook entered public beta for paid plans. The update emphasizes cross-app Microsoft 365 context, Microsoft AppSource admin deployment, OpenTelemetry observability, Analytics API reporting, and human review for email or calendar actions.
+
+### [New in Claude Managed Agents: dreaming, outcomes, and multiagent orchestration](https://claude.com/blog/new-in-claude-managed-agents)
+**Source:** Claude Blog  
+**Published:** 2026-05-06
+
+Claude Managed Agents gained dreaming, outcomes, webhooks, and multiagent orchestration. These capabilities make managed agents easier to operate as long-running business systems that improve from prior sessions, check work against rubrics, and delegate to specialist subagents.
+
+### [Deploying Claude across financial services](https://claude.com/blog/deploying-claude-across-financial-services)
+**Source:** Claude Blog  
+**Published:** 2026-05-05
+
+This guide-oriented article maps Claude products to financial-services use cases such as research, underwriting, claims, model reviews, KYC, general ledger reconciliation, and month-end close. It points implementation teams to product-selection guidance, finance agent templates, customer examples, and a phased rollout playbook.
+
+### [How a non-technical project manager built and shipped a stress management app with Claude Code in six weeks](https://claude.com/blog/how-a-non-technical-project-manager-built-and-shipped-a-stress-management-app-with-claude-code-in-six-weeks)
+**Source:** Claude Blog  
+**Published:** 2026-05-01
+
+Anthropic profiles a non-technical project manager who used Claude Code to build and ship an iOS stress-management app in six weeks. The article is relevant to managers because it shows AI-assisted product execution moving beyond professional engineering teams.
+
+### [Building AI agents for the enterprise](https://claude.com/blog/building-ai-agents-for-the-enterprise)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Anthropic frames enterprise AI advantage around embedding agents into workflows, institutional knowledge, and products rather than treating AI as simple chat. The associated guide covers employee upskilling, process compression, revenue-generating product capabilities, and a six-month Claude Cowork deployment framework.
+
+### [Claude Security is now in public beta](https://claude.com/blog/claude-security-public-beta)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Claude Security entered public beta for Claude Enterprise customers, offering repository scans, vulnerability explanations, confidence and severity details, patch guidance, scheduled scans, triage tracking, exports, and workflow integrations. The article positions AI-assisted vulnerability discovery and remediation as urgent because offensive timelines are accelerating.
+
+### [How Kepler built verifiable AI for financial services with Claude](https://claude.com/blog/how-kepler-built-verifiable-ai-for-financial-services-with-claude)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Kepler built a financial research platform that pairs Claude's reasoning with deterministic infrastructure so analysts can trace answers back to exact filings, pages, and line items. The article is relevant for managers evaluating AI in regulated analysis workflows where verifiability and accountability matter.
+
+### [Deploying agentic AI across the enterprise with Claude Cowork](https://claude.com/blog/new-guide-deploying-claude-across-the-enterprise-with-claude-cowork)
+**Source:** Claude Blog  
+**Published:** 2026-04-29
+
+Anthropic introduces a Claude Cowork deployment guide for rolling out agentic AI across business functions. It covers pilot selection, a five-level adoption maturity model, examples from Anthropic teams and customers, and a six-month roadmap from champion teams to broad deployment.
+
+### [Product development in the agentic era](https://claude.com/blog/product-development-in-the-agentic-era)
+**Source:** Claude Blog  
+**Published:** 2026-04-29
+
+Jess Yan describes using Claude, Claude Cowork, Claude Code, and Managed Agents to prototype product ideas, test API abstractions, monitor adoption analytics, track developer sentiment, and build demos. The article shows how product managers can build and operate custom agents for recurring product work.
+
+### [New connectors in Claude for everyday life](https://claude.com/blog/connectors-for-everyday-life)
+**Source:** Claude Blog  
+**Published:** 2026-04-23
+
+Claude added connectors for consumer services including AllTrails, Instacart, Audible, Tripadvisor, TurboTax, Uber, Resy, and Spotify. The management-relevant point is that Claude is expanding into consumer task orchestration while retaining user control before purchases or bookings.
+
+### [Built-in memory for Claude Managed Agents](https://claude.com/blog/claude-managed-agents-memory)
+**Source:** Claude Blog  
+**Published:** 2026-04-23
+
+Claude Managed Agents added filesystem-based memory in public beta so agents can learn across sessions while developers retain export, permissioning, rollback, redaction, and audit-log control. The feature makes managed agents more viable for persistent enterprise workflows.
+
+### [Meet the winners of our Built with Opus 4.6 Claude Code hackathon](https://claude.com/blog/meet-the-winners-of-our-built-with-opus-4-6-claude-code-hackathon)
+**Source:** Claude Blog  
+**Published:** 2026-04-20
+
+Anthropic highlights five Opus 4.6 hackathon winners building tools for permitting, education, healthcare, infrastructure, and music. The article is useful for managers tracking how AI-enabled domain experts can rapidly prototype software without traditional development backgrounds.
+
+### [Redesigning Claude Code on desktop for parallel agents](https://claude.com/blog/claude-code-desktop-redesign)
+**Source:** Claude Blog  
+**Published:** 2026-04-14
+
+Anthropic announced a redesigned Claude Code desktop app focused on running and monitoring multiple agentic coding sessions in parallel. New features include session sidebar management, side chats, integrated terminal/editor, faster diffs, previews, plugin parity, and remote SSH support.
+
+### [Introducing routines in Claude Code](https://claude.com/blog/introducing-routines-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-14
+
+Routines let teams configure repeatable Claude Code automations that run on schedules, API calls, or GitHub webhooks from Claude's cloud infrastructure. The examples span backlog triage, documentation drift, deploy verification, alert triage, and custom PR review.
+
+### [Preparing your security program for AI-accelerated offense](https://claude.com/blog/preparing-your-security-program-for-ai-accelerated-offense)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+Anthropic argues that frontier AI models will accelerate vulnerability discovery and exploit chaining, compressing defender response timelines. The article is aimed at security leaders who need to adapt programs before offensive automation becomes widespread.
+
+### [Multi-agent coordination patterns: Five approaches and when to use them](https://claude.com/blog/multi-agent-coordination-patterns)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+The article compares generator-verifier, orchestrator-subagent, agent teams, message bus, and shared-state coordination patterns. For leaders, the main recommendation is to start with the simplest workable pattern and evolve only when dependencies, scale, or event-driven complexity require it.
+
+### [The advisor strategy: Give agents an intelligence boost](https://claude.com/blog/the-advisor-strategy)
+**Source:** Claude Blog  
+**Published:** 2026-04-09
+
+Anthropic introduces the advisor strategy, where a cheaper model executes most work while consulting a stronger model only for hard decisions. The pattern is relevant for managers because it improves quality while controlling agent cost.
+
+### [Making Claude Cowork ready for enterprise](https://claude.com/blog/cowork-for-enterprise)
+**Source:** Claude Blog  
+**Published:** 2026-04-09
+
+Claude Cowork became generally available on paid plans with RBAC, group spend limits, usage analytics, OpenTelemetry, connector controls, and a Zoom MCP connector. The article focuses on scaling agentic work across organizations with governance, visibility, and budget control.
+
+### [Claude Managed Agents: get to production 10x faster](https://claude.com/blog/claude-managed-agents)
+**Source:** Claude Blog  
+**Published:** 2026-04-08
+
+Anthropic launched Claude Managed Agents, a public beta suite of APIs and infrastructure for cloud-hosted agents with sandboxing, authentication, long-running sessions, tool execution, tracing, and governance. The article targets teams that want to ship production agents without building the operational harness themselves.
+
+### [How Carta Healthcare gets AI to reason like a clinical abstractor](https://claude.com/blog/carta-healthcare-clinical-abstractor)
+**Source:** Claude Blog  
+**Published:** 2026-04-08
+
+Carta Healthcare describes using Claude on Amazon Bedrock in its Lighthouse platform to perform clinical data abstraction across complex medical records. The management lesson is that production accuracy came from context engineering and expert feedback loops, not just model selection.
+
+### [Harnessing Claude's intelligence](https://claude.com/blog/harnessing-claudes-intelligence)
+**Source:** Claude Blog  
+**Published:** 2026-04-02
+
+Anthropic lays out three patterns for building with Claude: use tools Claude already understands, regularly ask what harness logic can be removed, and set boundaries carefully for cost, UX, observability, and security. It encourages teams to keep pruning scaffolding as model capability improves.
+
+### [OpenAI named a Leader in enterprise coding agents by Gartner](https://openai.com/index/gartner-2026-agentic-coding-leader/)
+**Source:** OpenAI News  
+**Published:** 2026-05-22
+
+OpenAI says Gartner recognized Codex as a Leader in the 2026 Magic Quadrant for Enterprise AI Coding Agents. The article highlights enterprise governance, sandboxing, flexible deployment, and developer surfaces such as the app, IDE extensions, CLI, SDKs, and orchestration.
+
+### [An OpenAI model has disproved a central conjecture in discrete geometry](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)
+**Source:** OpenAI News  
+**Published:** 2026-05-20
+
+OpenAI reports that an internal general-purpose reasoning model autonomously found a disproof of Erdos's planar unit-distance conjecture. The article is strategically important because it shows AI-originated research contributions in advanced mathematics.
+
+### [Advancing content provenance for a safer, more transparent AI ecosystem](https://openai.com/index/advancing-content-provenance/)
+**Source:** OpenAI News  
+**Published:** 2026-05-19
+
+OpenAI announced a layered provenance strategy combining C2PA Content Credentials, Google DeepMind SynthID image watermarking, and a public verification preview. The update matters for platform trust, media integrity, and governance of generated content.
+
+### [OpenAI and Dell Technologies partner to bring Codex to hybrid and on-premises enterprise environments](https://openai.com/index/dell-codex-enterprise-partnership/)
+**Source:** OpenAI News  
+**Published:** 2026-05-18
+
+OpenAI and Dell are collaborating to connect Codex with Dell AI Data Platform and explore integrations with Dell AI Factory. The partnership targets enterprises that need agentic AI close to governed, on-prem, or hybrid data.
+
+### [A new personal finance experience in ChatGPT](https://openai.com/index/personal-finance-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-15
+
+OpenAI previewed a U.S. Pro-only personal finance experience that lets users connect financial accounts through Plaid, view dashboards, and ask ChatGPT questions grounded in financial context. The article emphasizes user controls, deletion paths, MFA, and finance-task accuracy benchmarks.
+
+### [Work with Codex from anywhere](https://openai.com/index/work-with-codex-from-anywhere/)
+**Source:** OpenAI News  
+**Published:** 2026-05-14
+
+OpenAI announced Codex in the ChatGPT mobile app, allowing users to review outputs, approve actions, switch threads, and steer Codex sessions running on trusted machines or remote environments. It frames Codex as a portable enterprise development surface with secure relay infrastructure.
+
+### [Helping ChatGPT better recognize context in sensitive conversations](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)
+**Source:** OpenAI News  
+**Published:** 2026-05-14
+
+OpenAI described safety updates that help ChatGPT recognize evolving risk signals in sensitive conversations, especially around self-harm and harm-to-others scenarios. The change introduces limited safety summaries and reports improved safe-response performance in long-running risk scenarios.
+
+### [Our response to the TanStack npm supply chain attack](https://openai.com/index/our-response-to-the-tanstack-npm-supply-chain-attack/)
+**Source:** OpenAI News  
+**Published:** 2026-05-13
+
+OpenAI disclosed that two employee devices were affected by a broader TanStack npm supply-chain attack, with limited credential material exfiltrated from internal repositories but no evidence of customer data or production compromise. The response included containment, credential rotation, code-signing certificate rotation, app update guidance, and supply-chain hardening.
+
+### [OpenAI Campus Network: Student club interest form](https://openai.com/index/openai-campus-network-student-club-interest-form/)
+**Source:** OpenAI News  
+**Published:** 2026-05-11
+
+OpenAI opened an interest form for university student clubs to join a global Campus Network focused on hands-on AI learning, events, workshops, projects, and research. The initiative is a community and education channel for student leaders, with potential early access to tools and programs.
+
+### [OpenAI launches the OpenAI Deployment Company to help businesses build around intelligence](https://openai.com/index/openai-launches-the-deployment-company/)
+**Source:** OpenAI News  
+**Published:** 2026-05-11
+
+OpenAI announced a majority-controlled Deployment Company to embed Forward Deployed Engineers into customer organizations and turn frontier AI into production workflows. The launch includes an agreement to acquire Tomoro, around 150 deployment specialists, and more than $4 billion in initial investment.
+
+### [Running Codex safely at OpenAI](https://openai.com/index/running-codex-safely/)
+**Source:** OpenAI News  
+**Published:** 2026-05-08
+
+OpenAI describes the controls it uses for Codex in real engineering work, including sandboxing, approval policies, managed network rules, identity controls, command rules, and enforced configuration. It also emphasizes telemetry and compliance logs for auditing prompts, tool use, approvals, execution results, and network decisions.
+
+### [Advancing voice intelligence with new models in the API](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI introduced GPT-Realtime-2, GPT-Realtime-Translate, and GPT-Realtime-Whisper for real-time voice agents, live translation, and streaming transcription. The update is strategically relevant because it expands API product scope while adding safety layers, guardrails, and enterprise privacy commitments.
+
+### [Introducing Trusted Contact in ChatGPT](https://openai.com/index/introducing-trusted-contact-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI began rolling out Trusted Contact, an optional feature for adults to nominate someone who may be notified after automated detection and trained human review indicate a serious self-harm concern. It adds a real-world support layer to ChatGPT safety operations.
+
+### [Scaling Trusted Access for Cyber with GPT-5.5 and GPT-5.5-Cyber](https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI expanded Trusted Access for Cyber, allowing vetted defenders to use GPT-5.5 with reduced refusals for legitimate defensive workflows. It also introduced GPT-5.5-Cyber in limited preview, tied to verification, monitoring, and phishing-resistant account security requirements.
+
+### [Testing ads in ChatGPT](https://openai.com/index/testing-ads-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI's May 7 update expanded the ChatGPT ads pilot to additional countries. The article and supporting materials emphasize that ads are separate from answers, targeted using signals kept within ChatGPT, excluded for predicted under-18 users, and controllable through settings and ad-free options.
+
+### [Introducing ChatGPT Futures: Class of 2026](https://openai.com/index/introducing-chatgpt-futures-class-of-2026/)
+**Source:** OpenAI News  
+**Published:** 2026-05-06
+
+OpenAI introduced the inaugural ChatGPT Futures Class of 2026, recognizing 26 students and young builders using AI across education, research, accessibility, mental health, and entrepreneurship. Each honoree receives a grant and access to frontier models.
+
+### [How frontier firms are pulling ahead](https://openai.com/index/introducing-b2b-signals/)
+**Source:** OpenAI News  
+**Published:** 2026-05-06
+
+OpenAI introduced B2B Signals, a recurring analysis of aggregated enterprise usage showing that "frontier firms" use far more intelligence per worker than typical firms. The report argues the advantage is shifting from seat deployment to deeper delegated workflows.
+
+### [GPT-5.5 Instant System Card](https://openai.com/index/gpt-5-5-instant-system-card/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+The system card explains GPT-5.5 Instant's safety posture, training-data considerations, evaluation results, and High capability classification in cybersecurity and biological/chemical preparedness. It is relevant to managers because deployment decisions depend on the model's documented risk profile.
+
+### [GPT-5.5 Instant: smarter, clearer, and more personalized](https://openai.com/index/gpt-5-5-instant/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+OpenAI updated ChatGPT's default model to GPT-5.5 Instant, emphasizing fewer hallucinated claims, stronger image and STEM performance, concise answers, and improved personalization from past chats, files, and connected Gmail where available. The rollout also makes GPT-5.5 Instant available in the API as `chat-latest`.
+
+### [New ways to buy ChatGPT ads](https://openai.com/index/new-ways-to-buy-chatgpt-ads/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+OpenAI expanded ChatGPT ads buying options through agency and technology partners, a beta self-serve Ads Manager, CPC bidding, and conversion measurement. The article stresses that delivery decisions remain controlled by OpenAI's ads system and that measurement uses aggregated insights.
+
+### [Advancing youth safety and wellbeing in EMEA](https://openai.com/index/advancing-youth-safety-in-emea/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+OpenAI published a European Youth Safety Blueprint and announced recipients of its EMEA Youth & Wellbeing Grant. The blueprint lays out policy pillars for responsible AI in education, age-appropriate safeguards, under-18 safety, protections against manipulative outputs, and parental controls.
+
+### [Introducing Advanced Account Security](https://openai.com/index/advanced-account-security/)
+**Source:** OpenAI News  
+**Published:** 2026-04-30
+
+OpenAI introduced an opt-in security mode for ChatGPT and Codex accounts with passkeys or physical security keys, disabled weaker recovery methods, shorter sessions, login alerts, session management, and automatic training exclusion. It is aimed at high-risk users and some Trusted Access for Cyber users.
+
+### [OpenAI models, Codex, and Managed Agents come to AWS](https://openai.com/index/openai-on-aws/)
+**Source:** OpenAI News  
+**Published:** 2026-04-28
+
+OpenAI and AWS expanded their partnership to make OpenAI models, Codex, and Amazon Bedrock Managed Agents powered by OpenAI available in limited preview. The announcement emphasizes enterprise deployment inside AWS security, compliance, billing, procurement, and governance workflows.
+
+### [Our commitment to community safety](https://openai.com/index/our-commitment-to-community-safety/)
+**Source:** OpenAI News  
+**Published:** 2026-04-28
+
+OpenAI described how ChatGPT is trained and monitored to reduce risks involving violence, self-harm, and real-world harm planning. The article covers refusal boundaries, automated detection, human review, enforcement, crisis resources, law-enforcement referral in imminent cases, parental controls, and a forthcoming trusted contact feature.
+
+### [The next phase of the Microsoft OpenAI partnership](https://openai.com/index/next-phase-of-microsoft-partnership/)
+**Source:** OpenAI News  
+**Published:** 2026-04-27
+
+OpenAI announced an amended Microsoft agreement giving both companies more flexibility while keeping Microsoft as OpenAI's primary cloud partner. Key changes include non-exclusive licensing through 2032, OpenAI's ability to serve products across cloud providers, revenue-share changes, and continued collaboration on datacenters, silicon, and cybersecurity.
+
+### [Our principles](https://openai.com/index/our-principles/)
+**Source:** OpenAI News  
+**Published:** 2026-04-26
+
+Sam Altman outlined OpenAI's operating principles: democratization, empowerment, universal prosperity, resilience, and adaptability. The post frames OpenAI's strategy around broad AI access, iterative deployment, infrastructure scale-up, safety collaboration, and willingness to revise positions as capabilities and risks evolve.
+
+### [Introducing GPT-5.5](https://openai.com/index/introducing-gpt-5-5/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+OpenAI launched GPT-5.5 and GPT-5.5 Pro, emphasizing stronger agentic coding, computer use, knowledge work, research, and scientific workflow performance. The article also highlights deployment safeguards, targeted cybersecurity and biology evaluations, API pricing, Codex availability, and the system card.
+
+### [Making ChatGPT better for clinicians](https://openai.com/index/making-chatgpt-better-for-clinicians/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+OpenAI introduced ChatGPT for Clinicians, free for verified U.S. physicians, nurse practitioners, physician assistants, and pharmacists. It includes clinical search, deep research, reusable workflows, CME support, privacy protections, and optional HIPAA support.
+
+### [Introducing workspace agents in ChatGPT](https://openai.com/index/introducing-workspace-agents-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+OpenAI introduced Codex-powered workspace agents for ChatGPT Business, Enterprise, Edu, and Teachers plans. The article emphasizes shared agents, long workflows across tools, organizational permissions, approvals, analytics, Compliance API visibility, prompt-injection safeguards, and future admin console support.
+
+### [Introducing ChatGPT Images 2.0](https://openai.com/index/introducing-chatgpt-images-2-0/)
+**Source:** OpenAI News  
+**Published:** 2026-04-21
+
+OpenAI introduced ChatGPT Images 2.0, with examples emphasizing better typography, multilingual rendering, layout control, editorial design, realism, comics, infographics, and flexible aspect ratios. The release broadens ChatGPT's creative and business-design utility.
+
+### [Scaling Codex to enterprises worldwide](https://openai.com/index/scaling-codex-to-enterprises-worldwide/)
+**Source:** OpenAI News  
+**Published:** 2026-04-21
+
+OpenAI announced Codex Labs and partnerships with global systems integrators including Accenture, Capgemini, CGI, Cognizant, Infosys, PwC, and TCS. The post frames Codex as expanding from software engineering into broader knowledge work and enterprise workflows.
+
+### [Codex for (almost) everything](https://openai.com/index/codex-for-almost-everything/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+OpenAI announced a major Codex update adding background computer use, in-app browser workflows, image generation, memory preview, automations, plugins, previews, PR review support, multiple terminals, and SSH devbox support. Codex is positioned as a broader work agent across and beyond the software lifecycle.
+
+### [Introducing GPT-Rosalind for life sciences research](https://openai.com/index/introducing-gpt-rosalind/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+OpenAI introduced GPT-Rosalind, a trusted-access life sciences model for biology, drug discovery, translational medicine, protein reasoning, genomics, literature review, experimental planning, and tool-heavy research workflows. The launch includes a Life Sciences plugin for Codex governed by eligibility, security, and misuse-prevention requirements.
+
+### [Accelerating the cyber defense ecosystem that protects us all](https://openai.com/index/accelerating-cyber-defense-ecosystem/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+OpenAI named initial organizations participating in Trusted Access for Cyber and described a broader effort to expand advanced defensive AI access to enterprises, researchers, open-source security teams, and critical infrastructure defenders. It also highlighted $10 million in API credits through the Cybersecurity Grant Program.
+
+### [Trusted access for the next era of cyber defense](https://openai.com/index/scaling-trusted-access-for-cyber-defense/)
+**Source:** OpenAI News  
+**Published:** 2026-04-14
+
+OpenAI expanded Trusted Access for Cyber to verified defenders and introduced GPT-5.4-Cyber, a more cyber-permissive model for legitimate defensive work. The article explains OpenAI's approach of democratized access, iterative deployment, escalating safeguards, identity verification, and tighter restrictions for highly capable cyber models.
+
+### [Our response to the Axios developer tool compromise](https://openai.com/index/axios-developer-tool-compromise/)
+**Source:** OpenAI News  
+**Published:** 2026-04-10
+
+OpenAI disclosed that a compromised Axios dependency affected a GitHub Actions workflow used in macOS app signing, though it found no evidence of user data, product, IP, or software alteration compromise. It rotated certificates, published updated builds, and required macOS users to update several apps by 8 May 2026.
+
+### [The next phase of enterprise AI](https://openai.com/index/next-phase-of-enterprise-ai/)
+**Source:** OpenAI News  
+**Published:** 2026-04-08
+
+OpenAI described its enterprise strategy around AI agents as a company-wide intelligence layer and ChatGPT/Codex as a unified work experience. The post cites enterprise revenue growth, Codex adoption, API scale, Frontier, partner alliances, and the shift from experimentation to production deployment.
+
+### [Introducing the Child Safety Blueprint](https://openai.com/index/introducing-child-safety-blueprint/)
+**Source:** OpenAI News  
+**Published:** 2026-04-08
+
+OpenAI introduced a policy blueprint for preventing and disrupting AI-enabled child sexual exploitation, developed with external child-safety organizations and policy stakeholders. The linked blueprint focuses on modernizing laws, improving provider reporting, and building safety-by-design detection, refusal, human review, and monitoring safeguards.
+
+### [Introducing the OpenAI Safety Fellowship](https://openai.com/index/introducing-openai-safety-fellowship/)
+**Source:** OpenAI News  
+**Published:** 2026-04-06
+
+OpenAI announced a pilot Safety Fellowship for external researchers, engineers, and practitioners working on evaluations, robustness, privacy-preserving safety, agent oversight, and high-severity misuse. The fellowship includes mentorship, stipend, compute support, and expected research outputs.
+
+### [OpenAI acquires TBPN](https://openai.com/index/openai-acquires-tbpn/)
+**Source:** OpenAI News  
+**Published:** 2026-04-02
+
+OpenAI acquired TBPN, a daily live tech talk show and media company, to support broader public conversation around AI, builders, business, and culture. OpenAI said TBPN will sit within its Strategy organization while retaining editorial independence.
+
+---
+
+## Developers / Engineers
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [How our partners are putting Opus to work for cybersecurity](https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity)
+**Source:** Claude Blog  
+**Published:** 2026-05-21
+
+Partners including Wiz, Palo Alto Networks, and Accenture are using Claude Opus for defensive security engineering: continuous pentesting, vulnerability validation, remediation acceleration, and API/application coverage. The examples show practical production workflows for pairing AI reasoning with security tooling.
+
+### [Using Claude Code: The unreasonable effectiveness of HTML](https://claude.com/blog/using-claude-code-the-unreasonable-effectiveness-of-html)
+**Source:** Claude Blog  
+**Published:** 2026-05-20
+
+The Claude Code team argues that HTML is often a better output format than Markdown for specs, reports, code reviews, prototypes, visual explanations, and custom editing interfaces. Claude Code can use repository, MCP, browser, and git context to generate richer interactive artifacts for complex agent workflows.
+
+### [New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)
+**Source:** Claude Blog  
+**Published:** 2026-05-19
+
+Claude Managed Agents can now execute tools in customer-controlled sandboxes and connect to private MCP servers through outbound tunnels. This lets teams keep files, repositories, internal services, network controls, audit logs, and runtime sizing inside their own perimeter while Anthropic manages the agent loop.
+
+### [The founder's playbook: Building an AI-native startup](https://claude.com/blog/the-founders-playbook)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+The playbook treats startup building as an AI-native workflow from idea validation through MVP, launch, and scale. It is relevant to engineers because it warns about architecture, scope, and security practices needed to avoid AI-generated technical debt.
+
+### [How Claude Code works in large codebases: Best practices and where to start](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+Anthropic recommends layered `CLAUDE.md` files, hooks, skills, plugins, LSP integrations, MCP servers, subagents, and scoped test commands for large repositories. The article explains why live agentic search can be more robust than stale indexes in complex codebases.
+
+### [Best practices for computer and browser use with Claude](https://claude.com/blog/best-practices-for-computer-and-browser-use-with-claude)
+**Source:** Claude Blog  
+**Published:** 2026-05-13
+
+This technical guide covers screenshot downscaling, click accuracy, model and thinking-effort selection, context management, batch tools, workflow teaching, and prompt-injection defenses for Claude computer/browser use. It recommends disposable VMs, safeguards, logging, and human confirmation for high-stakes actions.
+
+### [Code w/ Claude SF 2026 recap: Building on the AI exponential](https://claude.com/blog/code-w-claude-sf-2026-sf)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+The recap highlights higher Claude Code and Opus API rate limits plus Managed Agents features such as Dreaming, orchestration, Outcomes, and webhooks. It shows the direction of Anthropic's developer platform for building agentic production software.
+
+### [How Anthropic's cybersecurity team built a threat detection platform with Claude Code](https://claude.com/blog/how-anthropic-uses-claude-cybersecurity)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+Anthropic's Detection Platform Engineering team built CLUE, a Claude-powered detection and response platform that enriches alerts and runs investigations across internal systems. The article reports reduced false positives, broader coverage, and auditability through investigation transcripts.
+
+### [Agent view in Claude Code](https://claude.com/blog/agent-view-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-05-11
+
+Claude introduced agent view in Claude Code, a CLI interface for managing many Claude Code sessions from one place. Developers can background sessions, see which agents need input, inspect recent turns, and reattach when deeper review is needed.
+
+### [Introducing the Claude Platform on AWS](https://claude.com/blog/claude-platform-on-aws)
+**Source:** Claude Blog  
+**Published:** 2026-05-11
+
+The Claude Platform on AWS adds AWS IAM authentication, CloudTrail audit logging, unified AWS billing, and native Claude Platform features. Developers get a clearer deployment choice between direct Claude Platform features and Bedrock-hosted residency requirements.
+
+### [New in Claude Managed Agents: dreaming, outcomes, and multiagent orchestration](https://claude.com/blog/new-in-claude-managed-agents)
+**Source:** Claude Blog  
+**Published:** 2026-05-06
+
+Managed Agents now support dreaming, outcomes, webhooks, and multiagent orchestration. These features help developers build agents that self-improve from prior sessions, evaluate outputs against rubrics, and coordinate specialist subagents with traceability.
+
+### [Deploying Claude across financial services](https://claude.com/blog/deploying-claude-across-financial-services)
+**Source:** Claude Blog  
+**Published:** 2026-05-05
+
+The financial-services deployment guide maps Claude products to research, underwriting, claims, model review, KYC, ledger reconciliation, and close workflows. It is relevant for implementation teams designing finance-specific agents and rollout playbooks.
+
+### [How a non-technical project manager built and shipped a stress management app with Claude Code in six weeks](https://claude.com/blog/how-a-non-technical-project-manager-built-and-shipped-a-stress-management-app-with-claude-code-in-six-weeks)
+**Source:** Claude Blog  
+**Published:** 2026-05-01
+
+The article profiles using Claude Code to build and ship an iOS app without prior coding experience. It highlights practical engineering support from Claude Code for architecture changes, App Store shipping, and orchestration of specialized subagents.
+
+### [Claude Security is now in public beta](https://claude.com/blog/claude-security-public-beta)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Claude Security offers repository scans, vulnerability explanations, confidence and severity details, patch guidance, scheduled scans, triage tracking, exports, and workflow integrations. It is relevant to engineers integrating AI-assisted security review into repository workflows.
+
+### [Lessons from building Claude Code: Prompt caching is everything](https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+The Claude Code team explains how prompt caching shapes agent architecture, cost, latency, model switching, tool loading, plan mode, and compaction. The core guidance is to keep static prompt/tool content stable, avoid changing tools or models mid-session, and monitor cache hit rate.
+
+### [How Kepler built verifiable AI for financial services with Claude](https://claude.com/blog/how-kepler-built-verifiable-ai-for-financial-services-with-claude)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Kepler pairs Claude's reasoning with deterministic infrastructure so analysts can trace answers to exact filings, pages, and line items. The article focuses on verifiability, ambiguity handling, evaluation pipelines, structured context, and model routing.
+
+### [Claude API skill now in CodeRabbit, JetBrains, Resolve AI, and Warp](https://claude.com/blog/claude-api-skill)
+**Source:** Claude Blog  
+**Published:** 2026-04-29
+
+Anthropic expanded the `claude-api` skill into CodeRabbit, JetBrains/Junie, Resolve AI, and Warp. The skill keeps coding agents current on Claude API patterns, model migrations, prompt caching, compaction, and Managed Agents onboarding.
+
+### [Product development in the agentic era](https://claude.com/blog/product-development-in-the-agentic-era)
+**Source:** Claude Blog  
+**Published:** 2026-04-29
+
+The article shows product teams using Claude, Claude Cowork, Claude Code, and Managed Agents to prototype ideas, test API abstractions, monitor analytics, track developer sentiment, and build demos. It is a practical example of custom agent workflows for recurring product work.
+
+### [Onboarding Claude Code like a new developer: Lessons from 17 years of development](https://claude.com/blog/onboarding-claude-code-like-a-new-developer-lessons-from-17-years-of-development)
+**Source:** Claude Blog  
+**Published:** 2026-04-28
+
+The Skyline scientific software project shows how Claude Code can work on large legacy codebases when given deliberate onboarding context. The article recommends contained first tasks, versioned context, reusable skills, and MCP integrations for real project data.
+
+### [Built-in memory for Claude Managed Agents](https://claude.com/blog/claude-managed-agents-memory)
+**Source:** Claude Blog  
+**Published:** 2026-04-23
+
+Managed Agents added filesystem-based memory with export, API, permissioning, rollback, redaction, and audit-log control. Developers can share memory stores across agents while keeping scoped access and observability in Claude Console.
+
+### [Building agents that reach production systems with MCP](https://claude.com/blog/building-agents-that-reach-production-systems-with-mcp)
+**Source:** Claude Blog  
+**Published:** 2026-04-22
+
+Anthropic compares direct API calls, CLIs, and MCP for connecting agents to production systems. It recommends MCP for reusable protocol layers, standardized auth, discovery, rich semantics, remote servers, intent-oriented tools, OAuth/CIMD, vaults, tool search, and pairing MCP with skills.
+
+### [Meet the winners of our Built with Opus 4.6 Claude Code hackathon](https://claude.com/blog/meet-the-winners-of-our-built-with-opus-4-6-claude-code-hackathon)
+**Source:** Claude Blog  
+**Published:** 2026-04-20
+
+The hackathon winners demonstrate applied Claude Code patterns across permitting, education, healthcare, infrastructure, and music. The article is useful for engineers studying rapid prototyping with parallel subagents and domain-specific workflows.
+
+### [Best practices for using Claude Opus 4.7 with Claude Code](https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-16
+
+The post explains how Opus 4.7 changes Claude Code workflows around token usage, adaptive thinking, effort levels, and fewer default subagent/tool calls. It recommends specifying complete tasks up front, using `xhigh` for most agentic coding, and explicitly prompting for more tool or subagent use when needed.
+
+### [Using Claude Code: session management and 1M context](https://claude.com/blog/using-claude-code-session-management-and-1m-context)
+**Source:** Claude Blog  
+**Published:** 2026-04-15
+
+This guide explains how Claude Code's 1M-token context interacts with context rot, compaction, `/rewind`, `/clear`, and subagents. It frames each turn as a decision point: continue, rewind, clear, compact, or delegate.
+
+### [Redesigning Claude Code on desktop for parallel agents](https://claude.com/blog/claude-code-desktop-redesign)
+**Source:** Claude Blog  
+**Published:** 2026-04-14
+
+The redesigned Claude Code desktop app focuses on running and monitoring multiple coding agents in parallel. Engineering-relevant updates include integrated terminal/editor, faster diffs, previews, plugin parity, side chats, and remote SSH support.
+
+### [Introducing routines in Claude Code](https://claude.com/blog/introducing-routines-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-14
+
+Routines run repeatable Claude Code automations on schedules, API calls, or GitHub webhooks from Claude's cloud infrastructure. Developer examples include backlog triage, documentation drift, deploy verification, alert triage, and custom PR review.
+
+### [Seeing like an agent: how we design tools in Claude Code](https://claude.com/blog/seeing-like-an-agent)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+The Claude Code team explains tool design from the model's perspective, using examples such as AskUserQuestion and Claude Code Guide. The core lesson is to test tools against actual model behavior and evolve the harness based on how the agent reasons and acts.
+
+### [Multi-agent coordination patterns: Five approaches and when to use them](https://claude.com/blog/multi-agent-coordination-patterns)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+The article compares generator-verifier, orchestrator-subagent, agent teams, message bus, and shared-state coordination. It gives engineering teams a vocabulary for choosing the simplest coordination pattern that fits their dependency and scale constraints.
+
+### [The advisor strategy: Give agents an intelligence boost](https://claude.com/blog/the-advisor-strategy)
+**Source:** Claude Blog  
+**Published:** 2026-04-09
+
+The advisor strategy lets a cheaper model execute tasks while consulting a stronger model for hard decisions. Anthropic presents the advisor tool as an API feature for improving agent quality without sending the full workload to the most expensive model.
+
+### [Claude Managed Agents: get to production 10x faster](https://claude.com/blog/claude-managed-agents)
+**Source:** Claude Blog  
+**Published:** 2026-04-08
+
+Claude Managed Agents provide cloud-hosted agent infrastructure with sandboxing, authentication, long-running sessions, tool execution, tracing, and governance. The article is relevant to teams that want production agents without building the entire operational harness.
+
+### [How Carta Healthcare gets AI to reason like a clinical abstractor](https://claude.com/blog/carta-healthcare-clinical-abstractor)
+**Source:** Claude Blog  
+**Published:** 2026-04-08
+
+Carta Healthcare uses Claude on Amazon Bedrock for clinical data abstraction across complex medical records. The engineering lesson is that production accuracy came from context engineering and expert feedback loops, not model selection alone.
+
+### [How and when to use subagents in Claude Code](https://claude.com/blog/subagents-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-07
+
+This guide explains subagents as isolated Claude instances with separate context windows for research-heavy work, independent parallel tasks, fresh reviews, verification, and pipeline workflows. It also covers custom subagents, `CLAUDE.md` routing rules, skills, hooks, and delegation tradeoffs.
+
+### [Harnessing Claude's intelligence](https://claude.com/blog/harnessing-claudes-intelligence)
+**Source:** Claude Blog  
+**Published:** 2026-04-02
+
+Anthropic recommends using tools Claude already understands, removing unnecessary harness logic, and setting explicit boundaries for cost, UX, observability, and security. The article encourages developers to revisit architecture as model capability improves.
+
+### [OpenAI named a Leader in enterprise coding agents by Gartner](https://openai.com/index/gartner-2026-agentic-coding-leader/)
+**Source:** OpenAI News  
+**Published:** 2026-05-22
+
+OpenAI frames Codex as an enterprise-scale agentic development platform with app, IDE, CLI, SDK, and orchestration surfaces. The article also highlights governance, sandboxing, and flexible deployment as core engineering adoption requirements.
+
+### [An OpenAI model has disproved a central conjecture in discrete geometry](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)
+**Source:** OpenAI News  
+**Published:** 2026-05-20
+
+OpenAI reports an internal reasoning model autonomously found a disproof of Erdos's planar unit-distance conjecture. The attached proof and remarks describe the number-theoretic construction and external mathematical validation.
+
+### [Advancing content provenance for a safer, more transparent AI ecosystem](https://openai.com/index/advancing-content-provenance/)
+**Source:** OpenAI News  
+**Published:** 2026-05-19
+
+OpenAI announced C2PA Content Credentials, SynthID image watermarking, and a public verification preview for generated images. Developers building content workflows need to account for provenance metadata, verification UX, and ecosystem interoperability.
+
+### [OpenAI and Dell Technologies partner to bring Codex to hybrid and on-premises enterprise environments](https://openai.com/index/dell-codex-enterprise-partnership/)
+**Source:** OpenAI News  
+**Published:** 2026-05-18
+
+OpenAI and Dell are connecting Codex with Dell AI Data Platform and exploring Dell AI Factory integrations. The engineering implication is that Codex is being packaged for hybrid and on-prem enterprise environments close to governed data.
+
+### [Work with Codex from anywhere](https://openai.com/index/work-with-codex-from-anywhere/)
+**Source:** OpenAI News  
+**Published:** 2026-05-14
+
+Codex now appears in the ChatGPT mobile app for reviewing outputs, approving actions, switching threads, and steering remote sessions. Linked docs cover enterprise access tokens and hooks, while the product update highlights secure relay infrastructure and Remote SSH availability.
+
+### [Building a safe, effective sandbox to enable Codex on Windows](https://openai.com/index/building-codex-windows-sandbox/)
+**Source:** OpenAI News  
+**Published:** 2026-05-13
+
+OpenAI explains the engineering path to a Windows sandbox for Codex, moving from restricted tokens and ACLs toward stronger isolation and network suppression. The article is useful for engineers evaluating agent sandbox designs on Windows.
+
+### [Our response to the TanStack npm supply chain attack](https://openai.com/index/our-response-to-the-tanstack-npm-supply-chain-attack/)
+**Source:** OpenAI News  
+**Published:** 2026-05-13
+
+OpenAI's incident disclosure covers containment, credential rotation, code-signing certificate rotation, app update guidance, and supply-chain hardening after a npm supply-chain attack. Engineers should note the emphasis on package-manager controls, provenance validation, and device-level containment.
+
+### [OpenAI Campus Network: Student club interest form](https://openai.com/index/openai-campus-network-student-club-interest-form/)
+**Source:** OpenAI News  
+**Published:** 2026-05-11
+
+The Campus Network invites student clubs into AI learning, workshops, projects, and research. It is relevant to developers and engineers as a talent and community pipeline around OpenAI tools.
+
+### [OpenAI launches the OpenAI Deployment Company to help businesses build around intelligence](https://openai.com/index/openai-launches-the-deployment-company/)
+**Source:** OpenAI News  
+**Published:** 2026-05-11
+
+OpenAI's Deployment Company will embed Forward Deployed Engineers into customer organizations. The article is relevant to engineers because it formalizes a services model for taking frontier AI systems from prototype to reliable production workflows.
+
+### [Running Codex safely at OpenAI](https://openai.com/index/running-codex-safely/)
+**Source:** OpenAI News  
+**Published:** 2026-05-08
+
+OpenAI describes Codex controls including sandboxing, approval policies, managed network rules, identity controls, command rules, enforced configuration, and telemetry. Engineers can use the article as a reference for operating coding agents in internal development environments.
+
+### [Advancing voice intelligence with new models in the API](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI introduced GPT-Realtime-2, GPT-Realtime-Translate, and GPT-Realtime-Whisper for voice agents, translation, and transcription. The article highlights longer context, tool use, adjustable reasoning effort, pricing, active classifiers, guardrails, and data residency.
+
+### [Scaling Trusted Access for Cyber with GPT-5.5 and GPT-5.5-Cyber](https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI expanded Trusted Access for Cyber and introduced GPT-5.5-Cyber in limited preview for authorized defensive workflows. The article matters to engineers building security tools because it changes refusal behavior for vetted users while retaining monitoring and safeguards.
+
+### [How frontier firms are pulling ahead](https://openai.com/index/introducing-b2b-signals/)
+**Source:** OpenAI News  
+**Published:** 2026-05-06
+
+B2B Signals shows that high-performing firms use much more AI intelligence per worker than typical firms, with a particularly large Codex usage gap. The engineering implication is that adoption advantage comes from deeper delegated workflows, not just seat count.
+
+### [GPT-5.5 Instant System Card](https://openai.com/index/gpt-5-5-instant-system-card/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+The GPT-5.5 Instant system card covers training data, safety evaluations, cyber and bio/chemical risk, mental-health behavior, fairness, and post-deployment monitoring. Developers using the model need to account for these risk classifications and safeguards.
+
+### [GPT-5.5 Instant: smarter, clearer, and more personalized](https://openai.com/index/gpt-5-5-instant/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+GPT-5.5 Instant became ChatGPT's default model and is available in the API as `chat-latest`. OpenAI highlights fewer hallucinated claims, better image/STEM performance, clearer answers, and improved personalization.
+
+### [Where the goblins came from](https://openai.com/index/where-the-goblins-came-from/)
+**Source:** OpenAI News  
+**Published:** 2026-04-29
+
+OpenAI traced a recurring metaphor habit in GPT-5-era models to reward signals from a retired personality training setup and later data reuse. The post is useful to engineers as a concrete lesson in how reinforcement learning and training-data feedback loops can create persistent model behaviors.
+
+### [OpenAI models, Codex, and Managed Agents come to AWS](https://openai.com/index/openai-on-aws/)
+**Source:** OpenAI News  
+**Published:** 2026-04-28
+
+OpenAI models, Codex, and Amazon Bedrock Managed Agents powered by OpenAI became available in limited preview on AWS. The integration targets teams building inside AWS security, compliance, billing, procurement, and governance workflows.
+
+### [Introducing GPT-5.5](https://openai.com/index/introducing-gpt-5-5/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+GPT-5.5 and GPT-5.5 Pro improve agentic coding, computer use, knowledge work, research, and scientific workflow performance. The article also gives API pricing and links to safety documentation.
+
+### [GPT-5.5 System Card](https://openai.com/index/gpt-5-5-system-card/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+The GPT-5.5 system card documents predeployment safety testing, including Preparedness Framework evaluation, cybersecurity and biology red teaming, jailbreak and prompt-injection robustness, hallucination, alignment, bias, autonomy, and safeguards.
+
+### [GPT-5.5 Bio Bug Bounty](https://openai.com/index/gpt-5-5-bio-bug-bounty/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+OpenAI opened applications for vetted red-teamers and biosecurity experts to test whether universal jailbreaks can defeat GPT-5.5 bio-safety safeguards in Codex Desktop. The program offers a top reward and runs from 28 April to 27 July 2026.
+
+### [Introducing workspace agents in ChatGPT](https://openai.com/index/introducing-workspace-agents-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+Workspace agents let ChatGPT Business, Enterprise, Edu, and Teachers teams create shared Codex-powered agents for long workflows across tools. The article emphasizes permissions, approvals, analytics, Compliance API visibility, and prompt-injection safeguards.
+
+### [Introducing OpenAI Privacy Filter](https://openai.com/index/introducing-openai-privacy-filter/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+OpenAI released Privacy Filter, an Apache 2.0 open-weight model for detecting and redacting PII in text. The model card describes token-classification architecture, 128K context support, label taxonomy, benchmarks, limitations, and intended privacy-by-design use.
+
+### [Introducing ChatGPT Images 2.0](https://openai.com/index/introducing-chatgpt-images-2-0/)
+**Source:** OpenAI News  
+**Published:** 2026-04-21
+
+ChatGPT Images 2.0 improves typography, multilingual rendering, layout control, editorial design, realism, comics, infographics, and aspect-ratio flexibility. Engineers building image workflows should note the expansion of generated design and visual-content capabilities.
+
+### [Scaling Codex to enterprises worldwide](https://openai.com/index/scaling-codex-to-enterprises-worldwide/)
+**Source:** OpenAI News  
+**Published:** 2026-04-21
+
+OpenAI announced Codex Labs and global systems integrator partnerships to help enterprises adopt Codex. The article frames Codex as expanding from software engineering into broader enterprise workflows.
+
+### [Codex for (almost) everything](https://openai.com/index/codex-for-almost-everything/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+Codex gained background computer use, in-app browser workflows, image generation, memory preview, automations, plugins, previews, PR review support, multiple terminals, and SSH devbox support. The update moves Codex toward a general tool-using work agent.
+
+### [Introducing GPT-Rosalind for life sciences research](https://openai.com/index/introducing-gpt-rosalind/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+GPT-Rosalind is a trusted-access life sciences model for biology, drug discovery, translational medicine, protein reasoning, genomics, literature review, experimental planning, and tool-heavy workflows. The launch includes a Codex plugin with more than 50 scientific tools and data sources.
+
+### [Accelerating the cyber defense ecosystem that protects us all](https://openai.com/index/accelerating-cyber-defense-ecosystem/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+OpenAI named initial Trusted Access for Cyber participants and described expanded defensive AI access for enterprises, researchers, open-source security teams, and critical infrastructure defenders. The update includes API credits through a Cybersecurity Grant Program.
+
+### [Trusted access for the next era of cyber defense](https://openai.com/index/scaling-trusted-access-for-cyber-defense/)
+**Source:** OpenAI News  
+**Published:** 2026-04-14
+
+Trusted Access for Cyber gives verified defenders more permissive access to advanced cyber-capable models for legitimate defensive work. The article introduces GPT-5.4-Cyber and describes identity verification, escalating safeguards, and restrictive deployment for higher-capability cyber models.
+
+### [Our response to the Axios developer tool compromise](https://openai.com/index/axios-developer-tool-compromise/)
+**Source:** OpenAI News  
+**Published:** 2026-04-10
+
+OpenAI's disclosure shows how a compromised dependency affected a macOS app-signing GitHub Actions workflow. The technical response included certificate rotation, updated builds, and required updates for ChatGPT Desktop, Codex App, Codex CLI, and Atlas.
+
+### [The next phase of enterprise AI](https://openai.com/index/next-phase-of-enterprise-ai/)
+**Source:** OpenAI News  
+**Published:** 2026-04-08
+
+OpenAI describes ChatGPT and Codex as a unified work experience for enterprise AI agents. The post is relevant to engineers because it signals production integration priorities: agents, API scale, partner alliances, and deployment readiness.
+
+### [Introducing the OpenAI Safety Fellowship](https://openai.com/index/introducing-openai-safety-fellowship/)
+**Source:** OpenAI News  
+**Published:** 2026-04-06
+
+The Safety Fellowship supports external researchers and engineers working on evaluations, robustness, privacy-preserving safety, agent oversight, and misuse prevention. The program includes compute support, mentorship, and expected research outputs.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Claude now works with more security and compliance tools](https://claude.com/blog/compliance-api-security-partners)
+**Source:** Claude Blog  
+**Published:** 2026-05-21
+
+The Claude Compliance API now powers 28 integrations across DLP, SIEM, SASE, eDiscovery, identity, observability, and posture management. The update makes Claude easier to govern in enterprise environments that need auditability and compliance visibility.
+
+### [How our partners are putting Opus to work for cybersecurity](https://claude.com/blog/how-our-partners-are-putting-opus-to-work-for-cybersecurity)
+**Source:** Claude Blog  
+**Published:** 2026-05-21
+
+Claude Opus is being used by security partners for continuous pentesting, vulnerability validation, remediation acceleration, and defensive production deployment. The article shows advanced models being applied to legitimate cyber defense at enterprise scale.
+
+### [New in Claude Managed Agents: self-hosted sandboxes and MCP tunnels](https://claude.com/blog/claude-managed-agents-updates)
+**Source:** Claude Blog  
+**Published:** 2026-05-19
+
+Self-hosted sandboxes and MCP tunnels let customers keep files, repositories, internal services, network controls, and audit logs inside their own environment. This is a significant security update for production managed agents.
+
+### [Deploying Claude across the legal industry](https://claude.com/blog/deploying-claude-across-the-legal-industry)
+**Source:** Claude Blog  
+**Published:** 2026-05-15
+
+Anthropic's legal deployment guidance emphasizes privilege protection, SSO, audit, retention, governance, and controlled use of connectors and practice-area plugins. These controls are central to adopting AI in legal workflows that handle sensitive client information.
+
+### [The founder's playbook: Building an AI-native startup](https://claude.com/blog/the-founders-playbook)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+The founder playbook flags architecture, scope, and security practices as essential to avoid AI-generated technical debt. It treats security as a design requirement even for early-stage AI-native startups.
+
+### [How Claude Code works in large codebases: Best practices and where to start](https://claude.com/blog/how-claude-code-works-in-large-codebases-best-practices-and-where-to-start)
+**Source:** Claude Blog  
+**Published:** 2026-05-14
+
+Large-codebase Claude Code adoption requires governance ownership, context standards, hooks, skills, MCP servers, scoped test commands, and security-aware rollout practices. The article is relevant to security teams overseeing coding-agent use.
+
+### [Best practices for computer and browser use with Claude](https://claude.com/blog/best-practices-for-computer-and-browser-use-with-claude)
+**Source:** Claude Blog  
+**Published:** 2026-05-13
+
+Anthropic recommends disposable VMs, logging, safeguards, prompt-injection defenses, and human confirmation for high-stakes computer/browser actions. The guidance treats computer-use agents as powerful systems that need explicit risk controls.
+
+### [Claude for the legal industry](https://claude.com/blog/claude-for-the-legal-industry)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+Claude's legal connectors and plugins emphasize trusted content, security, accuracy, grounding, and governed access to legal systems. The article is relevant to privacy, privilege, and professional-risk management.
+
+### [How Anthropic's cybersecurity team built a threat detection platform with Claude Code](https://claude.com/blog/how-anthropic-uses-claude-cybersecurity)
+**Source:** Claude Blog  
+**Published:** 2026-05-12
+
+Anthropic's CLUE platform uses Claude to enrich alerts, run investigations, synthesize findings, and preserve auditability through transcripts. It is a concrete example of AI-assisted detection and response inside a security organization.
+
+### [Introducing the Claude Platform on AWS](https://claude.com/blog/claude-platform-on-aws)
+**Source:** Claude Blog  
+**Published:** 2026-05-11
+
+Claude Platform on AWS adds AWS IAM authentication, CloudTrail audit logging, and unified billing. The article is relevant to teams deciding how to satisfy cloud security, audit, and data-residency constraints.
+
+### [Collaborate with Claude across Excel, PowerPoint, Word and Outlook](https://claude.com/blog/collaborate-with-claude-across-excel-powerpoint-word-and-outlook)
+**Source:** Claude Blog  
+**Published:** 2026-05-07
+
+Claude's Microsoft 365 integrations include admin deployment, OpenTelemetry observability, Analytics API reporting, and human review before sensitive Outlook actions. These controls matter for enterprise productivity deployments.
+
+### [Deploying Claude across financial services](https://claude.com/blog/deploying-claude-across-financial-services)
+**Source:** Claude Blog  
+**Published:** 2026-05-05
+
+The financial-services deployment guide covers regulated workflows such as KYC, model reviews, claims, underwriting, and finance operations. Security relevance comes from grounding Claude rollout in governance and phased deployment practices.
+
+### [Claude Security is now in public beta](https://claude.com/blog/claude-security-public-beta)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Claude Security provides AI-assisted repository vulnerability scanning, explanations, patch guidance, triage tracking, scheduled scans, and workflow integrations. The product is directly aimed at defensive code security.
+
+### [How Kepler built verifiable AI for financial services with Claude](https://claude.com/blog/how-kepler-built-verifiable-ai-for-financial-services-with-claude)
+**Source:** Claude Blog  
+**Published:** 2026-04-30
+
+Kepler's platform emphasizes traceability to filings, pages, and line items, plus evaluation pipelines and structured context. These design choices reduce hallucination and audit risk in regulated financial analysis.
+
+### [New connectors in Claude for everyday life](https://claude.com/blog/connectors-for-everyday-life)
+**Source:** Claude Blog  
+**Published:** 2026-04-23
+
+Claude's consumer connectors include user-control boundaries before purchases or bookings and privacy boundaries for connected app data. These safeguards are central as AI assistants gain access to consumer services.
+
+### [Built-in memory for Claude Managed Agents](https://claude.com/blog/claude-managed-agents-memory)
+**Source:** Claude Blog  
+**Published:** 2026-04-23
+
+Managed Agents memory includes export, permissioning, rollback, redaction, scoped access, and audit-log control. These features address risk created by persistent agent memory across sessions.
+
+### [Building agents that reach production systems with MCP](https://claude.com/blog/building-agents-that-reach-production-systems-with-mcp)
+**Source:** Claude Blog  
+**Published:** 2026-04-22
+
+Anthropic's MCP guidance emphasizes standardized auth, discovery, remote servers, intent-oriented tools, OAuth/CIMD, vaults, tool search, and pairing MCP with skills. The security concern is how agents safely reach production systems.
+
+### [Introducing routines in Claude Code](https://claude.com/blog/introducing-routines-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-14
+
+Claude Code routines can automate alert triage, deploy verification, and PR review. Because routines run from cloud infrastructure on schedules, API calls, or webhooks, they require clear permissions and operational oversight.
+
+### [Preparing your security program for AI-accelerated offense](https://claude.com/blog/preparing-your-security-program-for-ai-accelerated-offense)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+Anthropic warns that AI will accelerate vulnerability discovery and exploit chaining, shortening defender response windows. The article argues security programs need to prepare before offensive automation becomes widely accessible.
+
+### [Multi-agent coordination patterns: Five approaches and when to use them](https://claude.com/blog/multi-agent-coordination-patterns)
+**Source:** Claude Blog  
+**Published:** 2026-04-10
+
+Multi-agent coordination creates risk around tool access, shared state, verification, and responsibility boundaries. The article's patterns help teams choose architectures that fit their operational and safety constraints.
+
+### [Making Claude Cowork ready for enterprise](https://claude.com/blog/cowork-for-enterprise)
+**Source:** Claude Blog  
+**Published:** 2026-04-09
+
+Claude Cowork's enterprise controls include RBAC, group spend limits, usage analytics, OpenTelemetry, connector controls, and a Zoom MCP connector. The update is directly relevant to governing agentic work across an organization.
+
+### [Claude Managed Agents: get to production 10x faster](https://claude.com/blog/claude-managed-agents)
+**Source:** Claude Blog  
+**Published:** 2026-04-08
+
+Claude Managed Agents include sandboxing, authentication, tracing, tool execution controls, long-running sessions, and governance. These are core safeguards for production cloud-hosted agents.
+
+### [How and when to use subagents in Claude Code](https://claude.com/blog/subagents-in-claude-code)
+**Source:** Claude Blog  
+**Published:** 2026-04-07
+
+Subagents can isolate context for research, review, verification, and pipeline workflows. The security relevance is in separating responsibilities and using fresh contexts for independent checks.
+
+### [Harnessing Claude's intelligence](https://claude.com/blog/harnessing-claudes-intelligence)
+**Source:** Claude Blog  
+**Published:** 2026-04-02
+
+Anthropic recommends explicit boundaries for cost, UX, observability, and security when building with Claude. It also warns that harness assumptions age quickly as model capability improves.
+
+### [OpenAI named a Leader in enterprise coding agents by Gartner](https://openai.com/index/gartner-2026-agentic-coding-leader/)
+**Source:** OpenAI News  
+**Published:** 2026-05-22
+
+OpenAI highlights Codex governance, sandboxing, and flexible deployment for enterprise coding-agent adoption. Security and control are central to the product positioning.
+
+### [Advancing content provenance for a safer, more transparent AI ecosystem](https://openai.com/index/advancing-content-provenance/)
+**Source:** OpenAI News  
+**Published:** 2026-05-19
+
+OpenAI's provenance strategy combines C2PA credentials, SynthID watermarking, and public verification for generated images. The update supports transparency, media trust, and abuse prevention.
+
+### [OpenAI and Dell Technologies partner to bring Codex to hybrid and on-premises enterprise environments](https://openai.com/index/dell-codex-enterprise-partnership/)
+**Source:** OpenAI News  
+**Published:** 2026-05-18
+
+The Dell partnership targets enterprises that need Codex close to governed, on-prem, or hybrid data. Security relevance comes from deployment flexibility and data-control requirements.
+
+### [A new personal finance experience in ChatGPT](https://openai.com/index/personal-finance-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-15
+
+The personal finance preview connects accounts through Plaid and includes dashboards and financial Q&A. OpenAI emphasizes user controls, deletion paths, temporary chat behavior, MFA, and evaluated accuracy.
+
+### [Work with Codex from anywhere](https://openai.com/index/work-with-codex-from-anywhere/)
+**Source:** OpenAI News  
+**Published:** 2026-05-14
+
+Codex mobile review flows use secure relay infrastructure and support remote sessions on trusted machines or environments. The article also references enterprise access tokens, hooks, Remote SSH, and HIPAA-compliant local use for eligible Enterprise workspaces.
+
+### [Helping ChatGPT better recognize context in sensitive conversations](https://openai.com/index/chatgpt-recognize-context-in-sensitive-conversations/)
+**Source:** OpenAI News  
+**Published:** 2026-05-14
+
+OpenAI improved ChatGPT's ability to recognize evolving risk signals in sensitive conversations, including self-harm and harm-to-others scenarios. The update introduces narrowly scoped safety summaries and reports improved safe-response performance.
+
+### [Building a safe, effective sandbox to enable Codex on Windows](https://openai.com/index/building-codex-windows-sandbox/)
+**Source:** OpenAI News  
+**Published:** 2026-05-13
+
+OpenAI explains Windows sandbox design for Codex, including restricted tokens, ACLs, network suppression, and usability tradeoffs. It is directly relevant to safely running coding agents on developer workstations.
+
+### [Our response to the TanStack npm supply chain attack](https://openai.com/index/our-response-to-the-tanstack-npm-supply-chain-attack/)
+**Source:** OpenAI News  
+**Published:** 2026-05-13
+
+OpenAI disclosed impact from a npm supply-chain attack and described containment, credential rotation, certificate rotation, app update guidance, and expanded supply-chain hardening. The article is an incident-response and dependency-security case study.
+
+### [Running Codex safely at OpenAI](https://openai.com/index/running-codex-safely/)
+**Source:** OpenAI News  
+**Published:** 2026-05-08
+
+OpenAI documents Codex sandboxing, approval policies, managed network rules, identity controls, command rules, enforced configuration, telemetry, and compliance logs. These controls are directly applicable to secure coding-agent operations.
+
+### [Advancing voice intelligence with new models in the API](https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI's new realtime voice models include safety layers such as active classifiers, developer guardrails through the Agents SDK, usage-policy requirements, EU Data Residency, and enterprise privacy commitments.
+
+### [Introducing Trusted Contact in ChatGPT](https://openai.com/index/introducing-trusted-contact-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+Trusted Contact allows adults to nominate someone who may be notified after automated detection and human review indicate a serious self-harm concern. It is an account-level safety feature for crisis escalation.
+
+### [Scaling Trusted Access for Cyber with GPT-5.5 and GPT-5.5-Cyber](https://openai.com/index/gpt-5-5-with-trusted-access-for-cyber/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI expanded trusted cyber access with GPT-5.5 and a GPT-5.5-Cyber limited preview. The program balances reduced refusals for vetted defenders with verification, monitoring, and stronger account-security requirements.
+
+### [Testing ads in ChatGPT](https://openai.com/index/testing-ads-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-05-07
+
+OpenAI's ads pilot emphasizes separation between ads and answers, targeting signals kept within ChatGPT, no ads for predicted under-18 users, and user controls. The update is relevant to privacy and product-trust governance.
+
+### [GPT-5.5 Instant System Card](https://openai.com/index/gpt-5-5-instant-system-card/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+The GPT-5.5 Instant system card documents safety evaluations and risk posture across cyber, bio/chemical, mental-health, fairness, and post-deployment monitoring. The model is classified as High capability in cybersecurity and biological/chemical preparedness.
+
+### [GPT-5.5 Instant: smarter, clearer, and more personalized](https://openai.com/index/gpt-5-5-instant/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+The GPT-5.5 Instant rollout improves personalization from chats, files, and connected Gmail where available. Security relevance comes from personalization scope, model behavior, and links to system-card safeguards.
+
+### [New ways to buy ChatGPT ads](https://openai.com/index/new-ways-to-buy-chatgpt-ads/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+OpenAI expanded ChatGPT ads buying while stating that delivery remains controlled by OpenAI's ads system and measurement uses aggregated insights. The article is relevant to privacy boundaries in ad-funded AI experiences.
+
+### [Advancing youth safety and wellbeing in EMEA](https://openai.com/index/advancing-youth-safety-in-emea/)
+**Source:** OpenAI News  
+**Published:** 2026-05-05
+
+OpenAI published a European Youth Safety Blueprint and announced grant recipients for youth safety and wellbeing. The blueprint covers responsible AI in education, age-appropriate safeguards, under-18 safety, protections against deceptive outputs, and parental controls.
+
+### [Introducing Advanced Account Security](https://openai.com/index/advanced-account-security/)
+**Source:** OpenAI News  
+**Published:** 2026-04-30
+
+Advanced Account Security adds passkeys or physical security keys, disables weaker recovery paths, shortens sessions, adds login alerts and session management, and excludes data from training. It targets high-risk users and some Trusted Access for Cyber participants.
+
+### [OpenAI models, Codex, and Managed Agents come to AWS](https://openai.com/index/openai-on-aws/)
+**Source:** OpenAI News  
+**Published:** 2026-04-28
+
+OpenAI's AWS preview packages models, Codex, and Managed Agents inside AWS security, compliance, billing, procurement, and governance workflows. It is relevant for enterprises with AWS-centered control requirements.
+
+### [Our commitment to community safety](https://openai.com/index/our-commitment-to-community-safety/)
+**Source:** OpenAI News  
+**Published:** 2026-04-28
+
+OpenAI describes refusal boundaries, automated detection, human review, enforcement, crisis resources, law-enforcement referral in credible imminent-risk cases, parental controls, and a trusted contact roadmap. The article is a broad safety-operations statement.
+
+### [Our principles](https://openai.com/index/our-principles/)
+**Source:** OpenAI News  
+**Published:** 2026-04-26
+
+OpenAI's principles include resilience, adaptability, safety collaboration, iterative deployment, and broad access. The security relevance lies in how the company frames risk management as capabilities and societal impacts evolve.
+
+### [Introducing GPT-5.5](https://openai.com/index/introducing-gpt-5-5/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+GPT-5.5 launched with targeted cybersecurity and biology evaluations, deployment safeguards, and a system card. The article positions safety evaluation as part of the product release.
+
+### [GPT-5.5 System Card](https://openai.com/index/gpt-5-5-system-card/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+The system card documents GPT-5.5 testing across cybersecurity, biology, jailbreak robustness, prompt injection, health, hallucination, alignment, bias, autonomy, and safeguards. It is central risk documentation for model deployment.
+
+### [GPT-5.5 Bio Bug Bounty](https://openai.com/index/gpt-5-5-bio-bug-bounty/)
+**Source:** OpenAI News  
+**Published:** 2026-04-23
+
+OpenAI's Bio Bug Bounty invites vetted researchers to test whether universal jailbreaks can defeat GPT-5.5 bio-safety safeguards. The program applies red-team incentives to high-consequence biological misuse prevention.
+
+### [Making ChatGPT better for clinicians](https://openai.com/index/making-chatgpt-better-for-clinicians/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+ChatGPT for Clinicians includes clinical search, deep research, reusable workflows, privacy protections, optional HIPAA support, and benchmarked clinical-task evaluation. It is relevant to healthcare privacy and safety.
+
+### [Introducing workspace agents in ChatGPT](https://openai.com/index/introducing-workspace-agents-in-chatgpt/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+Workspace agents include organizational permissions, approvals for sensitive actions, analytics, Compliance API visibility, prompt-injection safeguards, and future admin console support. These controls are core to secure shared-agent deployment.
+
+### [Introducing OpenAI Privacy Filter](https://openai.com/index/introducing-openai-privacy-filter/)
+**Source:** OpenAI News  
+**Published:** 2026-04-22
+
+Privacy Filter is an open-weight model for detecting and redacting PII locally at high throughput. It is designed as one component in privacy-by-design systems.
+
+### [Introducing GPT-Rosalind for life sciences research](https://openai.com/index/introducing-gpt-rosalind/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+GPT-Rosalind is a trusted-access life sciences model governed by eligibility, security, and misuse-prevention requirements. The article is relevant to biological and scientific misuse risk.
+
+### [Accelerating the cyber defense ecosystem that protects us all](https://openai.com/index/accelerating-cyber-defense-ecosystem/)
+**Source:** OpenAI News  
+**Published:** 2026-04-16
+
+OpenAI expanded advanced defensive AI access to verified defenders and critical security organizations. The program includes cyber grants and evaluation access for safety institutes.
+
+### [Trusted access for the next era of cyber defense](https://openai.com/index/scaling-trusted-access-for-cyber-defense/)
+**Source:** OpenAI News  
+**Published:** 2026-04-14
+
+Trusted Access for Cyber introduces a more cyber-permissive model for legitimate defensive workflows while relying on identity verification, safeguards, and more restrictive deployment for highly capable cyber models.
+
+### [Our response to the Axios developer tool compromise](https://openai.com/index/axios-developer-tool-compromise/)
+**Source:** OpenAI News  
+**Published:** 2026-04-10
+
+OpenAI disclosed a dependency compromise affecting a macOS app-signing workflow and responded with certificate rotation, updated builds, and required app updates. The post is directly relevant to supply-chain security and incident response.
+
+### [Introducing the Child Safety Blueprint](https://openai.com/index/introducing-child-safety-blueprint/)
+**Source:** OpenAI News  
+**Published:** 2026-04-08
+
+OpenAI's Child Safety Blueprint focuses on preventing and disrupting AI-enabled child sexual exploitation. The linked policy document covers legal modernization, provider reporting, coordination, detection, refusal, human review, and monitoring safeguards.
+
+### [Introducing the OpenAI Safety Fellowship](https://openai.com/index/introducing-openai-safety-fellowship/)
+**Source:** OpenAI News  
+**Published:** 2026-04-06
+
+The Safety Fellowship supports external work on evaluations, robustness, privacy-preserving safety, agent oversight, and high-severity misuse. It strengthens OpenAI's external safety research pipeline.
