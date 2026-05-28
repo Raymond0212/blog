@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import mdx from "@mdx-js/rollup";
+import rehypeHighlight from "rehype-highlight";
 
 const version = process.env.npm_package_version ?? "0.0.0";
 
@@ -15,6 +16,7 @@ export default defineConfig({
       enforce: "pre",
       ...mdx({
         providerImportSource: "@mdx-js/react",
+        rehypePlugins: [rehypeHighlight],
       }),
     },
     react(),

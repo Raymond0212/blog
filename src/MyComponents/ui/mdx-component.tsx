@@ -3,7 +3,6 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import { CodeBlockWrapper } from "./code-block-wrapper"
 import { CopyButton } from "./copy-button"
 import {
   Accordion,
@@ -23,6 +22,47 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+
+function readTextContent(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node)
+  }
+  if (Array.isArray(node)) {
+    return node.map((child) => readTextContent(child)).join("")
+  }
+  if (React.isValidElement(node)) {
+    return readTextContent(node.props.children)
+  }
+  return ""
+}
+
+function MdxPre({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLPreElement>) {
+  const codeToCopy = React.useMemo(() => readTextContent(children).trimEnd(), [children])
+
+  return (
+    <div className="relative mb-4 mt-6 w-full max-w-full rounded-lg border bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+      <pre
+        className={cn(
+          "w-full max-w-full overflow-hidden bg-transparent p-4",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </pre>
+      {codeToCopy ? (
+        <CopyButton
+          value={codeToCopy}
+          className="absolute right-3 top-3 z-20 bg-zinc-800/80 text-zinc-100 hover:bg-zinc-700"
+        />
+      ) : null}
+    </div>
+  )
+}
 
 export const components = {
   Accordion,
@@ -158,49 +198,23 @@ export const components = {
       {...props}
     />
   ),
-  pre: ({
-    className,
-    __rawString__,
-    __withMeta__,
-    __src__,
-    ...props
-  }: React.HTMLAttributes<HTMLPreElement> & {
-    __rawString__?: string
-    __withMeta__?: boolean
-    __src__?: string
-  }) => {
+  pre: MdxPre,
+  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
+    const isCodeBlock = Boolean(className?.includes("language-"))
+    if (isCodeBlock) {
+      return <code className={cn("font-mono text-sm", className)} {...props} />
+    }
     return (
-      <div>
-        <pre
-          className={cn(
-            "mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-zinc-950 py-4 dark:bg-zinc-900",
-            className
-          )}
-          {...props}
-        />
-        {__rawString__ && (
-          <CopyButton
-            value={__rawString__}
-            src={__src__}
-            className={cn("absolute right-4 top-4", __withMeta__ && "top-16")}
-          />
+      <code
+        className={cn(
+          "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm",
+          className
         )}
-      </div>
+        {...props}
+      />
     )
   },
-  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code
-      className={cn(
-        "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm",
-        className
-      )}
-      {...props}
-    />
-  ),
   AspectRatio,
-  CodeBlockWrapper: ({ ...props }) => (
-    <CodeBlockWrapper className="rounded-md border" {...props} />
-  ),
   Step: ({ className, ...props }: React.ComponentProps<"h3">) => (
     <h3
       className={cn(

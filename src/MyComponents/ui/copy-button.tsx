@@ -52,6 +52,14 @@ export function CopyButton({
       }}
       {...props}
     >
+      <span
+        className={cn(
+          "pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-zinc-800 px-2 py-1 text-[10px] font-medium text-zinc-100 transition-all duration-200",
+          hasCopied ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
+        )}
+      >
+        Copied
+      </span>
       <span className="sr-only">Copy</span>
       {hasCopied ? <CheckIcon /> : <ClipboardIcon />}
     </Button>

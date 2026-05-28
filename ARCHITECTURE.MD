@@ -10,7 +10,7 @@ Living architecture reference for agents and contributors working in this standa
 ## 2. Tech Stack
 - Runtime/build: Vite 5, TypeScript 5, React 18.
 - Styling/UI: Tailwind CSS, Radix UI primitives, shadcn-style components in `src/components/ui/*`, and `lucide-react`.
-- Content: MDX via `@mdx-js/rollup` and `@mdx-js/react`.
+- Content: MDX via `@mdx-js/rollup` and `@mdx-js/react`, with fenced code highlighting via `rehype-highlight`.
 - Forms/validation: `react-hook-form`, `@hookform/resolvers`, and `zod`.
 - Feature utilities: WebUSB/File System Access APIs for HiDock, `recharts`, `sonner`, and supporting UI packages.
 
