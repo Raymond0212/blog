@@ -1,115 +1,310 @@
 import {
-  getMenuItem,
-  MenuItem,
+  buildMenuIndex,
+  getNodeParentPathLabels,
+  getVisibleNodeIds,
   menuItems,
-  MenuItemSelection,
+  ROOT_HOME_ID,
+  type MenuNode,
+  type VisibleMenuNode,
 } from "@/data/MenuItems";
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  type ReactNode,
+} from "react";
 
-export interface MenuItemProviderInterface {
-  menuItemSelected: MenuItemSelection;
-  setSelectedMenuItem: (
-    selectedMenuItem: MenuItemSelection,
-    menuItem: MenuItem
-  ) => void;
-  setIsCollapsedMenuItem: (
-    selectedMenuItem: MenuItemSelection,
-    menuItem: MenuItem
-  ) => void;
-}
-
-const initialMenuItemProviderState: MenuItemProviderInterface = {
-  menuItemSelected: {
-    selectedItem: menuItems[0],
-    menuItems: menuItems,
-  },
-  setSelectedMenuItem: () => {},
-  setIsCollapsedMenuItem: () => {},
+type MenuState = {
+  selectedId: string;
+  expandedIds: Set<string>;
 };
 
-const MenuItemProviderContext = createContext<MenuItemProviderInterface>(
-  initialMenuItemProviderState
+type PersistedMenuState = {
+  selectedId: string;
+  expandedIds: string[];
+};
+
+type LegacyMenuNode = {
+  label?: string;
+  isCollapsed?: boolean;
+  itemIndexPath?: number[];
+  items?: LegacyMenuNode[];
+};
+
+type LegacyMenuSelection = {
+  selectedItem?: LegacyMenuNode;
+  menuItems?: LegacyMenuNode[];
+};
+
+type MenuAction =
+  | { type: "select"; id: string; ancestors: string[] }
+  | { type: "toggle"; id: string };
+
+export interface MenuItemProviderInterface {
+  menuItems: MenuNode[];
+  visibleMenuItems: VisibleMenuNode[];
+  selectedItem: MenuNode;
+  selectedParentPathLabels: string[];
+  selectedId: string;
+  selectItem: (id: string) => void;
+  toggleItemCollapsed: (id: string) => void;
+}
+
+const storageKeyDefault = "menu-context";
+
+const MenuItemProviderContext = createContext<MenuItemProviderInterface | null>(
+  null
 );
 
+function menuReducer(state: MenuState, action: MenuAction): MenuState {
+  if (action.type === "select") {
+    const nextExpanded = new Set(state.expandedIds);
+    action.ancestors.forEach((id) => nextExpanded.add(id));
+    return { selectedId: action.id, expandedIds: nextExpanded };
+  }
+
+  const nextExpanded = new Set(state.expandedIds);
+  if (nextExpanded.has(action.id)) {
+    nextExpanded.delete(action.id);
+  } else {
+    nextExpanded.add(action.id);
+  }
+  return { ...state, expandedIds: nextExpanded };
+}
+
+function nodeByIndexPath(
+  tree: MenuNode[],
+  indexPath: number[] | undefined
+): MenuNode | null {
+  if (!indexPath?.length) {
+    return null;
+  }
+
+  let current: MenuNode | undefined = tree[indexPath[0]];
+  if (!current) {
+    return null;
+  }
+  for (let i = 1; i < indexPath.length; i += 1) {
+    current = current.items?.[indexPath[i]];
+    if (!current) {
+      return null;
+    }
+  }
+  return current;
+}
+
+function collectExpandedFromLegacy(nodes: LegacyMenuNode[]): Set<string> {
+  const ids = new Set<string>();
+  const walk = (legacyNodes: LegacyMenuNode[], currentNodes: MenuNode[]) => {
+    legacyNodes.forEach((legacyNode, index) => {
+      const current = currentNodes[index];
+      if (!current) {
+        return;
+      }
+      if (legacyNode.isCollapsed === false && current.items?.length) {
+        ids.add(current.id);
+      }
+      if (legacyNode.items?.length && current.items?.length) {
+        walk(legacyNode.items, current.items);
+      }
+    });
+  };
+  walk(nodes, menuItems);
+  return ids;
+}
+
+function getDefaultExpandedIds(nodes: MenuNode[]): Set<string> {
+  const defaultExpandedIds = new Set<string>();
+  const walkDefaults = (nodes: MenuNode[]) => {
+    nodes.forEach((node) => {
+      if (node.items?.length) {
+        defaultExpandedIds.add(node.id);
+        walkDefaults(node.items);
+      }
+    });
+  };
+  walkDefaults(nodes);
+  return defaultExpandedIds;
+}
+
+function parseInitialState(
+  raw: string | null,
+  currentMenuItems: MenuNode[],
+  validIds: Set<string>
+): MenuState {
+  const defaultExpandedIds = getDefaultExpandedIds(currentMenuItems);
+  if (!raw) {
+    return { selectedId: ROOT_HOME_ID, expandedIds: defaultExpandedIds };
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as PersistedMenuState | LegacyMenuSelection;
+    if (
+      "selectedId" in parsed &&
+      typeof parsed.selectedId === "string" &&
+      Array.isArray(parsed.expandedIds)
+    ) {
+      const safeSelectedId = validIds.has(parsed.selectedId)
+        ? parsed.selectedId
+        : ROOT_HOME_ID;
+      const safeExpandedIds = parsed.expandedIds.filter((id) => validIds.has(id));
+      return {
+        selectedId: safeSelectedId,
+        expandedIds: safeExpandedIds.length
+          ? new Set(safeExpandedIds)
+          : defaultExpandedIds,
+      };
+    }
+
+    const legacy = parsed as LegacyMenuSelection;
+    const legacySelected = nodeByIndexPath(
+      currentMenuItems,
+      legacy.selectedItem?.itemIndexPath
+    );
+    const expandedIds = Array.isArray(legacy.menuItems)
+      ? collectExpandedFromLegacy(legacy.menuItems)
+      : new Set<string>();
+    const safeExpandedIds = [...expandedIds].filter((id) => validIds.has(id));
+    const safeSelectedId =
+      legacySelected?.id && validIds.has(legacySelected.id)
+        ? legacySelected.id
+        : ROOT_HOME_ID;
+
+    return {
+      selectedId: safeSelectedId,
+      expandedIds: safeExpandedIds.length
+        ? new Set(safeExpandedIds)
+        : defaultExpandedIds,
+    };
+  } catch {
+    return { selectedId: ROOT_HOME_ID, expandedIds: defaultExpandedIds };
+  }
+}
+
 interface MenuProviderProps {
-  children: React.ReactNode;
-  defaultItem?: MenuItemSelection;
+  children: ReactNode;
   storageKey?: string;
 }
 
-export const MenuItemProvider: React.FC<MenuProviderProps> = ({
+export const MenuItemProvider = ({
   children,
-  defaultItem = {
-    selectedItem: menuItems[0],
-    menuItems: menuItems,
-  },
-  storageKey = "menu-context",
-  ...props
+  storageKey = storageKeyDefault,
 }: MenuProviderProps) => {
-  const storedMenuItemSelected = localStorage.getItem(storageKey);
-  const deafultMenuItemSelected = () => {
-    const storedSelected =
-      storedMenuItemSelected == null
-        ? defaultItem
-        : (JSON.parse(storedMenuItemSelected) as MenuItemSelection);
-    storedSelected.selectedItem = getMenuItem(
-      storedSelected.selectedItem,
-      storedSelected.menuItems
-    );
-    return storedSelected;
-  };
-  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemSelection>(
-    deafultMenuItemSelected
+  const { nodeById, parentById } = useMemo(() => buildMenuIndex(menuItems), []);
+  const validIds = useMemo(() => new Set(nodeById.keys()), [nodeById]);
+  const initial = useMemo(
+    () => parseInitialState(localStorage.getItem(storageKey), menuItems, validIds),
+    [storageKey, validIds]
+  );
+  const [state, dispatch] = useReducer(menuReducer, initial);
+
+  const selectedItem = nodeById.get(state.selectedId) ?? menuItems[0];
+  const selectedId = selectedItem.id;
+
+  const persist = useCallback(
+    (nextState: MenuState) => {
+      const payload: PersistedMenuState = {
+        selectedId: nextState.selectedId,
+        expandedIds: [...nextState.expandedIds],
+      };
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+    },
+    [storageKey]
   );
 
-  const value = {
-    menuItemSelected: selectedMenuItem,
-    setSelectedMenuItem: (
-      prevSelected: MenuItemSelection,
-      menuItem: MenuItem
-    ) => {
-      selectedMenuItem.selectedItem.isActive = false;
-      menuItem.isActive = true;
-      let items = prevSelected.menuItems;
-      let currItem = items[menuItem.itemIndexPath![0]];
-      currItem.isCollapsed = false;
-      menuItem.itemIndexPath?.forEach((pathIndex, index) => {
-        if (index == 0) return;
-        items = currItem.items!;
-        currItem = items[pathIndex];
-        currItem.isCollapsed = false;
-      });
-      const currSelected = {
-        selectedItem: menuItem,
-        menuItems: prevSelected.menuItems,
+  const selectItem = useCallback(
+    (id: string) => {
+      if (!nodeById.has(id)) {
+        return;
+      }
+      const ancestors: string[] = [];
+      let current = parentById.get(id) ?? null;
+      while (current) {
+        ancestors.push(current);
+        current = parentById.get(current) ?? null;
+      }
+      const nextState: MenuState = {
+        selectedId: id,
+        expandedIds: new Set(state.expandedIds),
       };
-      localStorage.setItem(storageKey, JSON.stringify(currSelected));
-      setSelectedMenuItem(currSelected);
+      ancestors.forEach((ancestorId) => nextState.expandedIds.add(ancestorId));
+      persist(nextState);
+      dispatch({ type: "select", id, ancestors });
     },
-    setIsCollapsedMenuItem: (
-      prevSelected: MenuItemSelection,
-      menuItem: MenuItem
-    ) => {
-      let items = prevSelected.menuItems;
-      let currItem = items[menuItem.itemIndexPath![0]];
-      currItem.isCollapsed = !currItem.isCollapsed;
-      menuItem.itemIndexPath?.forEach((pathIndex, index) => {
-        if (index == 0) return;
-        items = currItem.items!;
-        currItem = items[pathIndex];
-        currItem.isCollapsed = !currItem.isCollapsed;
-      });
-      const currSelected = {
-        selectedItem: prevSelected.selectedItem,
-        menuItems: prevSelected.menuItems,
+    [nodeById, parentById, persist, state.expandedIds]
+  );
+
+  const toggleItemCollapsed = useCallback(
+    (id: string) => {
+      if (!nodeById.get(id)?.items?.length) {
+        return;
+      }
+      const nextExpanded = new Set(state.expandedIds);
+      if (nextExpanded.has(id)) {
+        nextExpanded.delete(id);
+      } else {
+        nextExpanded.add(id);
+      }
+      const nextState: MenuState = {
+        selectedId,
+        expandedIds: nextExpanded,
       };
-      localStorage.setItem(storageKey, JSON.stringify(currSelected));
-      setSelectedMenuItem(currSelected);
+      persist(nextState);
+      dispatch({ type: "toggle", id });
     },
-  };
+    [nodeById, persist, selectedId, state.expandedIds]
+  );
+
+  const visibleMenuItems = useMemo<VisibleMenuNode[]>(() => {
+    const rows = getVisibleNodeIds(menuItems, state.expandedIds);
+    const result: VisibleMenuNode[] = [];
+    rows.forEach(({ id, depth }) => {
+      const node = nodeById.get(id);
+      if (!node) {
+        return;
+      }
+      result.push({
+        id: node.id,
+        label: node.label,
+        depth,
+        hasChildren: Boolean(node.items?.length),
+        isActive: node.id === selectedId,
+        isExpanded: state.expandedIds.has(node.id),
+        url: node.url,
+      });
+    });
+    return result;
+  }, [nodeById, selectedId, state.expandedIds]);
+
+  const selectedParentPathLabels = useMemo(
+    () => getNodeParentPathLabels(selectedId, parentById, nodeById),
+    [selectedId, parentById, nodeById]
+  );
+
+  const value = useMemo<MenuItemProviderInterface>(
+    () => ({
+      menuItems,
+      visibleMenuItems,
+      selectedItem,
+      selectedParentPathLabels,
+      selectedId,
+      selectItem,
+      toggleItemCollapsed,
+    }),
+    [
+      visibleMenuItems,
+      selectedItem,
+      selectedParentPathLabels,
+      selectedId,
+      selectItem,
+      toggleItemCollapsed,
+    ]
+  );
 
   return (
-    <MenuItemProviderContext.Provider {...props} value={value}>
+    <MenuItemProviderContext.Provider value={value}>
       {children}
     </MenuItemProviderContext.Provider>
   );
@@ -117,9 +312,8 @@ export const MenuItemProvider: React.FC<MenuProviderProps> = ({
 
 export const useMenuItem = () => {
   const context = useContext(MenuItemProviderContext);
-
-  if (context === undefined)
+  if (!context) {
     throw new Error("useMenuItem must be used within a MenuItemProvider");
-
+  }
   return context;
 };

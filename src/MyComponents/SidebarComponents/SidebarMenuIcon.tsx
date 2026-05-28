@@ -1,12 +1,12 @@
 import React from "react";
-import { getComponent, MenuItem } from "@/data/MenuItems";
+import { getComponentById } from "@/data/MenuItems";
 
 type Props = {
-  menuItem: MenuItem;
+  menuId: string;
 };
 
-const SidebarMenuIcon: React.FC<Props> = ({ menuItem }) => {
-  const comp = getComponent(menuItem);
+const SidebarMenuIcon: React.FC<Props> = ({ menuId }) => {
+  const comp = getComponentById(menuId);
   const Icon = comp.icon;
   return Icon && <Icon />;
 };

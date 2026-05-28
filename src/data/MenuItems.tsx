@@ -12,132 +12,350 @@ import {
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
 
-export type MenuItem = {
+export type MenuNode = {
+  id: string;
   label: string;
+  source: "static" | "article";
+  kind: "root" | "group" | "page";
   url?: string;
-  isActive?: boolean;
-  isCollapsed?: boolean;
-  paretnPath?: string[];
-  itemIndexPath?: number[];
-  items?: MenuItem[];
+  items?: MenuNode[];
 };
 
-const menuItemsInitialData: MenuItem[] = [
-  {
-    label: "Home",
-    url: "#",
-    isActive: true,
-  },
-  {
-    label: "About",
-    items: [
-      {
-        label: "Links",
-      },
-    ],
-  },
-  {
-    label: "Slippery Button",
-  },
-  {
-    label: "HiDock Manager",
-    url: "#",
-  },
-];
+export type VisibleMenuNode = {
+  id: string;
+  label: string;
+  depth: number;
+  hasChildren: boolean;
+  isActive: boolean;
+  isExpanded: boolean;
+  url?: string;
+};
 
 export type MenuComponentItem = {
   component: React.ReactNode;
   icon?: LucideIcon;
-  items?: MenuComponentItem[];
 };
 
-export const menuComponentItems: MenuComponentItem[] = [
+export const ROOT_HOME_ID = "home";
+export const ARTICLES_ROOT_ID = "articles";
+const ARTICLE_ID_PREFIX = "article:";
+
+type MdxModule = {
+  default: React.ComponentType;
+};
+
+type ArticlePageRecord = {
+  id: string;
+  label: string;
+  folderId: string;
+  loader: () => Promise<MdxModule>;
+  dateSortKey: number | null;
+};
+
+type ArticleFolderRecord = {
+  id: string;
+  label: string;
+  pages: ArticlePageRecord[];
+};
+
+type ArticleRegistry = {
+  folders: ArticleFolderRecord[];
+  pageLoaderById: Map<string, () => Promise<MdxModule>>;
+};
+
+const staticMenuItems: MenuNode[] = [
   {
-    icon: House,
-    component: <Home />,
+    id: ROOT_HOME_ID,
+    label: "Home",
+    source: "static",
+    kind: "root",
+    url: "#",
   },
   {
-    icon: MessageCircleHeart,
-    component: <About />,
+    id: "about",
+    label: "About",
+    source: "static",
+    kind: "root",
+    items: [
+      {
+        id: "about-links",
+        label: "Links",
+        source: "static",
+        kind: "page",
+      },
+    ],
   },
   {
-    icon: Smile,
-    component: <Sliding />,
+    id: "slippery-button",
+    label: "Slippery Button",
+    source: "static",
+    kind: "root",
   },
   {
-    icon: HardDrive,
-    component: <HiDockManagerPage />,
+    id: "hidock-manager",
+    label: "HiDock Manager",
+    source: "static",
+    kind: "root",
+    url: "#",
   },
 ];
 
-export const menu404Component: MenuComponentItem = {
+const menuComponentItemsById: Record<string, MenuComponentItem> = {
+  [ROOT_HOME_ID]: {
+    icon: House,
+    component: <Home />,
+  },
+  about: {
+    icon: MessageCircleHeart,
+    component: <About />,
+  },
+  "slippery-button": {
+    icon: Smile,
+    component: <Sliding />,
+  },
+  "hidock-manager": {
+    icon: HardDrive,
+    component: <HiDockManagerPage />,
+  },
+};
+
+const menu404Component: MenuComponentItem = {
   component: <PageNotFound />,
 };
 
-export interface MenuItemSelection {
-  selectedItem: MenuItem;
-  menuItems: MenuItem[];
+const articleModules = import.meta.glob("../content/articles/**/*.mdx");
+
+function toTitleCase(value: string): string {
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1).toLowerCase())
+    .join(" ");
 }
 
-// =====================================
-
-export const getComponent = (menuItem: MenuItem) => {
-  try {
-    let result: MenuComponentItem =
-      menuComponentItems[menuItem.itemIndexPath![0]];
-    let nextComponents;
-    menuItem.itemIndexPath!.forEach((pathIndex, index) => {
-      if (index === 0) return;
-      nextComponents = result.items!;
-      result = nextComponents[pathIndex];
-    });
-
-    return result;
-  } catch {
-    return menu404Component;
+function parseDatePrefix(baseName: string): {
+  dateSortKey: number | null;
+  labelBase: string;
+} {
+  const match = /^(\d{2})(\d{2})(\d{2})-(.+)$/.exec(baseName);
+  if (!match) {
+    return { dateSortKey: null, labelBase: baseName };
   }
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = 2000 + Number(match[3]);
+  const utc = Date.UTC(year, month - 1, day);
+  const date = new Date(utc);
+  const isValid =
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day;
+  if (!isValid) {
+    return { dateSortKey: null, labelBase: baseName };
+  }
+
+  return { dateSortKey: utc, labelBase: match[4] };
+}
+
+function buildArticleRegistry(): ArticleRegistry {
+  const folderById = new Map<string, ArticleFolderRecord>();
+  const pageLoaderById = new Map<string, () => Promise<MdxModule>>();
+
+  Object.entries(articleModules).forEach(([rawPath, loader]) => {
+    const normalizedPath = rawPath.replace(/\\/g, "/");
+    const relative = normalizedPath.replace(/^.*\/content\/articles\//, "");
+    const segments = relative.split("/").filter(Boolean);
+    if (segments.length < 2) {
+      return;
+    }
+
+    const folderKey = segments[0];
+    const fileName = segments[segments.length - 1];
+    const pagePath = segments.join("/");
+    const baseName = fileName.replace(/\.mdx$/i, "");
+    const { dateSortKey, labelBase } = parseDatePrefix(baseName);
+    const pageLabel = toTitleCase(labelBase);
+    const folderId = `${ARTICLE_ID_PREFIX}${folderKey}`;
+
+    if (!folderById.has(folderId)) {
+      folderById.set(folderId, {
+        id: folderId,
+        label: toTitleCase(folderKey),
+        pages: [],
+      });
+    }
+
+    const pageId = `${ARTICLE_ID_PREFIX}${pagePath.replace(/\.mdx$/i, "")}`;
+    const typedLoader = loader as () => Promise<MdxModule>;
+    folderById.get(folderId)?.pages.push({
+      id: pageId,
+      label: pageLabel,
+      folderId,
+      loader: typedLoader,
+      dateSortKey,
+    });
+    pageLoaderById.set(pageId, typedLoader);
+  });
+
+  const folders = [...folderById.values()]
+    .map((folder) => ({
+      ...folder,
+      pages: [...folder.pages].sort((a, b) => {
+        if (a.dateSortKey !== null && b.dateSortKey !== null) {
+          return b.dateSortKey - a.dateSortKey;
+        }
+        if (a.dateSortKey !== null) {
+          return -1;
+        }
+        if (b.dateSortKey !== null) {
+          return 1;
+        }
+        return a.label.localeCompare(b.label);
+      }),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  return { folders, pageLoaderById };
+}
+
+const articleRegistry = buildArticleRegistry();
+
+function buildMenuItems(): MenuNode[] {
+  if (!articleRegistry.folders.length) {
+    return staticMenuItems;
+  }
+
+  const articleTree: MenuNode = {
+    id: ARTICLES_ROOT_ID,
+    label: "Articles",
+    source: "article",
+    kind: "root",
+    items: articleRegistry.folders.map((folder) => ({
+      id: folder.id,
+      label: folder.label,
+      source: "article",
+      kind: "group",
+      items: folder.pages.map((page) => ({
+        id: page.id,
+        label: page.label,
+        source: "article",
+        kind: "page",
+      })),
+    })),
+  };
+
+  return [...staticMenuItems, articleTree];
+}
+
+export const menuItems: MenuNode[] = buildMenuItems();
+
+type MenuIndex = {
+  nodeById: Map<string, MenuNode>;
+  parentById: Map<string, string | null>;
+  childrenById: Map<string, string[]>;
 };
 
-export const getMenuItem = (menuItem: MenuItem, menuItems: MenuItem[]) => {
-  try {
-    let result: MenuItem = menuItems[menuItem.itemIndexPath![0]];
-    let nextMenuItem;
-    menuItem.itemIndexPath!.forEach((pathIndex, index) => {
-      if (index === 0) return;
-      nextMenuItem = result.items!;
-      result = nextMenuItem[pathIndex];
-    });
+export function buildMenuIndex(tree: MenuNode[]): MenuIndex {
+  const nodeById = new Map<string, MenuNode>();
+  const parentById = new Map<string, string | null>();
+  const childrenById = new Map<string, string[]>();
 
-    return result;
-  } catch {
-    return menuItems[0];
-  }
-};
-
-function initMenuItems(
-  menuItems: MenuItem[],
-  parentPath: string[] = [],
-  itemIndexPath: number[] = [],
-) {
-  let index = 0;
-  if (menuItems && menuItems.length > 0) {
-    menuItems.forEach((menuItem: MenuItem) => {
-      menuItem.isCollapsed = false;
-      menuItem.itemIndexPath = [...itemIndexPath, index];
-      menuItem.paretnPath = [...parentPath];
-
-      if (menuItem.items !== undefined && menuItem.items.length > 0) {
-        initMenuItems(
-          menuItem.items,
-          [...parentPath, menuItem.label]!,
-          menuItem.itemIndexPath!,
-        );
+  const walk = (nodes: MenuNode[], parentId: string | null) => {
+    nodes.forEach((node) => {
+      nodeById.set(node.id, node);
+      parentById.set(node.id, parentId);
+      const children = node.items?.map((item) => item.id) ?? [];
+      childrenById.set(node.id, children);
+      if (node.items?.length) {
+        walk(node.items, node.id);
       }
-      index++;
     });
-  }
+  };
+
+  walk(tree, null);
+  return { nodeById, parentById, childrenById };
 }
 
-initMenuItems(menuItemsInitialData);
+export function getComponentById(id: string): MenuComponentItem {
+  if (id.startsWith(ARTICLE_ID_PREFIX)) {
+    const articleLoader = articleRegistry.pageLoaderById.get(id);
+    if (!articleLoader) {
+      return menu404Component;
+    }
+    return {
+      icon: undefined,
+      component: <LazyArticlePage loader={articleLoader} />,
+    };
+  }
+  return menuComponentItemsById[id] ?? menu404Component;
+}
 
-export const menuItems = menuItemsInitialData;
+type LazyArticlePageProps = {
+  loader: () => Promise<MdxModule>;
+};
+
+const LazyArticlePage = ({ loader }: LazyArticlePageProps) => {
+  const Component = React.useMemo(() => React.lazy(loader), [loader]);
+  return (
+    <React.Suspense fallback={<div className="text-sm text-muted-foreground">Loading article...</div>}>
+      <Component />
+    </React.Suspense>
+  );
+};
+
+export function getNodeParentPathLabels(
+  id: string,
+  parentById: Map<string, string | null>,
+  nodeById: Map<string, MenuNode>
+) {
+  const labels: string[] = [];
+  let current = parentById.get(id) ?? null;
+  while (current) {
+    const parent = nodeById.get(current);
+    if (!parent) {
+      break;
+    }
+    labels.unshift(parent.label);
+    current = parentById.get(current) ?? null;
+  }
+  return labels;
+}
+
+export function getVisibleNodeIds(
+  tree: MenuNode[],
+  expandedIds: Set<string>
+): { id: string; depth: number }[] {
+  const rows: { id: string; depth: number }[] = [];
+  const stack: { node: MenuNode; depth: number }[] = [];
+
+  for (let i = tree.length - 1; i >= 0; i -= 1) {
+    stack.push({ node: tree[i], depth: 0 });
+  }
+
+  while (stack.length) {
+    const current = stack.pop();
+    if (!current) {
+      continue;
+    }
+
+    rows.push({ id: current.node.id, depth: current.depth });
+    if (!expandedIds.has(current.node.id)) {
+      continue;
+    }
+
+    const children = current.node.items;
+    if (!children?.length) {
+      continue;
+    }
+
+    for (let i = children.length - 1; i >= 0; i -= 1) {
+      stack.push({ node: children[i], depth: current.depth + 1 });
+    }
+  }
+
+  return rows;
+}

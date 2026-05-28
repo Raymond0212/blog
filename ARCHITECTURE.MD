@@ -29,7 +29,7 @@ Living architecture reference for agents and contributors working in this standa
 - `src/main.tsx` mounts `<App />` and global styles.
 - `src/App.tsx` wraps `ThemeProvider` and `MenuItemProvider`.
 - `src/Page.tsx` composes the sidebar shell and main workspace.
-- `src/data/MenuItems.tsx` defines menu entries and maps each entry to rendered content.
+- `src/data/MenuItems.tsx` defines static menu nodes plus build-time article discovery (`src/content/articles/**/*.mdx`), id-based component/icon resolution, and index/visibility helper functions.
 - `src/MyComponents/MainContentComponents/MainContent.tsx` renders the selected menu component through the MDX provider.
 
 ## 5. Key Folders
@@ -39,12 +39,18 @@ Living architecture reference for agents and contributors working in this standa
 - `src/features/hidock/*`: HiDock Manager page, services, types, and utilities.
 - `src/data/*`: menu model and React context provider.
 - `src/content/*`: MDX content modules.
+  - `src/content/articles/**`: auto-discovered article pages grouped by first-level folder.
 - `src/types/*`: app API/domain types.
 - `public/*`: static assets.
 
 ## 6. State And Data Flow
 - Local UI state is held in React component state.
-- Menu state is held in `MenuItemProvider` and persisted in `localStorage` under `menu-context`.
+- Menu state is held in `MenuItemProvider` as immutable runtime state (`selectedId`, `expandedIds`) and persisted in `localStorage` under `menu-context`.
+- Article pages are discovered via `import.meta.glob` and merged into a dynamic top-level `Articles` menu node at startup.
+- Article menu ids are path-based (`article:<relative-path-without-ext>`) so selection persistence survives label changes.
+- Article ordering: dated files using `ddmmyy-` prefix sort newest-first within a folder; undated files sort alphabetically.
+- Sidebar rows are derived from menu tree + expanded state as a flattened visible list to avoid nested rerender costs on long menus.
+- Persisted menu state is validated against current menu ids; invalid selections fall back to `Home`.
 - Theme state is persisted by the theme provider.
 - App version changes clear `localStorage` and `sessionStorage`, then write `app_version`.
 - Backend interactions use direct `fetch` calls to runtime endpoints such as `/api/projects` and `/api/upload-openapi`.

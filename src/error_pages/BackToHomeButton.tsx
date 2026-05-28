@@ -1,12 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useMenuItem } from "@/data/MenuItemProvider";
+import { ROOT_HOME_ID } from "@/data/MenuItems";
 
 export default function BackToHome() {
-  const { menuItemSelected, setSelectedMenuItem } = useMenuItem();
-  const homeItem = menuItemSelected.menuItems[0];
-  return (
-    <Button onClick={() => setSelectedMenuItem(menuItemSelected, homeItem)}>
-      Back to Home
-    </Button>
-  );
+  const { selectItem } = useMenuItem();
+  return <Button onClick={() => selectItem(ROOT_HOME_ID)}>Back to Home</Button>;
 }
