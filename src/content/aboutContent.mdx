@@ -1,0 +1,13 @@
+## Background
+
+During the process of software development, I encountered a common problem: the API was not ready, but to keep up with the development timeline, we needed to use mock APIs to test our logic. There are existing API mocking solutions like MockServer, Mockoon, and Postman mock server. However, these solutions have several drawbacks:
+
+1. Some of them are paid services.
+2. Many are hosted online, which can raise security concerns for restricted projects.
+3. They often lack user-friendly configurations for easy deployment.
+4. They can be difficult to start with due to the limitations of the underlying language.
+To address these issues, I decided to create my own project, MockerPI. This project aims to develop a lightweight API mocking server with the following features:
+
+Entirely based on JavaScript (including the database), requiring only NodeJS and a simple npm run command to run locally.
+1. A user-friendly UI for easier configuration, avoiding the need for CLI.
+2. The ability to inject customized logic for complex APIs.

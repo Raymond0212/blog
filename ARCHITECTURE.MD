@@ -1,0 +1,61 @@
+# ARCHITECTURE.MD
+
+Living architecture reference for agents and contributors working in this standalone frontend repo.
+
+## 1. Purpose
+- Provide a rapid mental model of the copied UI app.
+- Reduce architectural drift after the transplant from `../MockerPI/ui`.
+- Update this file whenever module boundaries, core dependencies, or data flow change.
+
+## 2. Tech Stack
+- Runtime/build: Vite 5, TypeScript 5, React 18.
+- Styling/UI: Tailwind CSS, Radix UI primitives, shadcn-style components in `src/components/ui/*`, and `lucide-react`.
+- Content: MDX via `@mdx-js/rollup` and `@mdx-js/react`.
+- Forms/validation: `react-hook-form`, `@hookform/resolvers`, and `zod`.
+- Feature utilities: WebUSB/File System Access APIs for HiDock, `recharts`, `sonner`, and supporting UI packages.
+
+## 3. Build-Time Architecture
+- Entry config: `vite.config.ts`.
+- Output directory: `dist`.
+- Aliases:
+  - `@` -> `src`.
+- Compile-time globals:
+  - `__APP_VERSION__` from the npm package version, used by the app version guard.
+- Client environment:
+  - Use Vite-prefixed variables only, such as `VITE_WEBSITE_LINK`.
+  - Raw `process.env` is not injected into browser code.
+
+## 4. Runtime Topology
+- `src/main.tsx` mounts `<App />` and global styles.
+- `src/App.tsx` wraps `ThemeProvider` and `MenuItemProvider`.
+- `src/Page.tsx` composes the sidebar shell and main workspace.
+- `src/data/MenuItems.tsx` defines menu entries and maps each entry to rendered content.
+- `src/MyComponents/MainContentComponents/MainContent.tsx` renders the selected menu component through the MDX provider.
+
+## 5. Key Folders
+- `src/components/ui/*`: reusable UI primitives.
+- `src/components/*`: app-level shared UI such as sidebar sections and theme controls.
+- `src/MyComponents/*`: copied feature/page components from the original UI.
+- `src/features/hidock/*`: HiDock Manager page, services, types, and utilities.
+- `src/data/*`: menu model and React context provider.
+- `src/content/*`: MDX content modules.
+- `src/types/*`: app API/domain types.
+- `public/*`: static assets.
+
+## 6. State And Data Flow
+- Local UI state is held in React component state.
+- Menu state is held in `MenuItemProvider` and persisted in `localStorage` under `menu-context`.
+- Theme state is persisted by the theme provider.
+- App version changes clear `localStorage` and `sessionStorage`, then write `app_version`.
+- Backend interactions use direct `fetch` calls to runtime endpoints such as `/api/projects` and `/api/upload-openapi`.
+- HiDock services use browser capabilities including WebUSB and File System Access when available.
+
+## 7. Quality Gates
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
+## 8. Security And Risk Notes
+- Do not reintroduce whole-environment browser injection.
+- Keep `.env` files out of git; only `.env.example` is tracked.
+- Validate uploaded OpenAPI/Swagger payloads and untrusted API data before display.
