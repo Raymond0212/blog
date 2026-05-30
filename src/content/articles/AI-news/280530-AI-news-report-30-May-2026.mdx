@@ -1,0 +1,192 @@
+# AI News Report - 30 May 2026
+
+**Report period:** 24 May 2026 to 30 May 2026  
+**Generated on:** 30 May 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This week centered on production-grade agent systems, with Anthropic and OpenAI both emphasizing orchestration, eval-driven improvement, and stronger governance around higher-risk deployments. The biggest practical shift is that agentic workflows are being packaged as enterprise-operable products rather than experimental demos.
+
+**Key updates:**
+
+- Anthropic introduced Claude Code dynamic workflows and highlighted enterprise deployment patterns around self-hosted sandboxes, MCP tunnels, agent orchestration, and secure code review.
+- OpenAI published new governance and evaluation guidance while expanding trusted biodefense access and showing how Codex can drive self-improving production agents.
+- Security moved closer to the product core, with Zero Trust guidance for AI agents, LLM-assisted source-code defense workflows, and public-facing governance controls for frontier models.
+
+**Key trends:**
+
+- Agent systems are shifting from single-assistant usage toward orchestrated multi-agent workflows with verification loops, evals, and bounded autonomy.
+- Governance is becoming more concrete, with public frameworks, third-party evaluation methodology, and access controls tied to sensitive domains like biology and frontier-model safety.
+- Vendors are increasingly framing AI adoption as an operational design problem that spans engineering, security, compliance, and business process ownership.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [Introducing dynamic workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code)
+**Published:** 2026-05-28
+
+Anthropic launched dynamic workflows for Claude Code in research preview, positioning them for large engineering jobs such as migrations, bug hunts, optimization reviews, and other work that benefits from parallel subagents plus independent verification. For management, the main implications are higher capability on complex tasks, higher token spend, and new admin controls around when these workflows can be enabled.
+
+---
+
+### [Using LLMs to secure source code](https://claude.com/blog/using-llms-to-secure-source-code)
+**Published:** 2026-05-27
+
+Anthropic argues that the bottleneck in AI-assisted AppSec is no longer just finding vulnerabilities, but verifying, triaging, and patching them in a repeatable way. The post lays out a six-step operating model that starts with codebase-specific threat modeling and sandboxing, which makes it relevant for leaders planning security engineering workflows rather than isolated scans.
+
+---
+
+### [How CodeRabbit used Claude to build an agent orchestration system](https://claude.com/blog/how-coderabbit-used-claude-to-build-an-agent-orchestration-system)
+**Published:** 2026-05-27
+
+CodeRabbit describes adding a planning and orchestration layer ahead of coding agents so vague requests become explicit implementation plans before code is generated. The management takeaway is that agent quality depends on workflow design and evaluation discipline, not just model choice, especially when mis-scoped AI output creates costly rework.
+
+---
+
+### [Zero Trust for AI agents](https://claude.com/blog/zero-trust-for-ai-agents)
+**Published:** 2026-05-27
+
+Anthropic frames AI agents as a new enterprise security surface because they can use valid credentials, persist memory, and take multi-step actions at machine speed. The article is useful for management because it turns that threat model into a maturity framework and implementation roadmap for deploying agents with stronger access, isolation, and oversight controls.
+
+---
+
+### [Code w/ Claude London 2026: Rethinking how we build](https://claude.com/blog/code-w-claude-london-2026-rethinking-how-we-build)
+**Published:** 2026-05-26
+
+This event recap doubles as a product update on Claude Managed Agents, especially self-hosted sandboxes and MCP tunnels for enterprise-controlled execution and private tool access. The strategic message is that Anthropic is pushing agent deployment deeper into enterprise environments where control of infrastructure, data boundaries, and integration surfaces matters as much as model quality.
+
+---
+
+### [Strengthening societal resilience with Rosalind Biodefense](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)
+**Published:** 2026-05-29
+
+OpenAI announced Rosalind Biodefense, a program that funds trusted developers and expands access to GPT-Rosalind for selected biodefense, public-health, and government partners. For management, the key point is that OpenAI is coupling higher-capability biology tooling with a tightly governed deployment model aimed at defensive and preparedness use cases.
+
+---
+
+### [A shared playbook for trustworthy third party evaluations](https://openai.com/index/trustworthy-third-party-evaluations-foundations/)
+**Published:** 2026-05-29
+
+OpenAI argues that external evaluations of frontier models are only trustworthy when the claim being tested, the elicitation harness, and the validity checks are all made explicit. The article matters for decision-makers because it frames third-party testing as a governance input for deployment and policy, not just as a benchmarking exercise.
+
+---
+
+### [OpenAI’s Frontier Governance Framework](https://openai.com/index/openai-frontier-governance-framework/)
+**Published:** 2026-05-28
+
+OpenAI published a public governance framework that maps its frontier-model risk assessment and mitigation processes to emerging regulatory expectations, with the linked PDF providing the operational substance. The practical significance is that OpenAI is formalizing how it communicates deployment gating, incident response, and systemic-risk controls to regulators, enterprises, and other external stakeholders.
+
+---
+
+### [Building self-improving tax agents with Codex](https://openai.com/index/building-self-improving-tax-agents-with-codex/)
+**Published:** 2026-05-27
+
+OpenAI and Thrive Holdings describe how tax-practitioner corrections are turned into structured eval targets and bounded engineering tasks so Codex-based workflows improve over time instead of relying on one-off fixes. The article is strategically relevant because it shows a concrete business case where agent quality improves through operational feedback loops embedded in production work.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [Introducing dynamic workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code)
+**Published:** 2026-05-28
+
+Dynamic workflows let Claude Code write orchestration scripts, fan work out to many subagents, and verify results before returning a consolidated answer. Anthropic positions the feature for codebase-wide bug hunts, migrations, optimization passes, and other hard engineering tasks where a single linear agent pass is not enough.
+
+---
+
+### [Using LLMs to secure source code](https://claude.com/blog/using-llms-to-secure-source-code)
+**Published:** 2026-05-27
+
+Anthropic lays out a practical engineering pipeline for AI-assisted code security: threat model, sandbox, discovery, verification, triage, and patching. The supporting reference harness and linked security-review tooling make the post useful as an implementation pattern rather than a high-level pitch.
+
+---
+
+### [How CodeRabbit used Claude to build an agent orchestration system](https://claude.com/blog/how-coderabbit-used-claude-to-build-an-agent-orchestration-system)
+**Published:** 2026-05-27
+
+CodeRabbit explains how it routes work across Claude models, inserts a structured planning phase before code generation, and measures quality with an evaluation harness. The core engineering lesson is that better task decomposition and validation can reduce the gap between code that merely passes tests and code that actually satisfies user intent.
+
+---
+
+### [Zero Trust for AI agents](https://claude.com/blog/zero-trust-for-ai-agents)
+**Published:** 2026-05-27
+
+The article translates enterprise security concerns into concrete engineering controls for agent systems, including isolation, memory protections, least-privilege access, and defenses against prompt injection or poisoned tools. It is especially relevant for teams building internal agents that need to interact with sensitive systems and persistent context.
+
+---
+
+### [Code w/ Claude London 2026: Rethinking how we build](https://claude.com/blog/code-w-claude-london-2026-rethinking-how-we-build)
+**Published:** 2026-05-26
+
+Beyond the event recap, the post points engineers to the underlying details of self-hosted sandboxes, MCP tunnels, Claude Code skills, and reasoning-budget controls. Together these updates show Anthropic focusing on the infrastructure needed to run agentic development workflows inside real enterprise environments.
+
+---
+
+### [Building self-improving tax agents with Codex](https://openai.com/index/building-self-improving-tax-agents-with-codex/)
+**Published:** 2026-05-27
+
+OpenAI and Thrive describe a feedback loop where production corrections become evals and then bounded Codex tasks with repo context, validation gates, and clear ownership. The article is a concrete example of harness engineering, where agent quality improves because the surrounding workflow is observable, testable, and scoped for iterative fixes.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Introducing dynamic workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code)
+**Published:** 2026-05-28
+
+Anthropic’s workflow launch is also a security story because the feature introduces stronger admin controls and verification loops for higher-autonomy coding work. The linked settings and workflow docs make clear that organizations can govern when these workflows run and how much autonomy they get.
+
+---
+
+### [Using LLMs to secure source code](https://claude.com/blog/using-llms-to-secure-source-code)
+**Published:** 2026-05-27
+
+This is a direct AppSec workflow piece focused on using LLMs for vulnerability discovery, exploit verification, and patching in isolated environments. Anthropic’s main point is that safe and effective AI-assisted security work depends on sound threat models, sandboxing, and downstream remediation process, not just raw scanning throughput.
+
+---
+
+### [Zero Trust for AI agents](https://claude.com/blog/zero-trust-for-ai-agents)
+**Published:** 2026-05-27
+
+Anthropic proposes a Zero Trust framework for enterprise AI agents and calls out prompt injection, tool poisoning, privilege abuse, memory poisoning, and supply-chain compromise as core risks. The article gives security teams a structured way to think about maturity, controls, and deployment sequencing for agentic systems.
+
+---
+
+### [Code w/ Claude London 2026: Rethinking how we build](https://claude.com/blog/code-w-claude-london-2026-rethinking-how-we-build)
+**Published:** 2026-05-26
+
+The security relevance here comes from Anthropic’s emphasis on self-hosted sandboxes and MCP tunnels, which let enterprises keep execution and private integrations inside customer-controlled boundaries. That makes the post notable for teams evaluating how to adopt agent systems without giving up infrastructure or data-path control.
+
+---
+
+### [Strengthening societal resilience with Rosalind Biodefense](https://openai.com/index/strengthening-societal-resilience-with-rosalind-biodefense/)
+**Published:** 2026-05-29
+
+OpenAI frames GPT-Rosalind as a high-capability biology model that should be deployed first to trusted defenders working on biodefense and pandemic preparedness. The security significance is the combination of expanded access with explicit safeguards, trusted-partner gating, and biosecurity-oriented governance.
+
+---
+
+### [A shared playbook for trustworthy third party evaluations](https://openai.com/index/trustworthy-third-party-evaluations-foundations/)
+**Published:** 2026-05-29
+
+OpenAI argues that meaningful frontier-model safety evaluations require transparent elicitation setups, fit-for-purpose harnesses, and validity checks for issues such as reward hacking, sandbagging, and broken tasks. The post is best read as guidance for how external safety testing should influence trust and deployment decisions.
+
+---
+
+### [OpenAI’s Frontier Governance Framework](https://openai.com/index/openai-frontier-governance-framework/)
+**Published:** 2026-05-28
+
+The article and attached PDF outline how OpenAI assesses and mitigates systemic risks across cyber offense, CBRN, harmful manipulation, and loss-of-control scenarios. It is a security-relevant release because it turns internal preparedness and incident-response practices into a public governance artifact tied to legal and compliance expectations.
