@@ -1,0 +1,24 @@
+# [WhisperX UI](https://github.com/Raymond0212/WhisperX-UI)
+
+WhisperX UI is a local-first app for transcribing audio, reviewing sentence-level transcripts, renaming speakers, playing timestamped audio, and exporting VTT captions.
+
+It runs on your local machine. Uploaded audio, transcripts, settings, logs, downloaded models, and exports are stored locally by default.
+
+## What It Does
+
+- Upload audio files into a local library.
+- Download and use the default faster-whisper model when needed.
+- Run local transcription with optional Hugging Face pyannote diarization using CUDA or CPU.
+- Fall back to a single-speaker transcript when no Hugging Face token is provided.
+- Edit transcript sentences and speaker display names.
+- Play audio from transcript timestamps.
+- Export VTT from sentence or speaker-turn views.
+
+## Requirements
+
+- Python 3.11 or 3.12
+- `uv`
+- Node.js and npm
+- Internet access on first model download
+
+A Hugging Face token is optional. Add one when you want pyannote speaker diarization.

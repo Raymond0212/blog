@@ -28,7 +28,8 @@ export default function SideFooter() {
                   <p className="text-sm">Supported by my girlfriend @醨苒.</p>
                   <div className="flex items-center pt-2">
                     <span className="text-xs text-muted-foreground">
-                      Love 💕 December 2024
+                      Last updated at{" "}
+                      {new Date(document.lastModified).toLocaleDateString()}.
                     </span>
                   </div>
                 </div>

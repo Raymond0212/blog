@@ -1,6 +1,7 @@
 import React from "react";
 import About from "../About";
 import HiDockManagerPage from "@/features/hidock/HiDockManagerPage";
+import WhisperXUI from "@/WhisperX-UI";
 import Home from "../Home";
 import Sliding from "../MyComponents/MainContentComponents/Sliding";
 import {
@@ -9,6 +10,7 @@ import {
   MessageCircleHeart,
   Smile,
   Book,
+  Captions,
   type LucideIcon,
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
@@ -87,6 +89,13 @@ const staticMenuItems: MenuNode[] = [
     kind: "root",
     url: "#",
   },
+  {
+    id: "whisperx-ui",
+    label: "WhisperX UI",
+    source: "static",
+    kind: "root",
+    url: "#",
+  },
 ];
 
 const menuComponentItemsById: Record<string, MenuComponentItem> = {
@@ -101,6 +110,10 @@ const menuComponentItemsById: Record<string, MenuComponentItem> = {
   "hidock-manager": {
     icon: HardDrive,
     component: <HiDockManagerPage />,
+  },
+  "whisperx-ui": {
+    icon: Captions,
+    component: <WhisperXUI />,
   },
 };
 
@@ -311,7 +324,11 @@ type LazyArticlePageProps = {
 const LazyArticlePage = ({ loader }: LazyArticlePageProps) => {
   const Component = React.useMemo(() => React.lazy(loader), [loader]);
   return (
-    <React.Suspense fallback={<div className="text-sm text-muted-foreground">Loading article...</div>}>
+    <React.Suspense
+      fallback={
+        <div className="text-sm text-muted-foreground">Loading article...</div>
+      }
+    >
       <Component />
     </React.Suspense>
   );
@@ -320,7 +337,7 @@ const LazyArticlePage = ({ loader }: LazyArticlePageProps) => {
 export function getNodeParentPathLabels(
   id: string,
   parentById: Map<string, string | null>,
-  nodeById: Map<string, MenuNode>
+  nodeById: Map<string, MenuNode>,
 ) {
   const labels: string[] = [];
   let current = parentById.get(id) ?? null;
@@ -337,7 +354,7 @@ export function getNodeParentPathLabels(
 
 export function getVisibleNodeIds(
   tree: MenuNode[],
-  expandedIds: Set<string>
+  expandedIds: Set<string>,
 ): { id: string; depth: number }[] {
   const rows: { id: string; depth: number }[] = [];
   const stack: { node: MenuNode; depth: number }[] = [];

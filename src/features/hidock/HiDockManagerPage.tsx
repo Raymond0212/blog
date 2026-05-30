@@ -863,7 +863,8 @@ export default function HiDockManagerPage() {
             HiDock Manager
           </h1>
           <p className="text-muted-foreground">
-            Manage HiDock recordings inside the existing MockerPI workspace.
+            Manage HiDock recordings in browser. Deploy your own HiDock Manager
+            for offline recording management.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
