@@ -1,0 +1,96 @@
+# AI News Report - 06 Jun 2026
+
+**Report period:** 31 May 2026 to 06 Jun 2026  
+**Generated on:** 06 Jun 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This week was defined by OpenAI broadening how its products fit into production environments: Codex moved further into cross-functional workflow automation, OpenAI models became easier to buy and govern through AWS, and ChatGPT memory was upgraded around longer-lived personalization. The most consequential technical pattern was tighter coupling between model capability and surrounding operational systems such as plugins, deployment controls, trusted-access programs, and enterprise governance.
+
+**Key updates:**
+
+- OpenAI made frontier models and Codex generally available on AWS, reducing enterprise friction around procurement, governance, and production deployment.
+- Codex expanded beyond software engineering with role-specific plugins, in-place annotations, and shareable Sites for internal apps and web experiences.
+- OpenAI upgraded GPT-Rosalind for life sciences research and rolled out a more capable ChatGPT memory architecture built on dreaming.
+
+**Key trends:**
+
+- AI vendors are packaging model access inside existing enterprise control planes instead of treating deployment as a separate adoption problem.
+- Product direction is shifting from single-purpose assistants toward workflow systems that combine models with plugins, file handling, annotations, and app-sharing surfaces.
+- Sensitive or high-impact domains such as software security and life sciences continue to be paired with trusted-access, governance, and reviewable-control mechanisms.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [OpenAI frontier models and Codex are now available on AWS](https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws/)
+**Published:** 2026-06-01
+
+OpenAI announced that its frontier models and Codex are now generally available through AWS, aimed at enterprises that want to deploy OpenAI capabilities inside existing AWS procurement, billing, security, compliance, and governance workflows. The post frames this as a production-readiness move: OpenAI models are available via Amazon Bedrock, while Codex is positioned as an AWS-native software engineering agent for writing, reviewing, debugging, and modernizing code. It also signals a future AWS path for Daybreak, including cyber models and Codex Security.
+
+---
+
+### [Codex for every role, tool, and workflow](https://openai.com/index/codex-for-every-role-tool-workflow/)
+**Published:** 2026-06-02
+
+OpenAI announced a broader Codex push beyond software engineering, centered on role-specific plugins for teams such as analytics, creative, sales, design, and finance. The release also adds richer annotation workflows so users can refine specific parts of documents, slides, spreadsheets, and sites in place, plus a preview of Sites for sharing interactive internal apps and websites by URL within a workspace. The announcement positions Codex as a cross-functional work platform, with admins retaining control through plugin app approvals and site access settings.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [OpenAI frontier models and Codex are now available on AWS](https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws/)
+**Published:** 2026-06-01
+
+The AWS release gives enterprises a new path to use OpenAI frontier models through Amazon Bedrock and to run Codex inside the AWS environments where teams already build and ship. The engineering significance is less about a new model and more about integration: security controls, governance workflows, procurement, and familiar cloud operations are now part of the deployment story. OpenAI also points to future AWS availability for Daybreak and Codex Security, extending the platform story into secure software workflows.
+
+---
+
+### [Codex for every role, tool, and workflow](https://openai.com/index/codex-for-every-role-tool-workflow/)
+**Published:** 2026-06-02
+
+This release extends Codex into broader knowledge-work workflows with role-specific plugins, in-place annotations, and Sites for publishing internal apps and web experiences to a workspace. The technical story is that Codex is becoming a programmable work surface rather than just a coding tool, with more structured access to business systems, richer editing loops, and tighter connections to output artifacts. It also shows OpenAI investing in reusable workflow packaging through plugin bundles instead of isolated one-off prompts.
+
+---
+
+### [Introducing new capabilities to GPT-Rosalind](https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind/)
+**Published:** 2026-06-03
+
+OpenAI announced a GPT-Rosalind update for life sciences research that combines GPT-5.5-style agentic coding and tool use with stronger domain performance in medicinal chemistry, genomics, quantitative biology, and wet-lab troubleshooting. The post says the model improves on LifeSciBench, MedChemBench, GeneBench, and LabWorkBench, and pairs the model with Codex-based Life Sciences Research and NGS Analysis plugins plus native scientific file viewers. This makes the announcement notable as a workflow-oriented research product rather than a raw benchmark release.
+
+---
+
+### [Dreaming: Better memory for a more helpful ChatGPT](https://openai.com/index/chatgpt-memory-dreaming/)
+**Published:** 2026-06-04
+
+OpenAI announced a new ChatGPT memory architecture built on dreaming, a background synthesis system meant to keep personalization fresher, more relevant, and more scalable than the older saved-memories approach. The update adds a reviewable memory summary so users can see and correct what ChatGPT knows about them, while OpenAI says the rollout began in the United States for Plus and Pro users on June 4, 2026. The supporting materials make clear that this is as much a systems architecture update as a feature launch, with new controls around how remembered context is reviewed and managed.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [OpenAI frontier models and Codex are now available on AWS](https://openai.com/index/openai-frontier-models-and-codex-are-now-available-on-aws/)
+**Published:** 2026-06-01
+
+The security relevance of the AWS launch is that OpenAI is meeting enterprises inside existing cloud governance, compliance, and operational-control boundaries instead of asking them to adopt a separate trust model. The post also explicitly points toward future AWS delivery for Daybreak and Codex Security, tying model availability to secure code review, dependency risk analysis, detection, and remediation workflows. That makes the announcement partly a cloud-distribution update and partly a security-platform expansion.
+
+---
+
+### [Introducing new capabilities to GPT-Rosalind](https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind/)
+**Published:** 2026-06-03
+
+GPT-Rosalind is being expanded through a trusted-access research-preview model for eligible organizations, which keeps higher-capability life sciences tooling coupled to governance, safety oversight, and enterprise-grade controls. The post and linked access materials suggest OpenAI is continuing its pattern of pairing sensitive-domain capability growth with explicit gating and review structures. In practice, the security story here is about controlled deployment of advanced biology workflows rather than general availability.
+
+---
