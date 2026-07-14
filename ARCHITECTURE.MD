@@ -12,7 +12,7 @@ Living architecture reference for agents and contributors working in this standa
 - Styling/UI: Tailwind CSS, Radix UI primitives, shadcn-style components in `src/components/ui/*`, and `lucide-react`.
 - Content: MDX via `@mdx-js/rollup` and `@mdx-js/react`, with fenced code highlighting via `rehype-highlight`.
 - Forms/validation: `react-hook-form`, `@hookform/resolvers`, and `zod`.
-- Feature utilities: WebUSB/File System Access APIs for HiDock, `recharts`, `sonner`, and supporting UI packages.
+- Feature utilities: WebUSB/File System Access APIs for HiDock, `@huggingface/transformers`, `recharts`, `sonner`, and supporting UI packages.
 
 ## 3. Build-Time Architecture
 - Entry config: `vite.config.ts`.
@@ -37,6 +37,7 @@ Living architecture reference for agents and contributors working in this standa
 - `src/components/*`: app-level shared UI such as sidebar sections and theme controls.
 - `src/MyComponents/*`: copied feature/page components from the original UI.
 - `src/features/hidock/*`: HiDock Manager page, services, types, and utilities.
+- `src/features/embedding/*`: frontend-only multi-sentence contextual embedding demo using a matched Hugging Face WordPiece tokenizer and quantized MiniLM model in a Web Worker, plus client-side PCA and animated canvas rendering.
 - `src/data/*`: menu model and React context provider.
 - `src/content/*`: MDX content modules.
   - `src/content/articles/**`: auto-discovered article pages grouped by first-level folder.
@@ -52,6 +53,7 @@ Living architecture reference for agents and contributors working in this standa
 - Sidebar rows are derived from menu tree + expanded state as a flattened visible list to avoid nested rerender costs on long menus.
 - Persisted menu state is validated against current menu ids; invalid selections fall back to `Home`.
 - Theme state is persisted by the theme provider.
+- The Embedding Demo downloads and caches `onnx-community/all-MiniLM-L6-v2-ONNX`, independently embeds up to eight user-provided sentences with its paired tokenizer and quantized transformer in a Web Worker, reduces all contextual token and sentence vectors to one shared three-dimensional PCA projection, and finds the three nearest user tokens by Euclidean distance in that displayed space; it has no predefined comparison vocabulary or backend dependency.
 - App version changes clear `localStorage` and `sessionStorage`, then write `app_version`.
 - Backend interactions use direct `fetch` calls to runtime endpoints such as `/api/projects` and `/api/upload-openapi`.
 - HiDock services use browser capabilities including WebUSB and File System Access when available.

@@ -1,16 +1,16 @@
 import React from "react";
 import About from "../About";
 import HiDockManagerPage from "@/features/hidock/HiDockManagerPage";
+import EmbeddingDemoPage from "@/features/embedding/EmbeddingDemoPage";
 import WhisperXUI from "@/WhisperX-UI";
 import Home from "../Home";
-import Sliding from "../MyComponents/MainContentComponents/Sliding";
 import {
   HardDrive,
   House,
   MessageCircleHeart,
-  Smile,
   Book,
   Captions,
+  Orbit,
   type LucideIcon,
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
@@ -96,6 +96,13 @@ const staticMenuItems: MenuNode[] = [
     kind: "root",
     url: "#",
   },
+  {
+    id: "embedding-demo",
+    label: "Embedding Demo",
+    source: "static",
+    kind: "root",
+    url: "#",
+  },
 ];
 
 const menuComponentItemsById: Record<string, MenuComponentItem> = {
@@ -114,6 +121,10 @@ const menuComponentItemsById: Record<string, MenuComponentItem> = {
   "whisperx-ui": {
     icon: Captions,
     component: <WhisperXUI />,
+  },
+  "embedding-demo": {
+    icon: Orbit,
+    component: <EmbeddingDemoPage />,
   },
 };
 
