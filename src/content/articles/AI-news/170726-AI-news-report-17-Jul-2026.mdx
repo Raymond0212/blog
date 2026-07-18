@@ -1,0 +1,117 @@
+# AI News Report - 17 Jul 2026
+
+**Report period:** 11 Jul 2026 to 17 Jul 2026  
+**Generated on:** 17 Jul 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+OpenAI published four qualifying news items during the reporting window, while Claude published none. The week centered on enterprise adoption discipline and safety governance: OpenAI pushed a management framework for AI ROI, a practical guide to investment control in agentic workflows, a youth-safety policy update, and a technical account of automated red-teaming for prompt-injection robustness. The combined pattern is that OpenAI is treating AI deployment as an operating system of metrics, controls, and safety mechanisms rather than a pure model-capability story.
+
+**Key updates:**
+
+- OpenAI introduced a business scorecard for measuring AI value through useful work, cost per successful task, dependability, and value at scale.
+- OpenAI published a five-part enterprise playbook for managing AI investment in the agentic era, with emphasis on visibility, governance, and repeatable workflows.
+- OpenAI outlined expanded teen-safety protections in ChatGPT, including age prediction, parental controls, break reminders, and stronger youth-specific safeguards.
+- OpenAI described GPT-Red, an internal automated red-teaming system used to harden production models against prompt injection and related attacks.
+
+**Key trends:**
+
+- AI adoption messaging is shifting from token cost and experimentation toward workflow ROI, operating discipline, and budget governance.
+- Product safety is increasingly framed as a mix of policy, technical controls, and external collaboration rather than moderation alone.
+- OpenAI is investing in automated safety engineering so robustness methods can scale with increasingly agentic models and tools.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [How to manage AI investments in the agentic era](https://openai.com/index/managing-ai-investments-in-agentic-era/)
+**Published:** 2026-07-14
+
+OpenAI argues that AI investment should be managed around business outcomes rather than token price alone. The article recommends five practices: improve visibility into usage and spend, evaluate model efficiency by accepted outcomes, govern advanced workflows before scaling them, fund repeatable use cases that compound, and align infrastructure commitments with proven demand. It frames agentic AI as a portfolio-management problem spanning productivity use, functional workflows, and strategic systems.
+
+---
+
+### [Why teens deserve access to safe AI](https://openai.com/index/why-teens-deserve-access-safe-ai/)
+**Published:** 2026-07-16
+
+OpenAI makes a policy case that teens should have access to AI because it is becoming foundational for learning, productivity, and creativity, but that access must be paired with age-appropriate safeguards. The post emphasizes operating principles, family guidance, and collaboration with educators, mental-health specialists, child-safety experts, and policymakers. It presents youth AI access as a governance problem as much as a product decision.
+
+---
+
+### [A scorecard for the AI age](https://openai.com/index/a-scorecard-for-the-ai-age/)
+**Published:** 2026-07-17
+
+OpenAI proposes that organizations judge AI investments through "useful intelligence per dollar" instead of basic adoption or token-price metrics. It defines four management questions: how much useful work gets done, what a successful task actually costs, how dependable the output is, and whether each AI dollar delivers more value over time. The post is aimed squarely at leaders deciding how to evaluate and scale AI programs across core workflows.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [How to manage AI investments in the agentic era](https://openai.com/index/managing-ai-investments-in-agentic-era/)
+**Published:** 2026-07-14
+
+Although written for business leaders, the article has a strong implementation angle: it discusses evals, model selection, workflow design, stop conditions, and infrastructure planning as practical levers that determine real-world ROI. OpenAI also points to concrete supporting capabilities such as spend analytics, prompt caching, scale-tier capacity, and data controls. The technical message is that outcome measurement and system design have to be treated as part of the same engineering loop.
+
+---
+
+### [Why teens deserve access to safe AI](https://openai.com/index/why-teens-deserve-access-safe-ai/)
+**Published:** 2026-07-16
+
+The teen-safety post also describes product mechanisms rather than policy alone. OpenAI highlights age prediction, Study Mode, break reminders, and configurable parental controls as concrete system behaviors designed to shape how younger users interact with ChatGPT. That makes the article relevant to engineers building age-aware user experiences and safety-by-default product flows.
+
+---
+
+### [GPT‑Red: Unlocking Self-Improvement for Robustness](https://openai.com/index/unlocking-self-improvement-gpt-red/)
+**Published:** 2026-07-15
+
+OpenAI presents GPT-Red as an internal automated red-teaming model trained with self-play to find robustness failures, especially prompt-injection vulnerabilities, at scale. The system is used to adversarially train production models, and OpenAI says GPT-5.6 Sol became materially more resistant to prompt injection as a result. The article also describes evaluations on held-out attack arenas and realistic agentic systems such as a vending-machine agent and a Codex CLI agent.
+
+---
+
+### [A scorecard for the AI age](https://openai.com/index/a-scorecard-for-the-ai-age/)
+**Published:** 2026-07-17
+
+The scorecard post is partly an engineering document because it treats AI value as a workflow-measurement problem tied to routing, retries, quality bars, and model choice. It explicitly discusses GPT-5.6 tiering, coding benchmarks, and the tradeoff between cheaper tokens and fewer successful outcomes. The practical point is that system architecture and evaluation quality determine whether model capability translates into useful work.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [How to manage AI investments in the agentic era](https://openai.com/index/managing-ai-investments-in-agentic-era/)
+**Published:** 2026-07-14
+
+Security is a central theme in OpenAI's investment guidance because the article argues that advanced workflows should only scale with clear governance, approved context, tool permissions, approval paths, and privacy controls. It also points to data controls and Zero Data Retention for sensitive use cases. The message is that AI ROI cannot be separated from security posture and operational control.
+
+---
+
+### [Why teens deserve access to safe AI](https://openai.com/index/why-teens-deserve-access-safe-ai/)
+**Published:** 2026-07-16
+
+This is the clearest security and safety article of the week. OpenAI details teen-focused protections including stricter safeguards around self-harm, graphic violence, risky challenges, unhealthy body-image content, and dangerous or sexual roleplay, alongside parental notifications and quiet hours. It shows OpenAI extending safety design into age-based risk management and family oversight.
+
+---
+
+### [GPT‑Red: Unlocking Self-Improvement for Robustness](https://openai.com/index/unlocking-self-improvement-gpt-red/)
+**Published:** 2026-07-15
+
+GPT-Red is explicitly a security engineering story about scaling prompt-injection defense and adversarial testing. OpenAI says the model finds attacks against internal and production systems, helps harden GPT-5.6 against direct prompt injection, and generalizes to realistic exfiltration and agent-manipulation scenarios. The broader implication is that automated attackers are becoming part of the standing defensive toolkit for frontier AI systems.
+
+---
+
+### [A scorecard for the AI age](https://openai.com/index/a-scorecard-for-the-ai-age/)
+**Published:** 2026-07-17
+
+The scorecard article treats dependable AI use as inseparable from security, privacy, and control boundaries. It argues that organizations need clear rules for what data AI can access, what systems it can modify, and when a human must review or approve actions before deeper workflow automation is trusted. That ties AI ROI directly to governance maturity rather than to model performance alone.
+
