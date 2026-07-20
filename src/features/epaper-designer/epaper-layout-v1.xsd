@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:simpleType name="fontId">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="spleen-5x8" />
+      <xs:enumeration value="spleen-6x12" />
+      <xs:enumeration value="spleen-8x16" />
+      <xs:enumeration value="spleen-12x24" />
+      <xs:enumeration value="spleen-16x32" />
+      <xs:enumeration value="spleen-32x64" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="anchorArea">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="safe" />
+      <xs:enumeration value="full" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="alignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="left" />
+      <xs:enumeration value="middle" />
+      <xs:enumeration value="right" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="placementAttributes">
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="area" type="anchorArea" use="required" />
+    <xs:attribute name="alignment" type="alignment" use="required" />
+    <xs:attribute name="x1" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="y1" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="x2" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="y2" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="columns" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="selectable" type="xs:boolean" use="required" />
+    <xs:attribute name="selected" type="xs:boolean" use="required" />
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="componentAttributes">
+    <xs:attributeGroup ref="placementAttributes" />
+    <xs:attribute name="font" type="fontId" use="required" />
+  </xs:attributeGroup>
+
+  <xs:complexType name="fontMetric">
+    <xs:attribute name="id" type="fontId" use="required" />
+    <xs:attribute name="bitmap-width" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="bitmap-height" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="font-box-height" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="line-top" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="line-bottom" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="line-height" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="character-left" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="character-right" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="cell-width" type="xs:positiveInteger" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="textBox">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" />
+    </xs:sequence>
+    <xs:attributeGroup ref="componentAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" fixed="1" />
+    <xs:attribute name="wrap" type="xs:string" use="required" fixed="none" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="textArea">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" />
+    </xs:sequence>
+    <xs:attributeGroup ref="componentAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="wrap" type="xs:string" use="required" fixed="word" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="listItem">
+    <xs:sequence>
+      <xs:element name="left" type="xs:string" />
+      <xs:element name="middle" type="xs:string" />
+      <xs:element name="right" type="xs:string" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="selected" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="listArea">
+    <xs:sequence>
+      <xs:element name="items">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="item" type="listItem" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="componentAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="invert-color" type="xs:boolean" use="required" />
+    <xs:attribute name="initial-page" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="nestedTextBox">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" />
+    </xs:sequence>
+    <xs:attributeGroup ref="placementAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" fixed="1" />
+    <xs:attribute name="wrap" type="xs:string" use="required" fixed="none" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="nestedTextArea">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" />
+    </xs:sequence>
+    <xs:attributeGroup ref="placementAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="wrap" type="xs:string" use="required" fixed="word" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="nestedListArea">
+    <xs:sequence>
+      <xs:element name="items">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="item" type="listItem" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="placementAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="invert-color" type="xs:boolean" use="required" />
+    <xs:attribute name="initial-page" type="xs:nonNegativeInteger" use="required" />
+    <xs:attribute name="overflow" type="xs:string" use="required" fixed="ellipsis" />
+  </xs:complexType>
+
+  <xs:complexType name="regionType">
+    <xs:sequence>
+      <xs:element name="components">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="text-box" type="nestedTextBox" />
+            <xs:element name="text-area" type="nestedTextArea" />
+            <xs:element name="list-area" type="nestedListArea" />
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="componentAttributes" />
+    <xs:attribute name="rows" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="pixel-width" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="invert-color" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:element name="epaper-layout">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="typography">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="font" type="fontMetric" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="components">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="text-box" type="textBox" />
+              <xs:element name="text-area" type="textArea" />
+              <xs:element name="list-area" type="listArea" />
+              <xs:element name="region" type="regionType" />
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:positiveInteger" use="required" fixed="1" />
+      <xs:attribute name="width" type="xs:positiveInteger" use="required" fixed="200" />
+      <xs:attribute name="height" type="xs:positiveInteger" use="required" fixed="200" />
+      <xs:attribute name="palette" type="xs:string" use="required" fixed="black-white" />
+      <xs:attribute name="font-family" type="xs:string" use="required" fixed="Spleen" />
+      <xs:attribute name="font-version" type="xs:string" use="required" fixed="2.2.0" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

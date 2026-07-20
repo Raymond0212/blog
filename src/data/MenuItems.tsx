@@ -2,6 +2,7 @@ import React from "react";
 import About from "../About";
 import HiDockManagerPage from "@/features/hidock/HiDockManagerPage";
 import EmbeddingDemoPage from "@/features/embedding/EmbeddingDemoPage";
+import EpaperDesignerPage from "@/features/epaper-designer/EpaperDesignerPage";
 import WhisperXUI from "@/WhisperX-UI";
 import Home from "../Home";
 import {
@@ -11,6 +12,7 @@ import {
   Book,
   Captions,
   Orbit,
+  PanelsTopLeft,
   type LucideIcon,
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
@@ -103,6 +105,13 @@ const staticMenuItems: MenuNode[] = [
     kind: "root",
     url: "#",
   },
+  {
+    id: "epaper-designer",
+    label: "E-Paper Designer",
+    source: "static",
+    kind: "root",
+    url: "#",
+  },
 ];
 
 const menuComponentItemsById: Record<string, MenuComponentItem> = {
@@ -125,6 +134,10 @@ const menuComponentItemsById: Record<string, MenuComponentItem> = {
   "embedding-demo": {
     icon: Orbit,
     component: <EmbeddingDemoPage />,
+  },
+  "epaper-designer": {
+    icon: PanelsTopLeft,
+    component: <EpaperDesignerPage />,
   },
 };
 

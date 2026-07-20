@@ -38,6 +38,7 @@ Living architecture reference for agents and contributors working in this standa
 - `src/MyComponents/*`: copied feature/page components from the original UI.
 - `src/features/hidock/*`: HiDock Manager page, services, types, and utilities.
 - `src/features/embedding/*`: frontend-only multi-sentence contextual embedding demo using a matched Hugging Face WordPiece tokenizer and quantized MiniLM model in a Web Worker, plus client-side PCA and animated canvas rendering.
+- `src/features/epaper-designer/*`: browser-only 200 × 200 monochrome UI designer with exact Spleen 2.2.0 printable-ASCII bitmap data, fixed-cell component geometry, nested Regions, list pagination, and versioned XML import/export.
 - `src/data/*`: menu model and React context provider.
 - `src/content/*`: MDX content modules.
   - `src/content/articles/**`: auto-discovered article pages grouped by first-level folder.
@@ -57,6 +58,7 @@ Living architecture reference for agents and contributors working in this standa
 - App version changes clear `localStorage` and `sessionStorage`, then write `app_version`.
 - Backend interactions use direct `fetch` calls to runtime endpoints such as `/api/projects` and `/api/upload-openapi`.
 - HiDock services use browser capabilities including WebUSB and File System Access when available.
+- The E-Paper Designer keeps its layout in page-local React state. A pure renderer converts Text Box, Text Area, List Area, and Region components into a 1-bit 200 × 200 pixel buffer; Regions own fully contained ordinary components, which inherit their bitmap font and compose inversion with the parent background. The visible canvas is an integer-scaled preview with editor overlays that are excluded from export. Layout XML is parsed and downloaded entirely in the browser, with no backend or persistent draft storage.
 
 ## 7. Quality Gates
 - `npm run lint`
