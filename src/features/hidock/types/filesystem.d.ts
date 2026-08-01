@@ -48,6 +48,7 @@ interface USBDevice {
   opened?: boolean
   vendorId: number
   productId: number
+  productName?: string
   serialNumber?: string
   configuration: USBConfiguration | null
   open(): Promise<void>
@@ -63,6 +64,18 @@ interface USBDevice {
 interface USB {
   getDevices(): Promise<USBDevice[]>
   requestDevice(options: { filters: Array<{ vendorId: number; productId?: number }> }): Promise<USBDevice>
+  addEventListener(
+    type: "connect" | "disconnect",
+    listener: (event: USBConnectionEvent) => void,
+  ): void
+  removeEventListener(
+    type: "connect" | "disconnect",
+    listener: (event: USBConnectionEvent) => void,
+  ): void
+}
+
+interface USBConnectionEvent extends Event {
+  device: USBDevice
 }
 
 interface Navigator {

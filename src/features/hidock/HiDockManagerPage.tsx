@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Battery,
   Bell,
@@ -51,8 +51,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createDeviceService } from "@/features/hidock/services/factory";
+import { getCapabilities } from "@/features/hidock/jensen/capability-policy";
 import type {
   AudioInputDevice,
+  DeviceInfo,
   DeviceSettings,
   HiDockFile,
   RecordingQuality,
@@ -139,7 +141,7 @@ const buttonDocs: ButtonDoc[] = [
     label: "Get Settings",
     risk: "Read-only",
     description:
-      "Reads auto-record, auto-play, notification, and Bluetooth prompt settings.",
+      "Reads auto-record, auto-play, notification, Bluetooth prompt, and record-on-vibration settings.",
   },
   {
     label: "Toggle AutoRecord",
@@ -150,6 +152,11 @@ const buttonDocs: ButtonDoc[] = [
     label: "Toggle Notification",
     risk: "Writes setting",
     description: "Flips the notification popup/sound setting.",
+  },
+  {
+    label: "Toggle Vibration",
+    risk: "Writes setting",
+    description: "Flips record-on-vibration on supported P1 firmware.",
   },
   {
     label: "Bluetooth Status",
@@ -239,6 +246,11 @@ const buttonDocs: ButtonDoc[] = [
     description: "Starts realtime/live audio mode.",
   },
   {
+    label: "Pause Live",
+    risk: "Device mode",
+    description: "Pauses realtime/live audio mode with Jensen command 33.",
+  },
+  {
     label: "Live Status",
     risk: "Read-only",
     description: "Reads realtime buffer and mute status.",
@@ -286,9 +298,11 @@ export default function HiDockManagerPage() {
   const capability = service.getCapability();
 
   const [connected, setConnected] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
+  const [liveMode, setLiveMode] = useState(false);
   const [files, setFiles] = useState<HiDockFile[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [status, setStatus] = useState("Ready");
+  const [status, setStatus] = useState("Ready to connect");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>("createdAtRaw");
@@ -302,6 +316,46 @@ export default function HiDockManagerPage() {
     current: "-",
     aggregate: "-",
   });
+
+  useEffect(() => {
+    const unsubscribe = service.subscribeConnectionState((state) => {
+      if (state === "connected" || state === "connected-unidentified") {
+        setConnected(true);
+        if (state === "connected-unidentified") {
+          setStatus("Connected, but device identification failed");
+        }
+        return;
+      }
+      if (
+        state === "idle" ||
+        state === "disconnected" ||
+        state === "transport-error"
+      ) {
+        setConnected(false);
+        setDeviceInfo(null);
+        setLiveMode(false);
+        if (state === "transport-error") setStatus("Device transport error");
+        if (state === "disconnected") setStatus("Device disconnected");
+        if (state === "idle") setStatus("Ready to connect");
+      }
+    });
+    return () => {
+      unsubscribe();
+      service.dispose();
+    };
+  }, [service]);
+
+  const protocolCapabilities = getCapabilities(
+    {
+      model: deviceInfo?.model,
+      versionNumber: deviceInfo?.versionNumber,
+    },
+    {
+      busy,
+      liveMode,
+      listingFiles: status.startsWith("Streaming file list"),
+    },
+  );
 
   const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> =>
     new Promise<T>((resolve, reject) => {
@@ -336,6 +390,7 @@ export default function HiDockManagerPage() {
       setFiles(list);
       setSelected({});
     }
+    if (info) setDeviceInfo(info);
     setDetails(
       JSON.stringify(
         {
@@ -378,6 +433,7 @@ export default function HiDockManagerPage() {
   const onConnect = async () =>
     run("Connecting to device...", async () => {
       const info = await service.connect();
+      setDeviceInfo(info);
       setConnected(true);
       setStatus(`Connected ${info.model ? `(${info.model})` : ""}`);
       void refreshAfterSuccess();
@@ -387,6 +443,8 @@ export default function HiDockManagerPage() {
     run("Disconnecting...", async () => {
       await service.disconnect();
       setConnected(false);
+      setDeviceInfo(null);
+      setLiveMode(false);
       setFiles([]);
       setSelected({});
       setStatus("Disconnected");
@@ -523,6 +581,24 @@ export default function HiDockManagerPage() {
       setDetails(JSON.stringify(await service.setSettings(next), null, 2));
       await refreshAfterSuccess();
     });
+
+  const onToggleRecordOnVibe = async () =>
+    run("Toggling record-on-vibration...", async () => {
+      const current = await service.getSettings();
+      const result = await service.setSettings({
+        recordOnVibe: !current.recordOnVibe,
+      });
+      setDetails(JSON.stringify(result, null, 2));
+      await refreshAfterSuccess();
+    });
+
+  const requestToggleRecordOnVibe = async () =>
+    requestConfirmedAction(
+      "Toggle record-on-vibration?",
+      "This changes the P1 record-on-vibration setting.",
+      "Toggle Vibration",
+      onToggleRecordOnVibe,
+    );
 
   const requestFormat = async () => {
     requestConfirmedAction(
@@ -775,9 +851,11 @@ export default function HiDockManagerPage() {
     );
 
   const onStartRealtime = async () =>
-    run("Starting realtime audio...", async () =>
-      setDetails(JSON.stringify(await service.startRealtime(2), null, 2)),
-    );
+    run("Starting realtime audio...", async () => {
+      const result = await service.startRealtime(2);
+      setDetails(JSON.stringify(result, null, 2));
+      if (result?.result === "success") setLiveMode(true);
+    });
 
   const requestStartRealtime = async () =>
     requestConfirmedAction(
@@ -788,9 +866,11 @@ export default function HiDockManagerPage() {
     );
 
   const onStopRealtime = async () =>
-    run("Stopping realtime audio...", async () =>
-      setDetails(JSON.stringify(await service.stopRealtime(), null, 2)),
-    );
+    run("Stopping realtime audio...", async () => {
+      const result = await service.stopRealtime();
+      setDetails(JSON.stringify(result, null, 2));
+      if (result.result === "success") setLiveMode(false);
+    });
 
   const requestStopRealtime = async () =>
     requestConfirmedAction(
@@ -798,6 +878,21 @@ export default function HiDockManagerPage() {
       "This exits live audio mode on the device.",
       "Stop Live",
       onStopRealtime,
+    );
+
+  const onPauseRealtime = async () =>
+    run("Pausing realtime audio...", async () => {
+      const result = await service.pauseRealtime();
+      setDetails(JSON.stringify(result, null, 2));
+      if (result.result === "success") setLiveMode(false);
+    });
+
+  const requestPauseRealtime = async () =>
+    requestConfirmedAction(
+      "Pause realtime audio?",
+      "This pauses the active live audio stream.",
+      "Pause Live",
+      onPauseRealtime,
     );
 
   const onGetRealtime = async () =>
@@ -866,6 +961,9 @@ export default function HiDockManagerPage() {
             Manage HiDock recordings in browser. Deploy your own HiDock Manager
             for offline recording management.
           </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Implementation and hardware validation scope: HiDock P1 Mini only.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -884,7 +982,10 @@ export default function HiDockManagerPage() {
           </Button>
           <Button
             variant="outline"
-            disabled={busy || !connected}
+            disabled={
+              busy || !connected || !protocolCapabilities.fileList.allowed
+            }
+            title={protocolCapabilities.fileList.reason}
             onClick={onListFiles}
           >
             <RefreshCw className="h-4 w-4" />
@@ -912,9 +1013,7 @@ export default function HiDockManagerPage() {
         <StatusCard
           label="Status"
           value={status}
-          secondary={
-            connected ? "Device session active" : "No device connected"
-          }
+          secondary={connected ? "Device session active" : "Ready to connect"}
         />
         <StatusCard
           label="Download Progress"
@@ -1047,25 +1146,39 @@ export default function HiDockManagerPage() {
               label="Device Info"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.fileList.allowed
+              }
+              unavailableReason={protocolCapabilities.fileList.reason}
               icon={ListOrdered}
               onClick={onGetFileCount}
               label="File Count"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy ||
+                !connected ||
+                !protocolCapabilities.recordingFile.allowed
+              }
+              unavailableReason={protocolCapabilities.recordingFile.reason}
               icon={HardDrive}
               onClick={onRecordingFile}
               label="Recording File"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.cardInfo.allowed
+              }
+              unavailableReason={protocolCapabilities.cardInfo.reason}
               icon={HardDrive}
               onClick={onGetCardInfo}
               label="Card Info"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.battery.allowed
+              }
+              unavailableReason={protocolCapabilities.battery.reason}
               icon={Battery}
               onClick={onGetBattery}
               label="Battery"
@@ -1083,85 +1196,142 @@ export default function HiDockManagerPage() {
               label="Set Time Now"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.settings.allowed
+              }
+              unavailableReason={protocolCapabilities.settings.reason}
               icon={Settings2}
               onClick={onGetSettings}
               label="Get Settings"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.settings.allowed
+              }
+              unavailableReason={protocolCapabilities.settings.reason}
               icon={Settings2}
               onClick={requestSetSettings}
               label="Toggle AutoRecord"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.settings.allowed
+              }
+              unavailableReason={protocolCapabilities.settings.reason}
               icon={Bell}
               onClick={requestToggleNotification}
               label="Toggle Notification"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.recordOnVibe.allowed
+              }
+              unavailableReason={protocolCapabilities.recordOnVibe.reason}
+              icon={Radio}
+              onClick={requestToggleRecordOnVibe}
+              label="Toggle Vibration"
+            />
+            <ActionButton
+              disabled={
+                busy ||
+                !connected ||
+                !protocolCapabilities.bluetoothStatus.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetoothStatus.reason}
               icon={Bluetooth}
               onClick={onBluetoothStatus}
               label="Bluetooth Status"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={requestStartBluetoothScan}
               label="Start Scan"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={requestStopBluetoothScan}
               label="Stop Scan"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={onBluetoothScanResults}
               label="Scan Results"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={onPairedBluetoothDevices}
               label="Paired Devices"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Trash2}
               onClick={requestClearPairedBluetoothDevices}
               label="Clear Paired"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={requestDisconnectBluetoothDevice}
               label="Disconnect BT"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={requestConnectBluetoothDevice}
               label="Connect BT"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.bluetooth.allowed
+              }
+              unavailableReason={protocolCapabilities.bluetooth.reason}
               icon={Bluetooth}
               onClick={requestReconnectBluetoothDevice}
               label="Reconnect BT"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy ||
+                !connected ||
+                !protocolCapabilities.webUsbTimeout.allowed
+              }
+              unavailableReason={protocolCapabilities.webUsbTimeout.reason}
               icon={Usb}
               onClick={onGetWebUsbTimeout}
               label="Get Timeout"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy ||
+                !connected ||
+                !protocolCapabilities.webUsbTimeout.allowed
+              }
+              unavailableReason={protocolCapabilities.webUsbTimeout.reason}
               icon={Usb}
               onClick={requestSetWebUsbTimeout}
               label="Set Timeout"
@@ -1197,19 +1367,45 @@ export default function HiDockManagerPage() {
               label="Switch Audio Input"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy ||
+                !connected ||
+                !protocolCapabilities.startRealtime.allowed
+              }
+              unavailableReason={protocolCapabilities.startRealtime.reason}
               icon={PlayCircle}
               onClick={requestStartRealtime}
               label="Start Live"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={busy || !connected || !liveMode}
+              unavailableReason={
+                liveMode
+                  ? undefined
+                  : "Pause is available only during live mode."
+              }
+              icon={PauseCircle}
+              onClick={requestPauseRealtime}
+              label="Pause Live"
+            />
+            <ActionButton
+              disabled={busy || !connected || !liveMode}
+              unavailableReason={
+                liveMode
+                  ? undefined
+                  : "Live status is available only during live mode."
+              }
               icon={Radio}
               onClick={onGetRealtime}
               label="Live Status"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={busy || !connected || !liveMode}
+              unavailableReason={
+                liveMode
+                  ? undefined
+                  : "Stop is available only during live mode."
+              }
               icon={PauseCircle}
               onClick={requestStopRealtime}
               label="Stop Live"
@@ -1245,7 +1441,10 @@ export default function HiDockManagerPage() {
               label="Delete One"
             />
             <ActionButton
-              disabled={busy || !connected}
+              disabled={
+                busy || !connected || !protocolCapabilities.cardInfo.allowed
+              }
+              unavailableReason={protocolCapabilities.cardInfo.reason}
               icon={HardDrive}
               onClick={requestFormat}
               label="Format Card"
@@ -1315,16 +1514,19 @@ function ActionButton({
   icon: Icon,
   onClick,
   label,
+  unavailableReason,
 }: {
   disabled: boolean;
   icon: LucideIcon;
   onClick: () => Promise<void>;
   label: string;
+  unavailableReason?: string;
 }) {
   return (
     <Button
       variant="outline"
       disabled={disabled}
+      title={disabled ? unavailableReason : undefined}
       onClick={onClick}
       className="justify-start"
     >

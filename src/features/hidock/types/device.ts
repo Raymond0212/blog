@@ -1,10 +1,12 @@
 export type DeviceInfo = {
   connected: boolean
+  identified?: boolean
   model?: string
   vid?: string
   pid?: string
   serial?: string
   firmwareVersion?: string
+  versionNumber?: number
 }
 
 export type HiDockFile = {
@@ -58,6 +60,7 @@ export type DeviceSettings = {
   autoPlay: boolean
   bluetoothTone: boolean
   notificationSound?: boolean
+  recordOnVibe?: boolean
 }
 
 export type BatteryStatus = {
@@ -81,9 +84,12 @@ export type BluetoothDeviceInfo = {
   rssi?: number
   cod?: number
   audio?: boolean
+  sequence?: number
 }
 
 export type BluetoothStatus = {
+  status: "connected" | "disconnected" | "scanning" | "connecting"
+  name?: string
   mac: string
   connected: boolean
   a2dp: boolean
@@ -106,7 +112,19 @@ export type RealtimeStatus = {
   rest: number
   muted: boolean
   dataLength: number
+  data: Uint8Array
 }
+
+export type DeviceConnectionState =
+  | "idle"
+  | "selecting"
+  | "opening"
+  | "connected"
+  | "connected-unidentified"
+  | "disconnecting"
+  | "disconnected"
+  | "reconnecting"
+  | "transport-error"
 
 export type DeleteResult = {
   result: "success" | "not-exists" | "failed" | "unknown_error"

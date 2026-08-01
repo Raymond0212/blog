@@ -3,11 +3,13 @@
 Living architecture reference for agents and contributors working in this standalone frontend repo.
 
 ## 1. Purpose
+
 - Provide a rapid mental model of the copied UI app.
 - Reduce architectural drift after the transplant from `../MockerPI/ui`.
 - Update this file whenever module boundaries, core dependencies, or data flow change.
 
 ## 2. Tech Stack
+
 - Runtime/build: Vite 5, TypeScript 5, React 18.
 - Styling/UI: Tailwind CSS, Radix UI primitives, shadcn-style components in `src/components/ui/*`, and `lucide-react`.
 - Content: MDX via `@mdx-js/rollup` and `@mdx-js/react`, with fenced code highlighting via `rehype-highlight`.
@@ -15,6 +17,7 @@ Living architecture reference for agents and contributors working in this standa
 - Feature utilities: WebUSB/File System Access APIs for HiDock, `@huggingface/transformers`, `recharts`, `sonner`, and supporting UI packages.
 
 ## 3. Build-Time Architecture
+
 - Entry config: `vite.config.ts`.
 - Output directory: `dist`.
 - Aliases:
@@ -26,6 +29,7 @@ Living architecture reference for agents and contributors working in this standa
   - Raw `process.env` is not injected into browser code.
 
 ## 4. Runtime Topology
+
 - `src/main.tsx` mounts `<App />` and global styles.
 - `src/App.tsx` wraps `ThemeProvider` and `MenuItemProvider`.
 - `src/Page.tsx` composes the sidebar shell and main workspace.
@@ -33,10 +37,12 @@ Living architecture reference for agents and contributors working in this standa
 - `src/MyComponents/MainContentComponents/MainContent.tsx` renders the selected menu component through the MDX provider.
 
 ## 5. Key Folders
+
 - `src/components/ui/*`: reusable UI primitives.
 - `src/components/*`: app-level shared UI such as sidebar sections and theme controls.
 - `src/MyComponents/*`: copied feature/page components from the original UI.
-- `src/features/hidock/*`: HiDock Manager page, services, types, and utilities.
+- `src/features/hidock/*`: HiDock Manager page, services, types, utilities, and the pure Jensen protocol layer. The supported implementation and hardware-validation scope is the HiDock P1 Mini only; identifiers and protocol metadata for other models are compatibility references, not supported feature targets.
+- `src/features/hidock/jensen/*`: HiNotes-compatible product mapping, bounded frame codec, serialized command scheduler, capability policy, and response parsers. These modules are browser-independent and covered by parity tests.
 - `src/features/embedding/*`: frontend-only multi-sentence contextual embedding demo using a matched Hugging Face WordPiece tokenizer and quantized MiniLM model in a Web Worker, plus client-side PCA and animated canvas rendering.
 - `src/features/epaper-designer/*`: browser-only 200 × 200 monochrome UI designer with exact Spleen 2.2.0 printable-ASCII bitmap data, fixed-cell component geometry, nested Regions, list pagination, and versioned XML import/export.
 - `src/data/*`: menu model and React context provider.
@@ -46,6 +52,7 @@ Living architecture reference for agents and contributors working in this standa
 - `public/*`: static assets.
 
 ## 6. State And Data Flow
+
 - Local UI state is held in React component state.
 - Menu state is held in `MenuItemProvider` as immutable runtime state (`selectedId`, `expandedIds`) and persisted in `localStorage` under `menu-context`.
 - Article pages are discovered via `import.meta.glob` and merged into a dynamic top-level `Articles` menu node at startup.
@@ -57,15 +64,17 @@ Living architecture reference for agents and contributors working in this standa
 - The Embedding Demo downloads and caches `onnx-community/all-MiniLM-L6-v2-ONNX`, independently embeds up to eight user-provided sentences with its paired tokenizer and quantized transformer in a Web Worker, reduces all contextual token and sentence vectors to one shared three-dimensional PCA projection, and finds the three nearest user tokens by Euclidean distance in that displayed space; it has no predefined comparison vocabulary or backend dependency.
 - App version changes clear `localStorage` and `sessionStorage`, then write `app_version`.
 - Backend interactions use direct `fetch` calls to runtime endpoints such as `/api/projects` and `/api/upload-openapi`.
-- HiDock services use browser capabilities including WebUSB and File System Access when available.
+- HiDock services use browser capabilities including WebUSB and File System Access when available. `WebUsbDeviceService` owns WebUSB configuration and connection state, while the Jensen layer owns wire framing, one-command-at-a-time scheduling, streamed response completion, firmware/model gates, and binary parsing. React subscribes to transport state and derives action availability from the shared capability policy. Automated tests validate the protocol logic with simulated transports. Physical P1 Mini validation on firmware 2.3.1 covers connection and identification, file listing and download, duration conversion, read-only device/card/settings/Bluetooth/recording queries, command serialization, and clean disconnect/reconnect. It also confirms that P1 Mini device-info serials may omit null padding and that WebUSB-timeout commands are unsupported. Destructive and device-mode-changing actions remain intentionally untested. No physical-device validation or feature support is required for other HiDock models.
 - The E-Paper Designer keeps its layout in page-local React state. A pure renderer converts Text Box, Text Area, List Area, and Region components into a 1-bit 200 × 200 pixel buffer; Regions own fully contained ordinary components, which inherit their bitmap font and compose inversion with the parent background. The visible canvas is an integer-scaled preview with editor overlays that are excluded from export. Layout XML is parsed and downloaded entirely in the browser, with no backend or persistent draft storage.
 
 ## 7. Quality Gates
+
 - `npm run lint`
 - `npm run typecheck`
 - `npm run build`
 
 ## 8. Security And Risk Notes
+
 - Do not reintroduce whole-environment browser injection.
 - Keep `.env` files out of git; only `.env.example` is tracked.
 - Validate uploaded OpenAPI/Swagger payloads and untrusted API data before display.

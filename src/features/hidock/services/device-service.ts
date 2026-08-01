@@ -15,6 +15,7 @@ import type {
   RealtimeStatus,
   RecordingQuality,
   RecordingStatus,
+  DeviceConnectionState,
 } from "@/features/hidock/types/device"
 
 export interface DeviceService {
@@ -61,7 +62,12 @@ export interface DeviceService {
   setAudioInputDevice(device: AudioInputDevice): Promise<GenericResult>
   startRealtime(mode: number): Promise<GenericResult | null>
   stopRealtime(): Promise<GenericResult>
+  pauseRealtime(): Promise<GenericResult>
   getRealtime(): Promise<RealtimeStatus>
+  subscribeConnectionState(
+    listener: (state: DeviceConnectionState) => void,
+  ): () => void
+  dispose(): void
   getCapability(): {
     canUsbOperate: boolean
     canPickFolder: boolean

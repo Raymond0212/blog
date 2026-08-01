@@ -5,6 +5,13 @@ The E-Paper Designer imports and exports a self-contained XML description for a
 The accompanying `epaper-layout-v1.xsd` formally defines this structure and is
 available from the designer's **Download XSD** action.
 
+For the implementation contract used by agents to turn XML into a page UI,
+including component mapping, styling precedence, rendering order, and
+acceptance checks, see `XML-AGENT-GUIDE.md`.
+
+For a file-by-file explanation of the six supplied page templates, see
+`XML-LAYOUT-EXAMPLES.md`.
+
 ## Root
 
 `epaper-layout` identifies schema version `1`, the 200 × 200 screen, the

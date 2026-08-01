@@ -16,6 +16,7 @@ import type {
   RealtimeStatus,
   RecordingQuality,
   RecordingStatus,
+  DeviceConnectionState,
 } from "@/features/hidock/types/device"
 
 const UNSUPPORTED_REASON =
@@ -200,8 +201,23 @@ export class BrowserDeviceService implements DeviceService {
     return this.fail()
   }
 
+  async pauseRealtime(): Promise<GenericResult> {
+    return this.fail()
+  }
+
   async getRealtime(): Promise<RealtimeStatus> {
     return this.fail()
+  }
+
+  subscribeConnectionState(
+    listener: (state: DeviceConnectionState) => void,
+  ): () => void {
+    listener("idle")
+    return () => undefined
+  }
+
+  dispose(): void {
+    return
   }
 
   getCapability() {

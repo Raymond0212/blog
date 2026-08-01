@@ -1,6 +1,41 @@
-import { formatDuration } from "@/features/hidock/utils/format"
 import { logger } from "@/features/hidock/utils/logger"
 import type { DeviceService } from "@/features/hidock/services/device-service"
+import {
+  getCapabilities,
+  type JensenCapabilities,
+} from "@/features/hidock/jensen/capability-policy"
+import { JensenCommandScheduler } from "@/features/hidock/jensen/command-scheduler"
+import {
+  JENSEN_USB_ALTERNATE,
+  JENSEN_USB_CONFIGURATION,
+  JENSEN_USB_IN_ENDPOINT,
+  JENSEN_USB_INTERFACE,
+  JENSEN_USB_OUT_ENDPOINT,
+  JENSEN_USB_READ_SIZE,
+  JENSEN_VENDOR_IDS,
+  JensenCommand,
+} from "@/features/hidock/jensen/constants"
+import {
+  isSupportedJensenDevice,
+  modelFromProductId,
+} from "@/features/hidock/jensen/device-models"
+import {
+  JensenFrameDecoder,
+  type JensenMessage,
+} from "@/features/hidock/jensen/frame-codec"
+import {
+  estimateHiDockDurationSec,
+  parseBcdDeviceTime,
+  parseBluetoothDevices,
+  parseBluetoothMac,
+  parseBluetoothStatus,
+  parseDeviceInfoBody,
+  parseFileListPayload,
+  parsePairedBluetoothDevices,
+  parseRecordingStatus,
+  parseRealtimeStatus,
+  parseSettings,
+} from "@/features/hidock/jensen/parsers"
 import type {
   AudioInputDevice,
   BatteryStatus,
@@ -19,440 +54,418 @@ import type {
   RealtimeStatus,
   RecordingQuality,
   RecordingStatus,
+  DeviceConnectionState,
 } from "@/features/hidock/types/device"
-
-const DEFAULT_VIDS = [0x10d6, 0x3887]
-const KNOWN_PIDS = [0xaf0c, 0xaf0d, 0xb00d, 0xaf0e, 0xb00e, 0xaf0f, 0x0100, 0x0101, 0x0102, 0x0103, 0x2040, 0x2041]
-
-const CMD_GET_DEVICE_INFO = 1
-const CMD_GET_DEVICE_TIME = 2
-const CMD_SET_DEVICE_TIME = 3
-const CMD_GET_FILE_LIST = 4
-const CMD_TRANSFER_FILE = 5
-const CMD_GET_FILE_COUNT = 6
-const CMD_DELETE_FILE = 7
-const CMD_BNC_DEMO = 10
-const CMD_GET_SETTINGS = 11
-const CMD_SET_SETTINGS = 12
-const CMD_GET_CARD_INFO = 16
-const CMD_FORMAT_CARD = 17
-const CMD_GET_RECORDING_FILE = 18
-const CMD_GET_BATTERY_STATUS = 4100
-const CMD_START_STOP_BLUETOOTH_SCAN = 4101
-const CMD_GET_BLUETOOTH_SCAN_RESULTS = 4102
-const CMD_GET_PAIRED_BLUETOOTH_DEVICES = 4103
-const CMD_CLEAR_PAIRED_BLUETOOTH_DEVICES = 4104
-const CMD_BLUETOOTH_COMMAND = 4098
-const CMD_GET_BLUETOOTH_STATUS = 4099
-const CMD_SET_AUDIO_INPUT_DEVICE = 4105
-const CMD_GET_AUDIO_INPUT_DEVICE = 4106
-const CMD_ENTER_MASS_STORAGE_MODE = 61455
-const CMD_SET_WEBUSB_TIMEOUT = 61456
-const CMD_GET_WEBUSB_TIMEOUT = 61457
-const CMD_SEND_KEY_CODE = 28
-const CMD_GET_RECORDING_STATUS = 29
-const CMD_SET_RECORDING_QUALITY = 30
-const CMD_GET_RECORDING_QUALITY = 31
-const CMD_REALTIME_CONTROL = 33
-const CMD_GET_REALTIME = 34
-
-const OUT_EP = 1
-const IN_EP = 2
-const IFACE = 0
-const ALT = 0
-const CONFIG = 1
 
 function toHex(v?: number): string | undefined {
   return v == null ? undefined : `0x${v.toString(16)}`
 }
 
-function productModel(pid?: number): string | undefined {
-  if (pid === 0xaf0c || pid === 0x0100 || pid === 0x0102) return "hidock-h1"
-  if (pid === 0xaf0d || pid === 0x0101 || pid === 0x0103) return "hidock-h1e"
-  if (pid === 0xaf0e || pid === 0x2040) return "hidock-p1"
-  if (pid === 0xaf0f || pid === 0x2041) return "hidock-p1:mini"
-  if (pid === 0xb00d || pid === 0xb00e) return "hidock-h1:lite"
-  return undefined
-}
-
 function readUint32BE(bytes: Uint8Array, offset = 0): number {
-  return ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0
+  return (
+    (bytes[offset] * 0x1000000 +
+      (bytes[offset + 1] << 16) +
+      (bytes[offset + 2] << 8) +
+      bytes[offset + 3]) >>>
+    0
+  )
 }
 
 function writeUint32BE(value: number): number[] {
-  return [(value >>> 24) & 0xff, (value >>> 16) & 0xff, (value >>> 8) & 0xff, value & 0xff]
+  return [
+    (value >>> 24) & 0xff,
+    (value >>> 16) & 0xff,
+    (value >>> 8) & 0xff,
+    value & 0xff,
+  ]
 }
 
-function genericResult(msg: UsbMessage | null): GenericResult {
+function genericResult(msg: JensenMessage | null): GenericResult {
   if (!msg) return { result: "failed", error: "No response" }
   const code = msg.body[0] ?? 1
   return { result: code === 0 ? "success" : "failed", code }
-}
-
-function parseBluetoothDevices(body: Uint8Array): BluetoothDeviceInfo[] {
-  if (body.length === 0) return []
-  const count = ((body[0] & 0xff) << 8) | (body[1] & 0xff)
-  const decoder = new TextDecoder("utf-8")
-  const devices: BluetoothDeviceInfo[] = []
-  let offset = 2
-
-  for (let i = 0; i < count && offset < body.length; i += 1) {
-    if (offset + 2 > body.length) break
-    const nameLen = ((body[offset++] & 0xff) << 8) | (body[offset++] & 0xff)
-    if (offset + nameLen + 10 > body.length) break
-    const nameBytes = body.slice(offset, offset + nameLen)
-    offset += nameLen
-    const mac = Array.from(body.slice(offset, offset + 6))
-      .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-      .join("-")
-    offset += 6
-    const rssi = body[offset++] & 0xff
-    const cod = ((body[offset++] & 0xff) << 16) | ((body[offset++] & 0xff) << 8) | (body[offset++] & 0xff)
-    devices.push({
-      name: decoder.decode(nameBytes).replace(/\0+$/g, ""),
-      mac,
-      rssi,
-      cod,
-      audio: ((cod & 0x1f00) >> 8) === 4,
-    })
-  }
-
-  return devices
-}
-
-function macToBytes(mac: string): number[] {
-  const parts = mac.split("-")
-  if (parts.length !== 6) throw new Error("Bluetooth MAC must use AA-BB-CC-DD-EE-FF format")
-  return parts.map((part) => {
-    const value = Number.parseInt(part, 16)
-    if (!Number.isFinite(value) || value < 0 || value > 255) throw new Error("Bluetooth MAC contains an invalid byte")
-    return value
-  })
 }
 
 function toBcd(v: number): number {
   return ((Math.floor(v / 10) << 4) | (v % 10)) & 0xff
 }
 
-function parseBcdTime(body: Uint8Array): string {
-  if (body.length < 7) return "unknown"
-  const digits = Array.from(body.slice(0, 7))
-    .map((b) => `${(b >> 4) & 0x0f}${b & 0x0f}`)
-    .join("")
-  if (digits === "00000000000000") return "unknown"
-  const yyyy = digits.slice(0, 4)
-  const mm = digits.slice(4, 6)
-  const dd = digits.slice(6, 8)
-  const hh = digits.slice(8, 10)
-  const mi = digits.slice(10, 12)
-  const ss = digits.slice(12, 14)
-  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-export function estimateHiDockDurationSec(fileLength: number, version: number, filename: string): number {
-  if (fileLength <= 0) return 0
-
-  if (version === 1) return Math.floor(fileLength / 16)
-  if (version === 2) return Math.floor(Math.max(0, fileLength - 44) / 96)
-  if (version === 3) return Math.floor(Math.max(0, fileLength - 44) / 192)
-  if (version === 5) return Math.floor(fileLength / 12)
-  if (version === 6) return Math.floor(fileLength / 16)
-  if (version === 7) return Math.floor(fileLength / 10)
-
-  if (/^\d{14}REC\d+\.wav$/i.test(filename)) return Math.floor(fileLength / 32)
-  if (/^(\d{2})?(\d{2})(\w{3})(\d{2})-\d{6}-.*\.(hda|wav)$/i.test(filename)) {
-    return Math.floor(fileLength / 8)
-  }
-
-  return 0
-}
-
-function parseHiDockFilenameDate(name: string): string {
-  if (/^\d{14}/.test(name)) {
-    const s = name.slice(0, 14)
-    return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)} ${s.slice(8, 10)}:${s.slice(10, 12)}:${s.slice(12, 14)}`
-  }
-
-  const match = name.match(/^(\d{2})?(\d{2})([A-Za-z]{3})(\d{2})-(\d{2})(\d{2})(\d{2})-.*\.(hda|wav)$/)
-  if (match) {
-    const year = `20${match[2]}`
-    const month = monthNumber(match[3])
-    if (!month) return "-"
-    return `${year}-${month}-${match[4]} ${match[5]}:${match[6]}:${match[7]}`
-  }
-
-  return "-"
-}
-
-function monthNumber(month: string): string | null {
-  const idx = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(
-    month.toLowerCase()
-  )
-  return idx === -1 ? null : String(idx + 1).padStart(2, "0")
-}
-
-type PendingResolver = {
-  resolve: (v: { cmd: number; seq: number; body: Uint8Array } | null) => void
-  timeout: ReturnType<typeof setTimeout>
-}
-
-type UsbMessage = { cmd: number; seq: number; body: Uint8Array }
+export { estimateHiDockDurationSec }
 
 export class WebUsbDeviceService implements DeviceService {
   private device: USBDevice | null = null
-  private seq = Date.now() >>> 0
-  private pending = new Map<string, PendingResolver>()
-  private pendingByCmd = new Map<number, PendingResolver[]>()
-  private queuedByCmd = new Map<number, UsbMessage[]>()
-  private rxBuf: Uint8Array = new Uint8Array(0)
+  private readonly decoder = new JensenFrameDecoder()
+  private readonly scheduler: JensenCommandScheduler
   private readLoopRunning = false
+  private readLoopGeneration = 0
   private cachedDeviceInfo: DeviceInfo | null = null
+  private connectionState: DeviceConnectionState = "idle"
+  private readonly stateListeners = new Set<
+    (state: DeviceConnectionState) => void
+  >()
+  private liveMode = false
+  private listingFiles = false
+  private manualDisconnect = false
+  private disposed = false
+  private consecutiveReadFailures = 0
+  private lastProductId: number | null = null
+  private readonly handleUsbDisconnect = (event: USBConnectionEvent) => {
+    if (event.device === this.device) {
+      void this.handleTransportFailure(new Error("HiDock device was unplugged"))
+    }
+  }
+  private readonly handleUsbConnect = (event: USBConnectionEvent) => {
+    if (
+      this.connectionState === "disconnected" &&
+      !this.manualDisconnect &&
+      event.device.productId === this.lastProductId &&
+      isSupportedJensenDevice(event.device)
+    ) {
+      void this.reconnect(event.device)
+    }
+  }
+
+  constructor() {
+    this.scheduler = new JensenCommandScheduler(async (frame) => {
+      const device = this.device
+      if (!device) throw new Error("Device not connected")
+      const result = await device.transferOut(JENSEN_USB_OUT_ENDPOINT, frame)
+      if (result.status !== "ok")
+        throw new Error(`USB write failed: ${result.status}`)
+    }, Date.now() >>> 0)
+    this.installUsbListeners()
+  }
 
   getCapability() {
     const hasUsb = typeof navigator !== "undefined" && Boolean(navigator.usb)
-    const hasPicker = typeof window !== "undefined" && typeof window.showDirectoryPicker === "function"
+    const hasPicker =
+      typeof window !== "undefined" &&
+      typeof window.showDirectoryPicker === "function"
     return {
       canUsbOperate: hasUsb,
       canPickFolder: hasPicker,
       runtime: "browser" as const,
       transport: hasUsb ? ("webusb" as const) : ("ui-only" as const),
-      reason: hasUsb ? undefined : "WebUSB is unavailable. Use Chrome/Edge desktop with secure context (https or localhost).",
+      reason: hasUsb
+        ? undefined
+        : "WebUSB is unavailable. Use Chrome/Edge desktop with secure context (https or localhost).",
     }
   }
 
-  private nextSeq(): number {
-    this.seq = (this.seq + 1) >>> 0
-    return this.seq
+  subscribeConnectionState(
+    listener: (state: DeviceConnectionState) => void,
+  ): () => void {
+    this.stateListeners.add(listener)
+    listener(this.connectionState)
+    return () => this.stateListeners.delete(listener)
   }
 
-  private makeFrame(cmd: number, seq: number, body = new Uint8Array()): Uint8Array {
-    const len = body.length
-    const out = new Uint8Array(12 + len)
-    let i = 0
-    out[i++] = 0x12
-    out[i++] = 0x34
-    out[i++] = (cmd >> 8) & 0xff
-    out[i++] = cmd & 0xff
-    out[i++] = (seq >>> 24) & 0xff
-    out[i++] = (seq >>> 16) & 0xff
-    out[i++] = (seq >>> 8) & 0xff
-    out[i++] = seq & 0xff
-    out[i++] = (len >>> 24) & 0xff
-    out[i++] = (len >>> 16) & 0xff
-    out[i++] = (len >>> 8) & 0xff
-    out[i++] = len & 0xff
-    out.set(body, i)
-    return out
+  dispose(): void {
+    if (this.disposed) return
+    this.disposed = true
+    const usb = typeof navigator !== "undefined" ? navigator.usb : undefined
+    usb?.removeEventListener("disconnect", this.handleUsbDisconnect)
+    usb?.removeEventListener("connect", this.handleUsbConnect)
+    this.scheduler.stop(new Error("HiDock service disposed"))
+    this.stateListeners.clear()
+    void this.clearTransport(new Error("HiDock service disposed"), true)
   }
 
-  private concat(a: Uint8Array, b: Uint8Array): Uint8Array {
-    const out = new Uint8Array(a.length + b.length)
-    out.set(a, 0)
-    out.set(b, a.length)
-    return out
+  private installUsbListeners(): void {
+    const usb = typeof navigator !== "undefined" ? navigator.usb : undefined
+    usb?.addEventListener("disconnect", this.handleUsbDisconnect)
+    usb?.addEventListener("connect", this.handleUsbConnect)
   }
 
-  private parseFramesFromBuffer(buffer: Uint8Array) {
-    const msgs: Array<{ cmd: number; seq: number; body: Uint8Array }> = []
-    let off = 0
-
-    while (off + 12 <= buffer.length) {
-      if (buffer[off] !== 0x12 || buffer[off + 1] !== 0x34) {
-        off += 1
-        continue
-      }
-      const cmd = (buffer[off + 2] << 8) | buffer[off + 3]
-      const seq = ((buffer[off + 4] << 24) | (buffer[off + 5] << 16) | (buffer[off + 6] << 8) | buffer[off + 7]) >>> 0
-      const len = ((buffer[off + 8] << 24) | (buffer[off + 9] << 16) | (buffer[off + 10] << 8) | buffer[off + 11]) >>> 0
-      const total = 12 + len
-      if (off + total > buffer.length) break
-
-      const body = buffer.slice(off + 12, off + total)
-      msgs.push({ cmd, seq, body })
-      off += total
-    }
-
-    return { msgs, rest: buffer.slice(off) }
+  private setConnectionState(state: DeviceConnectionState): void {
+    if (state === this.connectionState) return
+    this.connectionState = state
+    for (const listener of this.stateListeners) listener(state)
   }
 
-  private startReadLoop() {
+  private startReadLoop(): void {
     if (this.readLoopRunning || !this.device) return
     this.readLoopRunning = true
+    const generation = ++this.readLoopGeneration
 
-    ;(async () => {
-      while (this.readLoopRunning && this.device) {
+    void (async () => {
+      while (
+        this.readLoopRunning &&
+        generation === this.readLoopGeneration &&
+        this.device
+      ) {
+        if (!this.scheduler.isBusy) {
+          await new Promise((resolve) => setTimeout(resolve, 10))
+          continue
+        }
         try {
-          const r = await this.device.transferIn(IN_EP, 512 * 1024)
-          if (!r?.data) continue
-          const chunk = new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength)
-          this.rxBuf = this.concat(this.rxBuf, chunk)
-
-          const { msgs, rest } = this.parseFramesFromBuffer(this.rxBuf)
-          this.rxBuf = rest
-
-          for (const m of msgs) {
-            const wait = this.pending.get(`${m.cmd}-${m.seq}`)
-            if (wait) {
-              clearTimeout(wait.timeout)
-              this.pending.delete(`${m.cmd}-${m.seq}`)
-              wait.resolve(m)
-              continue
+          const result = await this.device.transferIn(
+            JENSEN_USB_IN_ENDPOINT,
+            JENSEN_USB_READ_SIZE,
+          )
+          if (!result?.data || result.data.byteLength === 0) continue
+          this.consecutiveReadFailures = 0
+          const chunk = new Uint8Array(
+            result.data.buffer,
+            result.data.byteOffset,
+            result.data.byteLength,
+          )
+          for (const message of this.decoder.push(chunk)) {
+            logger.debug("webusb", "received Jensen frame", {
+              command: message.command,
+              sequence: message.sequence,
+              payloadLength: message.body.length,
+              paddingLength: message.paddingLength,
+            })
+            if (!this.scheduler.accept(message)) {
+              logger.debug("webusb", "ignored unsolicited Jensen frame", {
+                command: message.command,
+                sequence: message.sequence,
+              })
             }
-            const cmdWaiters = this.pendingByCmd.get(m.cmd)
-            if (cmdWaiters && cmdWaiters.length > 0) {
-              const cmdWait = cmdWaiters.shift()
-              if (cmdWait) {
-                clearTimeout(cmdWait.timeout)
-                cmdWait.resolve(m)
-                if (cmdWaiters.length === 0) this.pendingByCmd.delete(m.cmd)
-                continue
-              }
-            }
-            const queued = this.queuedByCmd.get(m.cmd) ?? []
-            queued.push(m)
-            this.queuedByCmd.set(m.cmd, queued)
           }
-        } catch {
-          await new Promise((r) => setTimeout(r, 30))
+        } catch (error) {
+          this.consecutiveReadFailures += 1
+          if (this.consecutiveReadFailures >= 3) {
+            await this.handleTransportFailure(
+              error instanceof Error ? error : new Error(String(error)),
+            )
+            break
+          }
+          await new Promise((resolve) => setTimeout(resolve, 30))
         }
       }
+      if (generation === this.readLoopGeneration) this.readLoopRunning = false
     })()
   }
 
-  private async sendCommand(cmd: number, body = new Uint8Array(), timeoutSec = 8) {
-    logger.debug("webusb", "sendCommand", { cmd, bodyLen: body.length, timeoutSec })
-    if (!this.device) throw new Error("Device not connected")
-    const seq = this.nextSeq()
-    const frame = this.makeFrame(cmd, seq, body)
-    const key = `${cmd}-${seq}`
-
-    const p = new Promise<{ cmd: number; seq: number; body: Uint8Array } | null>((resolve) => {
-      const timeout = setTimeout(() => {
-        this.pending.delete(key)
-        resolve(null)
-      }, timeoutSec * 1000)
-      this.pending.set(key, { resolve, timeout })
-    })
-
-    const out = await this.device.transferOut(OUT_EP, new Uint8Array(frame))
-    if (out.status !== "ok") {
-      this.pending.delete(key)
-      throw new Error(`USB write failed: ${out.status}`)
-    }
-
-    return p
+  private stopReadLoop(): void {
+    this.readLoopRunning = false
+    this.readLoopGeneration += 1
   }
 
-  private async waitForCommand(cmd: number, timeoutSec = 2): Promise<UsbMessage | null> {
-    const queued = this.queuedByCmd.get(cmd)
-    if (queued && queued.length > 0) {
-      const msg = queued.shift() ?? null
-      if (queued.length === 0) this.queuedByCmd.delete(cmd)
-      return msg
-    }
-
-    return new Promise<UsbMessage | null>((resolve) => {
-      const timeout = setTimeout(() => {
-        const waiters = this.pendingByCmd.get(cmd) ?? []
-        const idx = waiters.findIndex((w) => w.timeout === timeout)
-        if (idx >= 0) waiters.splice(idx, 1)
-        if (waiters.length === 0) this.pendingByCmd.delete(cmd)
-        resolve(null)
-      }, timeoutSec * 1000)
-
-      const waiters = this.pendingByCmd.get(cmd) ?? []
-      waiters.push({ resolve, timeout })
-      this.pendingByCmd.set(cmd, waiters)
+  private async sendCommand(
+    command: number,
+    body = new Uint8Array(),
+    timeoutSeconds = 8,
+  ): Promise<JensenMessage | null> {
+    logger.debug("webusb", "sendCommand", {
+      command,
+      bodyLength: body.length,
+      timeoutSeconds,
     })
+    if (!this.device || !this.device.opened)
+      throw new Error("Device not connected")
+    try {
+      return await this.scheduler.send(command, body, {
+        timeoutMs: timeoutSeconds * 1000,
+      })
+    } catch (error) {
+      if ((error as Error).message.includes("timed out")) return null
+      throw error
+    }
   }
 
   async connect(): Promise<DeviceInfo> {
     logger.info("webusb", "connect requested")
-    if (!navigator.usb) throw new Error("WebUSB is not supported in this browser")
+    if (!navigator.usb)
+      throw new Error("WebUSB is not supported in this browser")
+    this.manualDisconnect = false
+    this.setConnectionState("selecting")
 
     const known = await navigator.usb.getDevices()
-    const existing = known.find((d: USBDevice) => DEFAULT_VIDS.includes(d.vendorId) && KNOWN_PIDS.includes(d.productId))
+    const existing = known.find((device) => isSupportedJensenDevice(device))
 
     let device: USBDevice
     try {
-      device = existing ?? (await navigator.usb.requestDevice({ filters: DEFAULT_VIDS.map((vendorId) => ({ vendorId })) }))
+      device =
+        existing ??
+        (await navigator.usb.requestDevice({
+          filters: JENSEN_VENDOR_IDS.map((vendorId) => ({ vendorId })),
+        }))
     } catch (error) {
+      this.setConnectionState("idle")
       const msg = (error as Error)?.message ?? String(error)
       const lower = msg.toLowerCase()
-      if (lower.includes("no device selected") || lower.includes("notfounderror")) {
-        throw new Error("WebUSB device picker did not return a device. Open this app in Chrome/Edge directly and try again.")
+      if (
+        lower.includes("no device selected") ||
+        lower.includes("notfounderror")
+      ) {
+        throw new Error(
+          "WebUSB device picker did not return a device. Open this app in Chrome/Edge directly and try again.",
+        )
       }
-      if (lower.includes("securityerror") || lower.includes("notallowederror")) {
-        throw new Error("WebUSB access was blocked by browser security/permission policy. Use Chrome/Edge desktop on localhost/HTTPS.")
+      if (
+        lower.includes("securityerror") ||
+        lower.includes("notallowederror")
+      ) {
+        throw new Error(
+          "WebUSB access was blocked by browser security/permission policy. Use Chrome/Edge desktop on localhost/HTTPS.",
+        )
       }
       throw error
     }
 
-    if (!device.opened) await device.open()
-    if (device.configuration?.configurationValue !== CONFIG) await device.selectConfiguration(CONFIG)
-    await device.claimInterface(IFACE)
-    await device.selectAlternateInterface(IFACE, ALT)
+    if (!isSupportedJensenDevice(device)) {
+      this.setConnectionState("idle")
+      throw new Error(
+        "The selected USB device is not a supported HiDock Jensen device",
+      )
+    }
+    return this.openDevice(device, "opening")
+  }
+
+  async disconnect(): Promise<void> {
+    this.manualDisconnect = true
+    this.setConnectionState("disconnecting")
+    await this.clearTransport(new Error("HiDock manually disconnected"), true)
+    this.setConnectionState("idle")
+  }
+
+  private async openDevice(
+    device: USBDevice,
+    state: "opening" | "reconnecting",
+  ): Promise<DeviceInfo> {
+    this.setConnectionState(state)
+    try {
+      if (!device.opened) await device.open()
+      if (
+        device.configuration?.configurationValue !== JENSEN_USB_CONFIGURATION
+      ) {
+        await device.selectConfiguration(JENSEN_USB_CONFIGURATION)
+      }
+      await device.claimInterface(JENSEN_USB_INTERFACE)
+      await device.selectAlternateInterface(
+        JENSEN_USB_INTERFACE,
+        JENSEN_USB_ALTERNATE,
+      )
+    } catch (error) {
+      if (device.opened) {
+        try {
+          await device.close()
+        } catch (closeError) {
+          logger.error(
+            "webusb",
+            "failed to close partially opened device",
+            closeError,
+          )
+        }
+      }
+      this.setConnectionState(state === "opening" ? "idle" : "disconnected")
+      throw error
+    }
 
     this.device = device
-    this.rxBuf = new Uint8Array(0)
-    this.pending.clear()
+    this.lastProductId = device.productId
+    this.cachedDeviceInfo = null
+    this.decoder.reset()
+    this.scheduler.resume()
     this.startReadLoop()
 
-    const info = await this.readDeviceInfoRaw().catch(() => ({ connected: true } as DeviceInfo))
-    this.cachedDeviceInfo = {
-      ...info,
-      connected: true,
-      vid: toHex(device.vendorId),
-      pid: toHex(device.productId),
-      serial: device.serialNumber ?? undefined,
+    try {
+      const info = await this.readDeviceInfoRaw()
+      this.cachedDeviceInfo = {
+        ...info,
+        vid: toHex(device.vendorId),
+        pid: toHex(device.productId),
+        serial: info.serial || device.serialNumber,
+      }
+      this.setConnectionState("connected")
+    } catch (error) {
+      logger.error("webusb", "device identification failed", error)
+      this.cachedDeviceInfo = {
+        connected: true,
+        identified: false,
+        model: modelFromProductId(device.productId),
+        vid: toHex(device.vendorId),
+        pid: toHex(device.productId),
+        serial: device.serialNumber,
+      }
+      this.setConnectionState("connected-unidentified")
     }
     return this.cachedDeviceInfo
   }
 
-  async disconnect(): Promise<void> {
-    this.readLoopRunning = false
-    this.pending.forEach((p) => {
-      clearTimeout(p.timeout)
-      p.resolve(null)
-    })
-    this.pending.clear()
-    this.pendingByCmd.forEach((arr) => {
-      for (const p of arr) {
-        clearTimeout(p.timeout)
-        p.resolve(null)
-      }
-    })
-    this.pendingByCmd.clear()
-    this.queuedByCmd.clear()
-    if (this.device?.opened) await this.device.close()
-    this.device = null
-    this.rxBuf = new Uint8Array(0)
+  private async reconnect(device: USBDevice): Promise<void> {
+    try {
+      await this.openDevice(device, "reconnecting")
+    } catch (error) {
+      logger.error("webusb", "automatic reconnect failed", error)
+      this.setConnectionState("disconnected")
+    }
+  }
+
+  private async handleTransportFailure(error: Error): Promise<void> {
+    if (!this.device && this.connectionState === "disconnected") return
+    logger.error("webusb", "transport failure", error)
+    this.setConnectionState("transport-error")
+    await this.clearTransport(error, true)
+    this.setConnectionState("disconnected")
+  }
+
+  private async clearTransport(
+    reason: Error,
+    closeDevice: boolean,
+  ): Promise<void> {
+    const device = this.device
+    this.stopReadLoop()
+    this.scheduler.cancelAll(reason)
+    this.decoder.reset()
+    this.liveMode = false
+    this.listingFiles = false
     this.cachedDeviceInfo = null
+    this.device = null
+    this.consecutiveReadFailures = 0
+    if (closeDevice && device?.opened) {
+      try {
+        await device.close()
+      } catch (error) {
+        logger.error("webusb", "failed to close device", error)
+      }
+    }
+  }
+
+  private capabilities(): JensenCapabilities {
+    return getCapabilities(
+      {
+        model: this.cachedDeviceInfo?.model,
+        versionNumber: this.cachedDeviceInfo?.versionNumber,
+      },
+      {
+        busy: this.scheduler.isBusy,
+        liveMode: this.liveMode,
+        listingFiles: this.listingFiles,
+      },
+    )
+  }
+
+  private assertCapability(feature: keyof JensenCapabilities): void {
+    const capability = this.capabilities()[feature]
+    if (!capability.allowed)
+      throw new Error(capability.reason ?? `${feature} is unavailable`)
+  }
+
+  private usesLegacySettingsFallback(): boolean {
+    const model = this.cachedDeviceInfo?.model
+    return (
+      (model === "hidock-h1" || model === "hidock-h1e") &&
+      (this.cachedDeviceInfo?.versionNumber ?? 0) < 327714
+    )
   }
 
   private async readDeviceInfoRaw(): Promise<DeviceInfo> {
-    const res = await this.sendCommand(CMD_GET_DEVICE_INFO, new Uint8Array(), 5)
-    if (!res || res.cmd !== CMD_GET_DEVICE_INFO) throw new Error("Failed to get device info")
-    const versionNumber = res.body.length >= 4 ? readUint32BE(res.body, 0) : 0
-    const version = versionNumber
-      ? `${(versionNumber >> 16) & 0xff}.${(versionNumber >> 8) & 0xff}.${versionNumber & 0xff}`
-      : undefined
-    const serial =
-      res.body.length > 4
-        ? new TextDecoder("ascii").decode(res.body.slice(4, 20)).replace(/\0/g, "").trim()
-        : this.device?.serialNumber
-    return {
-      connected: true,
-      model: productModel(this.device?.productId) ?? "HiDock Device",
-      firmwareVersion: version,
-      vid: toHex(this.device?.vendorId),
-      pid: toHex(this.device?.productId),
-      serial: serial || (this.device?.serialNumber ?? undefined),
-    }
+    const response = await this.sendCommand(
+      JensenCommand.GetDeviceInfo,
+      new Uint8Array(),
+      5,
+    )
+    if (!response) throw new Error("Failed to get device info")
+    const model = modelFromProductId(this.device?.productId)
+    if (!model)
+      throw new Error(
+        "HiDock model could not be identified from its product ID",
+      )
+    return parseDeviceInfoBody(response.body, model)
   }
 
   async getDeviceInfo(): Promise<DeviceInfo> {
@@ -463,113 +476,85 @@ export class WebUsbDeviceService implements DeviceService {
   }
 
   async getFileCount(): Promise<number> {
-    const msg = await this.sendCommand(CMD_GET_FILE_COUNT, new Uint8Array(), 5)
+    this.assertCapability("fileList")
+    const msg = await this.sendCommand(
+      JensenCommand.GetFileCount,
+      new Uint8Array(),
+      5,
+    )
     if (!msg || msg.body.length < 4) return 0
     return readUint32BE(msg.body)
   }
 
-  private parseFilenameDate(name: string): string {
-    return parseHiDockFilenameDate(name)
-  }
-
-  private parseFileListPayload(bytes: Uint8Array) {
-    let i = 0
-    let expected = -1
-
-    if (bytes.length >= 6 && bytes[0] === 0xff && bytes[1] === 0xff) {
-      expected = ((bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5]) >>> 0
-      i = 6
-    }
-
-    const files: HiDockFile[] = []
-    while (i < bytes.length) {
-      if (i + 4 > bytes.length) break
-      const version = bytes[i++]
-      const nameLen = (bytes[i++] << 16) | (bytes[i++] << 8) | bytes[i++]
-      if (i + nameLen > bytes.length) break
-
-      const nameBytes = bytes.slice(i, i + nameLen)
-      i += nameLen
-      const filename = new TextDecoder("ascii").decode(nameBytes).replace(/\0+$/g, "")
-
-      if (i + 4 + 6 + 16 > bytes.length) break
-      const length = ((bytes[i++] << 24) | (bytes[i++] << 16) | (bytes[i++] << 8) | bytes[i++]) >>> 0
-      i += 6
-      const signature = Array.from(bytes.slice(i, i + 16))
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("")
-      i += 16
-
-      const durationSec = estimateHiDockDurationSec(length, version, filename)
-      const modeRaw = filename.replace(/^(\w{9})-(\d{6})-(.+?)\d+\.\w+$/i, "$3").toUpperCase()
-      const mode = modeRaw === "WHSP" || modeRaw === "WIP" ? "whisper" : modeRaw === "CALL" ? "call" : "room"
-      files.push({
-        filename,
-        fileLength: length,
-        createdAtRaw: this.parseFilenameDate(filename),
-        durationSec,
-        durationLabel: formatDuration(durationSec),
-        mode,
-        version,
-        signature,
-      })
-    }
-
-    return { files, expected }
-  }
-
-  async listFiles(onPartial?: (files: HiDockFile[]) => void): Promise<HiDockFile[]> {
-    const countHint = await this.getFileCount().catch(() => 0)
-    let aggregate = new Uint8Array(0)
-    let done = false
-    let rounds = 0
+  async listFiles(
+    onPartial?: (files: HiDockFile[]) => void,
+  ): Promise<HiDockFile[]> {
+    this.assertCapability("fileList")
+    const useCountCommand =
+      this.cachedDeviceInfo?.versionNumber == null ||
+      this.cachedDeviceInfo.versionNumber <= 327722
+    const countHint = useCountCommand
+      ? await this.getFileCount().catch(() => 0)
+      : null
+    let aggregate = new Uint8Array()
     let lastEmitted = 0
-    let consecutiveNulls = 0
-    const startedAt = Date.now()
-    const maxDurationMs = 15000
+    this.listingFiles = true
 
-    while (!done && rounds < 20) {
-      if (Date.now() - startedAt > maxDurationMs) break
-
-      rounds += 1
-      const msg = await this.sendCommand(CMD_GET_FILE_LIST, new Uint8Array(), 3)
-      if (!msg || !msg.body) {
-        consecutiveNulls += 1
-        if (consecutiveNulls >= 2) break
-        continue
-      }
-      consecutiveNulls = 0
-      if (msg.body.length === 0) break
-
-      const merged = new Uint8Array(aggregate.length + msg.body.length)
-      merged.set(aggregate, 0)
-      merged.set(msg.body, aggregate.length)
-      aggregate = merged
-
-      const parsed = this.parseFileListPayload(aggregate)
-      if (onPartial && parsed.files.length > lastEmitted) {
-        onPartial(parsed.files)
-        lastEmitted = parsed.files.length
-      }
-
-      if ((parsed.expected >= 0 && parsed.files.length >= parsed.expected) || (countHint > 0 && parsed.files.length >= countHint)) {
-        done = true
-      }
+    try {
+      return await this.scheduler.send<HiDockFile[]>(
+        JensenCommand.GetFileList,
+        new Uint8Array(),
+        {
+          timeoutMs: 5000,
+          streamIdleTimeoutMs: 3000,
+          acceptCommandStream: true,
+          responsePolicy: (message) => {
+            const merged = new Uint8Array(
+              aggregate.length + message.body.length,
+            )
+            merged.set(aggregate)
+            merged.set(message.body, aggregate.length)
+            aggregate = merged
+            const parsed = parseFileListPayload(aggregate)
+            if (onPartial && parsed.files.length > lastEmitted) {
+              lastEmitted = parsed.files.length
+              onPartial(parsed.files)
+            }
+            const complete =
+              parsed.complete ||
+              (countHint != null &&
+                countHint > 0 &&
+                parsed.files.length >= countHint) ||
+              (message.body.length === 0 && countHint === 0)
+            return complete
+              ? { done: true, value: parsed.files }
+              : { done: false }
+          },
+        },
+      )
+    } catch (error) {
+      const parsed = parseFileListPayload(aggregate)
+      if (parsed.files.length === 0 && countHint === 0) return []
+      logger.error("webusb", "file-list stream failed", error)
+      throw new Error(
+        `Timed out while listing files from device${
+          parsed.files.length > 0
+            ? ` (${parsed.files.length} records received)`
+            : ""
+        }`,
+      )
+    } finally {
+      this.listingFiles = false
     }
-
-    const final = this.parseFileListPayload(aggregate).files
-    if (final.length === 0 && countHint > 0) {
-      throw new Error("Timed out while listing files from device")
-    }
-    return final
   }
 
   async downloadFiles(
     files: HiDockFile[],
     _destination: string,
     onProgress: (progress: DownloadProgress) => void,
-    _options?: DownloadOptions
+    _options?: DownloadOptions,
   ): Promise<DownloadReport> {
+    this.assertCapability("fileList")
     void _destination
     void _options
     const aggregateTotal = files.reduce((s, f) => s + f.fileLength, 0)
@@ -580,51 +565,52 @@ export class WebUsbDeviceService implements DeviceService {
       let offset = 0
       let status: DownloadFileResult["status"] = "success"
       let err: string | undefined
-      let failureReason: "none" | "empty_response" | "timeout" | "disconnected" | "short_read" | "exception" = "none"
+      let failureReason:
+        | "none"
+        | "empty_response"
+        | "timeout"
+        | "disconnected"
+        | "short_read"
+        | "exception" = "none"
       const chunks: ArrayBuffer[] = []
 
       try {
-        this.queuedByCmd.delete(CMD_TRANSFER_FILE)
         const startBody = new TextEncoder().encode(file.filename)
-        const start = await this.sendCommand(CMD_TRANSFER_FILE, startBody, 12)
-        if (start?.body && start.body.length > 0) {
-          const initialChunk = new Uint8Array(start.body)
-          chunks.push(initialChunk.buffer.slice(initialChunk.byteOffset, initialChunk.byteOffset + initialChunk.byteLength) as ArrayBuffer)
-          offset += initialChunk.length
-          aggregateDone += initialChunk.length
-          onProgress({ filename: file.filename, done: offset, total: file.fileLength, aggregateDone, aggregateTotal })
-        }
+        await this.scheduler.send<number>(
+          JensenCommand.TransferFile,
+          startBody,
+          {
+            timeoutMs: 12000,
+            streamIdleTimeoutMs: 2500,
+            acceptCommandStream: true,
+            responsePolicy: (message) => {
+              if (message.body.length > 0) {
+                const remaining = Math.max(0, file.fileLength - offset)
+                const chunk = message.body.slice(0, remaining)
+                chunks.push(
+                  chunk.buffer.slice(
+                    chunk.byteOffset,
+                    chunk.byteOffset + chunk.byteLength,
+                  ) as ArrayBuffer,
+                )
+                offset += chunk.length
+                aggregateDone += chunk.length
+                onProgress({
+                  filename: file.filename,
+                  done: offset,
+                  total: file.fileLength,
+                  aggregateDone,
+                  aggregateTotal,
+                })
+              }
+              return offset >= file.fileLength
+                ? { done: true, value: offset }
+                : { done: false }
+            },
+          },
+        )
 
-        const deadline = Date.now() + 180000
-        let consecutiveEmpty = 0
-        while (offset < file.fileLength) {
-          if (Date.now() > deadline) {
-            failureReason = "timeout"
-            break
-          }
-          const msg = await this.waitForCommand(CMD_TRANSFER_FILE, 15)
-          if (!msg) {
-            failureReason = this.device ? "timeout" : "disconnected"
-            break
-          }
-          if (!msg.body || msg.body.length === 0) {
-            consecutiveEmpty += 1
-            if (consecutiveEmpty >= 3) {
-              failureReason = "empty_response"
-              break
-            }
-            await sleep(100)
-            continue
-          }
-          consecutiveEmpty = 0
-          const chunk = new Uint8Array(msg.body)
-          chunks.push(chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength) as ArrayBuffer)
-          offset += chunk.length
-          aggregateDone += chunk.length
-          onProgress({ filename: file.filename, done: offset, total: file.fileLength, aggregateDone, aggregateTotal })
-        }
-
-        if (offset > 0) {
+        if (offset > 0 || file.fileLength === 0) {
           const blob = new Blob(chunks, { type: "application/octet-stream" })
           const url = URL.createObjectURL(blob)
           const anchor = document.createElement("a")
@@ -638,19 +624,26 @@ export class WebUsbDeviceService implements DeviceService {
           if (offset < file.fileLength) {
             status = "failed"
             err = `Short read: expected ${file.fileLength} bytes, got ${offset}`
-            failureReason = failureReason === "none" ? "short_read" : failureReason
+            failureReason =
+              failureReason === "none" ? "short_read" : failureReason
           }
         } else {
           status = "failed"
           err = "No data returned from device"
-          failureReason = failureReason === "none" ? "empty_response" : failureReason
+          failureReason =
+            failureReason === "none" ? "empty_response" : failureReason
         }
       } catch (e) {
         status = "failed"
         err = (e as Error).message
         const lower = (err ?? "").toLowerCase()
-        if (lower.includes("timeout")) failureReason = "timeout"
-        else if (lower.includes("disconnect") || lower.includes("not connected") || lower.includes("device")) failureReason = "disconnected"
+        if (lower.includes("timed out")) failureReason = "timeout"
+        else if (
+          lower.includes("disconnect") ||
+          lower.includes("not connected") ||
+          lower.includes("device")
+        )
+          failureReason = "disconnected"
         else failureReason = "exception"
       }
 
@@ -671,57 +664,108 @@ export class WebUsbDeviceService implements DeviceService {
       })
     }
 
-    return { files: results, totalBytesWritten: results.reduce((s, r) => s + r.bytesWritten, 0) }
+    return {
+      files: results,
+      totalBytesWritten: results.reduce((s, r) => s + r.bytesWritten, 0),
+    }
   }
 
   async deleteFile(filename: string): Promise<DeleteResult> {
-    const msg = await this.sendCommand(CMD_DELETE_FILE, new TextEncoder().encode(filename), 8)
-    if (!msg || msg.cmd !== CMD_DELETE_FILE) return { result: "failed", code: -1 }
+    this.assertCapability("fileList")
+    const msg = await this.sendCommand(
+      JensenCommand.DeleteFile,
+      new TextEncoder().encode(filename),
+      8,
+    )
+    if (!msg || msg.command !== JensenCommand.DeleteFile)
+      return { result: "failed", code: -1 }
     const code = msg.body[0] ?? 2
-    const map: Record<number, DeleteResult["result"]> = { 0: "success", 1: "not-exists", 2: "failed" }
+    const map: Record<number, DeleteResult["result"]> = {
+      0: "success",
+      1: "not-exists",
+      2: "failed",
+    }
     return { result: map[code] ?? "unknown_error", code }
   }
 
   async getCardInfo(): Promise<CardInfo> {
-    const msg = await this.sendCommand(CMD_GET_CARD_INFO, new Uint8Array(), 5)
+    this.assertCapability("cardInfo")
+    const msg = await this.sendCommand(
+      JensenCommand.GetCardInfo,
+      new Uint8Array(),
+      5,
+    )
     if (!msg || msg.body.length < 12) throw new Error("Failed to get card info")
     const free = readUint32BE(msg.body, 0)
     const capacity = readUint32BE(msg.body, 4)
     const statusRaw = readUint32BE(msg.body, 8)
-    return { free, used: Math.max(0, capacity - free), capacity, statusRaw, status: statusRaw.toString(16) }
+    return {
+      free,
+      used: Math.max(0, capacity - free),
+      capacity,
+      statusRaw,
+      status: statusRaw.toString(16),
+    }
   }
 
   async formatCard(confirmed: boolean): Promise<GenericResult> {
-    if (!confirmed) return { result: "failed", error: "format requires explicit confirmation" }
-    const msg = await this.sendCommand(CMD_FORMAT_CARD, new Uint8Array([1, 2, 3, 4]), 60)
+    if (!confirmed)
+      return {
+        result: "failed",
+        error: "format requires explicit confirmation",
+      }
+    this.assertCapability("cardInfo")
+    const msg = await this.sendCommand(
+      JensenCommand.FormatCard,
+      new Uint8Array([1, 2, 3, 4]),
+      60,
+    )
     if (!msg) return { result: "failed", error: "No response" }
     const code = msg.body[0] ?? 1
     return { result: code === 0 ? "success" : "failed", code }
   }
 
   async getRecordingFile(): Promise<{ name: string; status: string } | null> {
-    const msg = await this.sendCommand(CMD_GET_RECORDING_FILE, new Uint8Array(), 5)
+    this.assertCapability("recordingFile")
+    const msg = await this.sendCommand(
+      JensenCommand.GetRecordingFile,
+      new Uint8Array(),
+      5,
+    )
     if (!msg || msg.body.length === 0) return null
-    const name = new TextDecoder("ascii").decode(msg.body).replace(/\0/g, "").trim()
+    const name = new TextDecoder("ascii")
+      .decode(msg.body)
+      .replace(/\0/g, "")
+      .trim()
     if (!name) return null
     return { name, status: "recording_active_or_last" }
   }
 
   async getBatteryStatus(): Promise<BatteryStatus | null> {
-    const msg = await this.sendCommand(CMD_GET_BATTERY_STATUS, new Uint8Array(), 5)
+    this.assertCapability("battery")
+    const msg = await this.sendCommand(
+      JensenCommand.GetBatteryStatus,
+      new Uint8Array(),
+      5,
+    )
     if (!msg || msg.body.length < 6) return null
     const statusCode = msg.body[0] & 0xff
     return {
-      status: statusCode === 0 ? "idle" : statusCode === 1 ? "charging" : "full",
+      status:
+        statusCode === 0 ? "idle" : statusCode === 1 ? "charging" : "full",
       battery: msg.body[1] & 0xff,
       voltage: readUint32BE(msg.body, 2),
     }
   }
 
   async getDeviceTime(): Promise<{ time: string }> {
-    const msg = await this.sendCommand(CMD_GET_DEVICE_TIME, new Uint8Array(), 5)
+    const msg = await this.sendCommand(
+      JensenCommand.GetDeviceTime,
+      new Uint8Array(),
+      5,
+    )
     if (!msg) throw new Error("Failed to get device time")
-    return { time: parseBcdTime(msg.body) }
+    return { time: parseBcdDeviceTime(msg.body) }
   }
 
   async setDeviceTime(date: Date): Promise<GenericResult> {
@@ -735,167 +779,311 @@ export class WebUsbDeviceService implements DeviceService {
       toBcd(date.getMinutes()),
       toBcd(date.getSeconds()),
     ])
-    const msg = await this.sendCommand(CMD_SET_DEVICE_TIME, payload, 5)
+    const msg = await this.sendCommand(JensenCommand.SetDeviceTime, payload, 5)
     if (!msg) return { result: "failed", error: "No response" }
     const code = msg.body[0] ?? 1
     return { result: code === 0 ? "success" : "failed", code }
   }
 
   async getSettings(): Promise<DeviceSettings> {
-    const msg = await this.sendCommand(CMD_GET_SETTINGS, new Uint8Array(), 5)
-    if (!msg || msg.body.length < 4) throw new Error("Failed to get settings")
-    return {
-      autoRecord: msg.body[3] === 1,
-      autoPlay: msg.body[7] === 1,
-      notificationSound: msg.body.length >= 12 ? msg.body[11] === 1 : undefined,
-      bluetoothTone: msg.body[15] !== 1,
+    this.assertCapability("settings")
+    if (this.usesLegacySettingsFallback()) {
+      return {
+        autoRecord: false,
+        autoPlay: false,
+        bluetoothTone: false,
+      }
     }
+    const msg = await this.sendCommand(
+      JensenCommand.GetSettings,
+      new Uint8Array(),
+      5,
+    )
+    if (!msg) throw new Error("Failed to get settings")
+    return parseSettings(msg.body)
   }
 
   async setSettings(settings: Partial<DeviceSettings>): Promise<GenericResult> {
-    const current = await this.getSettings()
-    const merged = { ...current, ...settings }
-    const payload = new Uint8Array(16)
-    payload[3] = merged.autoRecord ? 1 : 2
-    payload[7] = merged.autoPlay ? 1 : 2
-    payload[11] = merged.notificationSound ? 1 : 2
-    payload[15] = merged.bluetoothTone ? 2 : 1
-    const msg = await this.sendCommand(CMD_SET_SETTINGS, payload, 5)
+    this.assertCapability("settings")
+    if (this.usesLegacySettingsFallback()) {
+      return {
+        result: "failed",
+        error: "Settings writes require H1/H1E firmware 327714 or newer.",
+      }
+    }
+    if (settings.recordOnVibe != null) this.assertCapability("recordOnVibe")
+    if (settings.bluetoothTone != null)
+      this.assertCapability("bluetoothPromptSetting")
+    const payload = new Uint8Array(settings.recordOnVibe == null ? 16 : 20)
+    if (settings.autoRecord != null) payload[3] = settings.autoRecord ? 1 : 2
+    if (settings.autoPlay != null) payload[7] = settings.autoPlay ? 1 : 2
+    if (settings.notificationSound != null)
+      payload[11] = settings.notificationSound ? 1 : 2
+    if (settings.bluetoothTone != null)
+      payload[15] = settings.bluetoothTone ? 2 : 1
+    if (settings.recordOnVibe != null)
+      payload[19] = settings.recordOnVibe ? 1 : 2
+    const msg = await this.sendCommand(JensenCommand.SetSettings, payload, 5)
     return genericResult(msg)
   }
 
   async setNotification(enabled: boolean): Promise<GenericResult> {
-    const payload = new Uint8Array(12)
-    payload[11] = enabled ? 1 : 2
-    return genericResult(await this.sendCommand(CMD_SET_SETTINGS, payload, 5))
+    return this.setSettings({ notificationSound: enabled })
   }
 
   async beginBncDemo(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_BNC_DEMO, new Uint8Array([1]), 5))
+    return genericResult(
+      await this.sendCommand(JensenCommand.BncDemo, new Uint8Array([1]), 5),
+    )
   }
 
   async endBncDemo(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_BNC_DEMO, new Uint8Array([0]), 5))
+    return genericResult(
+      await this.sendCommand(JensenCommand.BncDemo, new Uint8Array([0]), 5),
+    )
   }
 
   async startBluetoothScan(count: number): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_START_STOP_BLUETOOTH_SCAN, new Uint8Array([1, count & 0xff]), 5))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.BluetoothScan,
+        new Uint8Array([1, count & 0xff]),
+        5,
+      ),
+    )
   }
 
   async stopBluetoothScan(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_START_STOP_BLUETOOTH_SCAN, new Uint8Array([0, 0]), 5))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.BluetoothScan,
+        new Uint8Array([0, 0]),
+        5,
+      ),
+    )
   }
 
   async getBluetoothScanResults(): Promise<BluetoothDeviceInfo[]> {
-    const msg = await this.sendCommand(CMD_GET_BLUETOOTH_SCAN_RESULTS, new Uint8Array(), 5)
+    this.assertCapability("bluetooth")
+    const msg = await this.sendCommand(
+      JensenCommand.GetBluetoothScanResults,
+      new Uint8Array(),
+      5,
+    )
     return msg ? parseBluetoothDevices(msg.body) : []
   }
 
   async getPairedBluetoothDevices(): Promise<BluetoothDeviceInfo[]> {
-    const msg = await this.sendCommand(CMD_GET_PAIRED_BLUETOOTH_DEVICES, new Uint8Array(), 5)
-    return msg ? parseBluetoothDevices(msg.body) : []
+    this.assertCapability("bluetooth")
+    const msg = await this.sendCommand(
+      JensenCommand.GetPairedBluetoothDevices,
+      new Uint8Array(),
+      5,
+    )
+    return msg ? parsePairedBluetoothDevices(msg.body) : []
   }
 
   async clearPairedBluetoothDevices(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_CLEAR_PAIRED_BLUETOOTH_DEVICES, new Uint8Array([0]), 5))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.ClearPairedBluetoothDevices,
+        new Uint8Array([0]),
+        5,
+      ),
+    )
   }
 
   async getBluetoothStatus(): Promise<BluetoothStatus | null> {
-    const msg = await this.sendCommand(CMD_GET_BLUETOOTH_STATUS, new Uint8Array(), 5)
-    if (!msg || msg.body.length < 11) return null
-    const mac = Array.from(msg.body.slice(0, 6))
-      .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
-      .join("-")
-    let i = 6
-    return {
-      mac,
-      connected: msg.body[i++] === 1,
-      a2dp: msg.body[i++] === 1,
-      hfp: msg.body[i++] === 1,
-      avrcp: msg.body[i++] === 1,
-      battery: Math.floor(((msg.body[i] ?? 0) / 255) * 100),
-    }
+    this.assertCapability("bluetoothStatus")
+    const msg = await this.sendCommand(
+      JensenCommand.GetBluetoothStatus,
+      new Uint8Array(),
+      5,
+    )
+    return msg ? parseBluetoothStatus(msg.body) : null
   }
 
   async disconnectBluetoothDevice(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_BLUETOOTH_COMMAND, new Uint8Array([1]), 10))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.BluetoothCommand,
+        new Uint8Array([1]),
+        10,
+      ),
+    )
   }
 
   async connectBluetoothDevice(mac: string): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_BLUETOOTH_COMMAND, new Uint8Array([0, ...macToBytes(mac)]), 10))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.BluetoothCommand,
+        new Uint8Array([0, ...parseBluetoothMac(mac)]),
+        10,
+      ),
+    )
   }
 
   async reconnectBluetoothDevice(mac: string): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_BLUETOOTH_COMMAND, new Uint8Array([3, ...macToBytes(mac)]), 10))
+    this.assertCapability("bluetooth")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.BluetoothCommand,
+        new Uint8Array([3, ...parseBluetoothMac(mac)]),
+        10,
+      ),
+    )
   }
 
   async getWebUsbTimeout(): Promise<{ timeout: number }> {
-    const msg = await this.sendCommand(CMD_GET_WEBUSB_TIMEOUT, new Uint8Array(), 5)
-    if (!msg || msg.body.length < 4) throw new Error("Failed to get WebUSB timeout")
+    this.assertCapability("webUsbTimeout")
+    const msg = await this.sendCommand(
+      JensenCommand.GetWebUsbTimeout,
+      new Uint8Array(),
+      5,
+    )
+    if (!msg || msg.body.length < 4)
+      throw new Error("Failed to get WebUSB timeout")
     return { timeout: readUint32BE(msg.body) }
   }
 
   async setWebUsbTimeout(timeoutMs: number): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_SET_WEBUSB_TIMEOUT, new Uint8Array(writeUint32BE(timeoutMs)), 5))
+    this.assertCapability("webUsbTimeout")
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.SetWebUsbTimeout,
+        new Uint8Array(writeUint32BE(timeoutMs)),
+        5,
+      ),
+    )
   }
 
   async sendKeyCode(key: number, action: number): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_SEND_KEY_CODE, new Uint8Array([key & 0xff, action & 0xff]), 5))
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.SendKeyCode,
+        new Uint8Array([key & 0xff, action & 0xff]),
+        5,
+      ),
+    )
   }
 
   async enterMassStorageMode(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_ENTER_MASS_STORAGE_MODE, new Uint8Array([1]), 5))
+    const result = genericResult(
+      await this.sendCommand(
+        JensenCommand.EnterMassStorageMode,
+        new Uint8Array([1]),
+        5,
+      ),
+    )
+    if (result.result === "success") {
+      await this.clearTransport(
+        new Error("Device entered mass-storage mode"),
+        true,
+      )
+      this.setConnectionState("disconnected")
+    }
+    return result
   }
 
   async getRecordingStatus(): Promise<RecordingStatus> {
-    const msg = await this.sendCommand(CMD_GET_RECORDING_STATUS, new Uint8Array(), 5)
-    if (!msg || msg.body.length === 0) return { recording: null, duration: 0, samples: [], type: null }
-    let i = 0
-    const typeCode = msg.body[i++] & 0xff
-    const nameLen = msg.body[i++] & 0xff
-    const recording = new TextDecoder("ascii").decode(msg.body.slice(i, i + nameLen)).replace(/\0+$/g, "")
-    i += nameLen
-    const duration = ((msg.body[i++] & 0xff) << 8) | (msg.body[i++] & 0xff)
-    const sampleCount = msg.body[i++] & 0xff
-    const samples = Array.from(msg.body.slice(i, i + sampleCount))
-    return { recording, duration, samples, type: typeCode === 0 ? "recording" : "whisper" }
+    const msg = await this.sendCommand(
+      JensenCommand.GetRecordingStatus,
+      new Uint8Array(),
+      5,
+    )
+    return parseRecordingStatus(msg?.body ?? new Uint8Array())
   }
 
   async getRecordingQuality(): Promise<{ quality: RecordingQuality }> {
-    const msg = await this.sendCommand(CMD_GET_RECORDING_QUALITY, new Uint8Array(), 5)
+    const msg = await this.sendCommand(
+      JensenCommand.GetRecordingQuality,
+      new Uint8Array(),
+      5,
+    )
     const code = msg && msg.body.length >= 4 ? readUint32BE(msg.body) : 0
     return { quality: code === 0 ? "normal" : "high" }
   }
 
   async setRecordingQuality(quality: RecordingQuality): Promise<GenericResult> {
     const code = quality === "normal" ? 0 : 1
-    return genericResult(await this.sendCommand(CMD_SET_RECORDING_QUALITY, new Uint8Array(writeUint32BE(code)), 5))
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.SetRecordingQuality,
+        new Uint8Array(writeUint32BE(code)),
+        5,
+      ),
+    )
   }
 
   async getAudioInputDevice(): Promise<{ device: AudioInputDevice }> {
-    const msg = await this.sendCommand(CMD_GET_AUDIO_INPUT_DEVICE, new Uint8Array(), 5)
+    const msg = await this.sendCommand(
+      JensenCommand.GetAudioInputDevice,
+      new Uint8Array(),
+      5,
+    )
     const code = msg && msg.body.length >= 4 ? readUint32BE(msg.body) : 0
     return { device: code === 0 ? "bt-mic" : "mic" }
   }
 
   async setAudioInputDevice(device: AudioInputDevice): Promise<GenericResult> {
     const code = device === "bt-mic" ? 0 : 1
-    return genericResult(await this.sendCommand(CMD_SET_AUDIO_INPUT_DEVICE, new Uint8Array(writeUint32BE(code)), 5))
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.SetAudioInputDevice,
+        new Uint8Array(writeUint32BE(code)),
+        5,
+      ),
+    )
   }
 
   async startRealtime(mode: number): Promise<GenericResult | null> {
-    const msg = await this.sendCommand(CMD_REALTIME_CONTROL, new Uint8Array([0, 0, 0, 1, 0, 0, 0, mode & 0x03]), 5)
+    this.assertCapability("startRealtime")
+    this.liveMode = true
+    const msg = await this.sendCommand(
+      JensenCommand.RealtimeControl,
+      new Uint8Array([0, 0, 0, 1, 0, 0, 0, mode & 0x03]),
+      5,
+    )
     return genericResult(msg)
   }
 
   async stopRealtime(): Promise<GenericResult> {
-    return genericResult(await this.sendCommand(CMD_REALTIME_CONTROL, new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]), 5))
+    this.liveMode = false
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.RealtimeControl,
+        new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]),
+        5,
+      ),
+    )
+  }
+
+  async pauseRealtime(): Promise<GenericResult> {
+    if (!this.liveMode)
+      return { result: "failed", error: "Realtime is not active" }
+    this.liveMode = false
+    return genericResult(
+      await this.sendCommand(
+        JensenCommand.RealtimeControl,
+        new Uint8Array([0, 0, 0, 2, 0, 0, 0, 0]),
+        5,
+      ),
+    )
   }
 
   async getRealtime(): Promise<RealtimeStatus> {
-    const msg = await this.sendCommand(CMD_GET_REALTIME, new Uint8Array(), 5)
-    if (!msg || msg.body.length < 8) throw new Error("Failed to get realtime audio status")
-    const muted = readUint32BE(msg.body, 4) === 1
-    return { rest: readUint32BE(msg.body, 0), muted, dataLength: msg.body.length }
+    this.liveMode = true
+    const msg = await this.sendCommand(
+      JensenCommand.GetRealtime,
+      new Uint8Array(),
+      5,
+    )
+    if (!msg) throw new Error("Failed to get realtime audio status")
+    return parseRealtimeStatus(msg.body)
   }
 }

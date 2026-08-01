@@ -1,0 +1,152 @@
+# AI News Report - 01 Aug 2026
+
+**Report period:** 26 Jul 2026 to 01 Aug 2026  
+**Generated on:** 01 Aug 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This week was unusually dense and concentrated around production-scale AI operations rather than consumer feature churn. OpenAI dominated the period with seven posts spanning infrastructure economics, benchmark methodology, scientific workflows, workplace adoption, and academic distribution, while Anthropic published one important protocol update focused on MCP deployability and governance. The clearest pattern is that both vendors are pushing AI further into operational systems: lower-cost model tiers, better harness design, stronger enterprise controls, and more standardized agent infrastructure.
+
+**Key updates:**
+
+- OpenAI positioned GPT-5.6 efficiency gains as a full-stack strategy, pairing lower Luna and Terra pricing with faster Sol processing and internal serving optimizations.
+- OpenAI argued that benchmark outcomes depend heavily on harness choices, showing ARC-AGI-3 scores improve sharply when reasoning state and compaction are preserved.
+- OpenAI expanded distribution into research institutions with a program for 100,000 academic researchers using ChatGPT, ChatGPT Work, and Codex.
+- OpenAI published a field report showing coding agents can materially accelerate scientific software modernization, while moving the bottleneck toward validation and stewardship.
+- Anthropic announced support for the MCP `2026-07-28` spec, moving the protocol toward stateless HTTP-style operation with stronger OAuth/OIDC-ready authorization patterns.
+
+**Key trends:**
+
+- AI vendors are increasingly selling outcome economics, workflow throughput, and infrastructure efficiency rather than raw model novelty alone.
+- Agent performance is being framed as a systems problem where harness design, context handling, and tooling choices materially affect results.
+- Enterprise adoption is maturing around governance and standardization, with more emphasis on privacy-controlled workspaces, interoperable protocols, and production-ready authorization.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [Building abundant intelligence](https://openai.com/index/building-abundant-intelligence/)
+**Published:** 2026-07-31
+
+OpenAI uses this post to argue that frontier AI is becoming more economically abundant as capability, adoption, and infrastructure efficiency reinforce each other. The piece ties product reach, falling inference costs, and internal engineering gains into a single operating model for scaling useful intelligence. It is fundamentally a strategy note about deploying capacity against credible demand while lowering the cost of successful outcomes.
+
+---
+
+### [Advancing the price-performance frontier with GPT-5.6](https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/)
+**Published:** 2026-07-30
+
+This announcement focuses on turning backend efficiency gains into customer-facing economics. OpenAI cut GPT-5.6 Luna pricing by 80 percent and Terra pricing by 20 percent, while introducing faster Sol processing for time-sensitive workloads. The management message is that enterprise AI adoption broadens when model choice is tied to outcome value, urgency, and operating cost rather than one default model.
+
+---
+
+### [Accelerating scientific discovery with ChatGPT for Academic Researchers](https://openai.com/index/chatgpt-for-academic-researchers/)
+**Published:** 2026-07-29
+
+OpenAI announced a program to provide ChatGPT, ChatGPT Work, and Codex access to 100,000 academic researchers, starting with 10,000 in summer 2026. The post frames frontier AI as research infrastructure, combining model access with institutional rollout, training, and workflow support. It is a distribution and ecosystem move as much as a product one.
+
+---
+
+### [How GPT-5.6 fuses frontier intelligence with frontier efficiency](https://openai.com/index/gpt-5-6-frontier-intelligence-efficiency/)
+**Published:** 2026-07-29
+
+Although the article is technical, it also makes a business case that stack-wide efficiency gains move the cost-intelligence frontier in a durable way. OpenAI describes how model improvements, inference optimizations, and agent harness design compound to make stronger capability cheaper to deploy. The post supports the broader strategy that higher-end intelligence can scale if the surrounding system keeps getting more productive.
+
+---
+
+### [Scientific computing in the age of agentic AI](https://openai.com/index/scientific-computing-agentic-ai/)
+**Published:** 2026-07-28
+
+OpenAI presents this as a field report on how coding agents are changing scientific software work, especially in under-maintained research codebases. The linked report shows large gains in migration speed, optimization, and maintainability across eight case studies, but it repeatedly emphasizes that validation and long-term ownership still require disciplined human oversight. The management takeaway is that AI shifts the bottleneck from implementation toward review, verification, and stewardship.
+
+---
+
+### [How AI is expanding what people do at work](https://openai.com/index/how-ai-is-expanding-what-people-do-at-work/)
+**Published:** 2026-07-27
+
+OpenAI uses ChatGPT usage data to argue that AI is changing job boundaries inside firms, not just accelerating existing tasks. Workers are increasingly using AI for work traditionally associated with other occupations, suggesting broader generalist workflows may emerge before job titles formally change. The article is chiefly about organizational redesign and early labor-market signals.
+
+---
+
+### [MCP 2026-07-28 spec: stateless core, coming to Claude](https://claude.com/blog/bringing-mcp-2026-07-28-to-claude)
+**Published:** 2026-07-28
+
+Anthropic positions the new MCP release as an operational and ecosystem upgrade, not just a protocol revision. By moving MCP toward stateless request-response behavior and versioned extensions, the company is making server deployment easier across standard infrastructure while improving interoperability across Claude products. The post matters for platform governance because it also ties protocol evolution to stronger enterprise authorization patterns and rollout discipline.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [Building abundant intelligence](https://openai.com/index/building-abundant-intelligence/)
+**Published:** 2026-07-31
+
+The article is partly an engineering report about how OpenAI is lowering the cost of useful intelligence through serving improvements, token-efficiency gains, and better system design around its models. It highlights price cuts for Luna and Terra, faster Sol processing, and improved benchmark outcomes tied to harness behavior rather than raw model changes alone. The practical engineering point is that infrastructure, routing, and context management now materially shape delivered model capability.
+
+---
+
+### [Advancing the price-performance frontier with GPT-5.6](https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6/)
+**Published:** 2026-07-30
+
+This is an engineering and platform announcement about efficiency across the GPT-5.6 stack. OpenAI links lower pricing and faster processing to inference work in kernels, routing, caching, and speculative decoding, and says GPT-5.6 Sol helped discover some of those improvements. It also clarifies how Fast mode replaces Priority Processing for Sol in the API.
+
+---
+
+### [How enabling two settings tripled our scores on the ARC-AGI-3 benchmark](https://openai.com/index/how-two-settings-tripled-our-arc-agi-3-scores/)
+**Published:** 2026-07-29
+
+OpenAI argues that GPT-5.6 Sol's weak ARC-AGI-3 result was mostly a harness problem rather than a pure model limitation. Preserving reasoning state and using compaction instead of rolling truncation raised the public-set score from 13.3 percent to 38.3 percent while using far fewer output tokens. The article is a strong reminder that agent benchmarks are deeply sensitive to API and harness design choices.
+
+---
+
+### [Accelerating scientific discovery with ChatGPT for Academic Researchers](https://openai.com/index/chatgpt-for-academic-researchers/)
+**Published:** 2026-07-29
+
+The announcement is also technically relevant because it highlights the concrete tooling OpenAI wants researchers to use: GPT-5.6 models, larger context windows, deep research workflows, Codex, and domain-specific life-science skills. The post positions these capabilities as everyday research tools rather than experimental demos. It effectively markets an engineering environment for academic work.
+
+---
+
+### [How GPT-5.6 fuses frontier intelligence with frontier efficiency](https://openai.com/index/gpt-5-6-frontier-intelligence-efficiency/)
+**Published:** 2026-07-29
+
+This is the week's clearest deep technical post from OpenAI. It describes efficiency gains across training, inference, and agentic harness design, including Sol-assisted kernel rewrites, better routing, speculative decoding work, and prompt-cache-friendly context handling. OpenAI presents these as the mechanisms that let GPT-5.6 improve both capability and economics at production scale.
+
+---
+
+### [Scientific computing in the age of agentic AI](https://openai.com/index/scientific-computing-agentic-ai/)
+**Published:** 2026-07-28
+
+OpenAI's linked field report shows how coding agents are being used to rewrite, migrate, optimize, and validate real scientific software stacks. The case studies cover large code migrations, GPU-native redesigns, runtime reductions, and reproducibility problems in research tooling. The common lesson is that agents can dramatically compress implementation effort, but correctness still depends on external tests and domain-aware review.
+
+---
+
+### [MCP 2026-07-28 spec: stateless core, coming to Claude](https://claude.com/blog/bringing-mcp-2026-07-28-to-claude)
+**Published:** 2026-07-28
+
+Anthropic's MCP post is primarily an engineering infrastructure update. The protocol drops session-oriented behavior in favor of stateless per-request metadata, adds `server/discover`, and formalizes extensions such as MCP Apps and Tasks. That makes MCP servers easier to run on conventional HTTP, serverless, and edge environments while making long-running workflows and inline UIs more standardized.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Accelerating scientific discovery with ChatGPT for Academic Researchers](https://openai.com/index/chatgpt-for-academic-researchers/)
+**Published:** 2026-07-29
+
+Security matters here because OpenAI routes the academic program through institution-managed workspaces with business-grade privacy controls. The article says workspace data is not used to train models by default, making the program more viable for research teams handling sensitive material. This is a practical privacy and governance story, not just a research-access announcement.
+
+---
+
+### [MCP 2026-07-28 spec: stateless core, coming to Claude](https://claude.com/blog/bringing-mcp-2026-07-28-to-claude)
+**Published:** 2026-07-28
+
+Anthropic explicitly connects the new MCP release to stronger production authorization and governance. The post emphasizes OAuth 2.0 and OIDC-aligned identity flows, enterprise IdP compatibility, and cleaner protocol behavior for production agent integrations. That makes the update relevant to teams concerned with secure connector deployment and control boundaries.
