@@ -320,11 +320,6 @@ const buttonDocs: ButtonDoc[] = [
     description: "Sends the playback double-press key code.",
   },
   {
-    label: "Delete One",
-    risk: "Destructive",
-    description: "Permanently deletes the first selected recording.",
-  },
-  {
     label: "Format Card",
     risk: "Destructive",
     description: "Formats the storage card and erases recordings.",
@@ -339,7 +334,6 @@ export default function HiDockManagerPage() {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo | null>(null);
   const [liveMode, setLiveMode] = useState(false);
   const [files, setFiles] = useState<HiDockFile[]>([]);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState("Ready to connect");
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
@@ -556,7 +550,6 @@ export default function HiDockManagerPage() {
 
     if (list) {
       setFiles(list);
-      setSelected({});
     }
     if (info) setDeviceInfo(info);
     setDetails(
@@ -572,8 +565,6 @@ export default function HiDockManagerPage() {
       ),
     );
   };
-
-  const selectedFiles = files.filter((f) => selected[f.filename]);
 
   const recordingCounts = getLocalRecordingCounts(files);
   const visibleFiles = filterLocalRecordings(files, {
@@ -625,7 +616,6 @@ export default function HiDockManagerPage() {
       setDeviceInfo(null);
       setLiveMode(false);
       setFiles([]);
-      setSelected({});
       setActivity("idle");
       setStatus("Disconnected");
       setProgress({ current: "-", aggregate: "-" });
@@ -638,7 +628,6 @@ export default function HiDockManagerPage() {
         setStatus(`Streaming file list... ${partial.length} parsed`);
       });
       setFiles(list);
-      setSelected({});
       setStatus(`Loaded ${list.length} files`);
       setDetails(JSON.stringify({ files: list.length }, null, 2));
     });
@@ -812,16 +801,6 @@ export default function HiDockManagerPage() {
       setDetails(JSON.stringify(await service.formatCard(true), null, 2));
       await refreshAfterSuccess();
     });
-
-  const requestDeleteFirstSelected = async () => {
-    const target = selectedFiles[0];
-    if (!target) {
-      setStatus("Select one file to delete first");
-      return;
-    }
-
-    requestDeleteFile(target);
-  };
 
   const requestDeleteFile = (target: HiDockFile) => {
     requestConfirmedAction(
@@ -1478,7 +1457,6 @@ export default function HiDockManagerPage() {
           const list = await service.listFiles();
           if (cancelled) return;
           setFiles(list);
-          setSelected({});
           setHighlightedFile(completed);
           setActivity("idle");
           setStatus(`Recording complete: ${completed}`);
@@ -1602,15 +1580,77 @@ export default function HiDockManagerPage() {
     setSortAsc(true);
   };
 
-  const toggleFile = (name: string, checked: boolean) => {
-    setSelected((prev) => ({ ...prev, [name]: checked }));
+  const recordingPlaybackButton = (file: HiDockFile) => {
+    const action = getRecordingPlaybackAction(
+      playback.file?.filename ?? null,
+      activity,
+      file.filename,
+    );
+
+    return (
+      <Button
+        size="icon"
+        variant={
+          playback.file?.filename === file.filename ? "secondary" : "outline"
+        }
+        disabled={
+          busy ||
+          !connected ||
+          activity === "recording" ||
+          activity === "stopping" ||
+          activity === "realtime-monitor"
+        }
+        onClick={() => onToggleRecordingPlayback(file)}
+        aria-label={`${action === "stop" ? "Stop" : "Play"} ${file.filename}`}
+        title={`${action === "stop" ? "Stop" : "Play"} ${file.filename}`}
+      >
+        {action === "stop" ? (
+          <PauseCircle className="h-4 w-4" />
+        ) : (
+          <PlayCircle className="h-4 w-4" />
+        )}
+      </Button>
+    );
   };
 
-  const toggleAll = (checked: boolean) => {
-    const next: Record<string, boolean> = {};
-    for (const file of visibleFiles) next[file.filename] = checked;
-    setSelected((previous) => ({ ...previous, ...next }));
-  };
+  const recordingActionsMenu = (file: HiDockFile) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          size="icon"
+          variant="ghost"
+          disabled={
+            busy ||
+            !connected ||
+            activity === "recording" ||
+            activity === "stopping" ||
+            activity === "file-transfer" ||
+            activity === "playback" ||
+            activity === "realtime-monitor"
+          }
+          aria-label={`Actions for ${file.filename}`}
+          title={`Actions for ${file.filename}`}
+        >
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onSelect={() => void onDownloadFile(file)}>
+          <Download className="mr-2 h-4 w-4" />
+          Download
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-destructive focus:text-destructive"
+          disabled={destructiveLocked}
+          onSelect={() => requestDeleteFile(file)}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   const lockedReason = safetyLock
     ? "Safety lock is on. Unlock device changes to use this control."
@@ -1625,7 +1665,7 @@ export default function HiDockManagerPage() {
     activity === "realtime-monitor";
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 max-w-full space-y-6 overflow-x-hidden">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-bold">
@@ -1841,195 +1881,155 @@ export default function HiDockManagerPage() {
                     aria-label="Search local recordings"
                   />
                 </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <Checkbox
-                          checked={
-                            visibleFiles.length > 0 &&
-                            visibleFiles.every(
-                              (file) => selected[file.filename],
-                            )
-                          }
-                          onCheckedChange={(checked) =>
-                            toggleAll(checked === true)
-                          }
-                          aria-label="Select all files"
-                        />
-                      </TableHead>
-                      <TableHead>
-                        <SortButton
-                          onClick={() => toggleSort("filename")}
-                          active={sortKey === "filename"}
-                        >
-                          Filename
-                        </SortButton>
-                      </TableHead>
-                      <TableHead>
-                        <SortButton
-                          onClick={() => toggleSort("fileLength")}
-                          active={sortKey === "fileLength"}
-                        >
-                          Size
-                        </SortButton>
-                      </TableHead>
-                      <TableHead>
-                        <SortButton
-                          onClick={() => toggleSort("createdAtRaw")}
-                          active={sortKey === "createdAtRaw"}
-                        >
-                          Created
-                        </SortButton>
-                      </TableHead>
-                      <TableHead>
-                        <SortButton
-                          onClick={() => toggleSort("durationSec")}
-                          active={sortKey === "durationSec"}
-                        >
-                          Duration
-                        </SortButton>
-                      </TableHead>
-                      <TableHead>View</TableHead>
-                      <TableHead className="w-16 text-right">
-                        <span className="sr-only">Playback</span>
-                      </TableHead>
-                      <TableHead className="w-12 text-right">
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedFiles.length === 0 ? (
+                <div
+                  className="space-y-3 md:hidden"
+                  aria-label="Recording cards"
+                >
+                  {sortedFiles.length === 0 ? (
+                    <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+                      {files.length === 0
+                        ? "No recordings loaded yet. Connect and list files to begin."
+                        : "No local recordings match this view."}
+                    </div>
+                  ) : (
+                    sortedFiles.map((file) => (
+                      <article
+                        key={file.filename}
+                        className={`min-w-0 rounded-lg border p-4 ${
+                          highlightedFile === file.filename
+                            ? "border-primary bg-primary/10"
+                            : "bg-card"
+                        }`}
+                      >
+                        <div className="flex min-w-0 items-start gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="break-words font-medium leading-snug">
+                              {file.filename}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {file.mode === "whisper" ? "Whisper" : "Note"}
+                            </p>
+                          </div>
+                          <div className="flex shrink-0 gap-1">
+                            {recordingPlaybackButton(file)}
+                            {recordingActionsMenu(file)}
+                          </div>
+                        </div>
+                        <dl className="mt-4 grid grid-cols-3 gap-3 text-xs text-muted-foreground">
+                          <div className="min-w-0">
+                            <dt className="opacity-70">Size</dt>
+                            <dd className="mt-0.5 truncate text-foreground/70">
+                              {formatBytes(file.fileLength)}
+                            </dd>
+                          </div>
+                          <div className="min-w-0">
+                            <dt className="opacity-70">Created</dt>
+                            <dd className="mt-0.5 break-words text-foreground/70">
+                              {file.createdAtRaw || "-"}
+                            </dd>
+                          </div>
+                          <div className="min-w-0">
+                            <dt className="opacity-70">Duration</dt>
+                            <dd className="mt-0.5 truncate text-foreground/70">
+                              {file.durationLabel}
+                            </dd>
+                          </div>
+                        </dl>
+                      </article>
+                    ))
+                  )}
+                </div>
+
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell
-                          colSpan={8}
-                          className="text-center text-muted-foreground"
-                        >
-                          {files.length === 0
-                            ? "No recordings loaded yet. Connect and list files to begin."
-                            : "No local recordings match this view."}
-                        </TableCell>
+                        <TableHead>
+                          <SortButton
+                            onClick={() => toggleSort("filename")}
+                            active={sortKey === "filename"}
+                          >
+                            Filename
+                          </SortButton>
+                        </TableHead>
+                        <TableHead>
+                          <SortButton
+                            onClick={() => toggleSort("fileLength")}
+                            active={sortKey === "fileLength"}
+                          >
+                            Size
+                          </SortButton>
+                        </TableHead>
+                        <TableHead>
+                          <SortButton
+                            onClick={() => toggleSort("createdAtRaw")}
+                            active={sortKey === "createdAtRaw"}
+                          >
+                            Created
+                          </SortButton>
+                        </TableHead>
+                        <TableHead>
+                          <SortButton
+                            onClick={() => toggleSort("durationSec")}
+                            active={sortKey === "durationSec"}
+                          >
+                            Duration
+                          </SortButton>
+                        </TableHead>
+                        <TableHead>View</TableHead>
+                        <TableHead className="w-16 text-right">
+                          <span className="sr-only">Playback</span>
+                        </TableHead>
+                        <TableHead className="w-12 text-right">
+                          <span className="sr-only">Actions</span>
+                        </TableHead>
                       </TableRow>
-                    ) : (
-                      sortedFiles.map((file) => (
-                        <TableRow
-                          key={file.filename}
-                          className={
-                            highlightedFile === file.filename
-                              ? "bg-primary/10"
-                              : undefined
-                          }
-                        >
-                          <TableCell>
-                            <Checkbox
-                              checked={Boolean(selected[file.filename])}
-                              onCheckedChange={(checked) =>
-                                toggleFile(file.filename, checked === true)
-                              }
-                              aria-label={`Select ${file.filename}`}
-                            />
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {file.filename}
-                          </TableCell>
-                          <TableCell>{formatBytes(file.fileLength)}</TableCell>
-                          <TableCell>{file.createdAtRaw || "-"}</TableCell>
-                          <TableCell>{file.durationLabel}</TableCell>
-                          <TableCell>
-                            {file.mode === "whisper" ? "Whisper" : "Note"}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button
-                              size="icon"
-                              variant={
-                                playback.file?.filename === file.filename
-                                  ? "secondary"
-                                  : "outline"
-                              }
-                              disabled={
-                                busy ||
-                                !connected ||
-                                activity === "recording" ||
-                                activity === "stopping" ||
-                                activity === "realtime-monitor"
-                              }
-                              onClick={() => onToggleRecordingPlayback(file)}
-                              aria-label={`${
-                                getRecordingPlaybackAction(
-                                  playback.file?.filename ?? null,
-                                  activity,
-                                  file.filename,
-                                ) === "stop"
-                                  ? "Stop"
-                                  : "Play"
-                              } ${file.filename}`}
-                              title={`${
-                                getRecordingPlaybackAction(
-                                  playback.file?.filename ?? null,
-                                  activity,
-                                  file.filename,
-                                ) === "stop"
-                                  ? "Stop"
-                                  : "Play"
-                              } ${file.filename}`}
-                            >
-                              {getRecordingPlaybackAction(
-                                playback.file?.filename ?? null,
-                                activity,
-                                file.filename,
-                              ) === "stop" ? (
-                                <PauseCircle className="h-4 w-4" />
-                              ) : (
-                                <PlayCircle className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  disabled={
-                                    busy ||
-                                    !connected ||
-                                    activity === "recording" ||
-                                    activity === "stopping" ||
-                                    activity === "file-transfer" ||
-                                    activity === "playback" ||
-                                    activity === "realtime-monitor"
-                                  }
-                                  aria-label={`Actions for ${file.filename}`}
-                                  title={`Actions for ${file.filename}`}
-                                >
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onSelect={() => void onDownloadFile(file)}
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Download
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-destructive focus:text-destructive"
-                                  disabled={destructiveLocked}
-                                  onSelect={() => requestDeleteFile(file)}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                    </TableHeader>
+                    <TableBody>
+                      {sortedFiles.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={7}
+                            className="text-center text-muted-foreground"
+                          >
+                            {files.length === 0
+                              ? "No recordings loaded yet. Connect and list files to begin."
+                              : "No local recordings match this view."}
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ) : (
+                        sortedFiles.map((file) => (
+                          <TableRow
+                            key={file.filename}
+                            className={
+                              highlightedFile === file.filename
+                                ? "bg-primary/10"
+                                : undefined
+                            }
+                          >
+                            <TableCell className="font-medium">
+                              {file.filename}
+                            </TableCell>
+                            <TableCell>
+                              {formatBytes(file.fileLength)}
+                            </TableCell>
+                            <TableCell>{file.createdAtRaw || "-"}</TableCell>
+                            <TableCell>{file.durationLabel}</TableCell>
+                            <TableCell>
+                              {file.mode === "whisper" ? "Whisper" : "Note"}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {recordingPlaybackButton(file)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {recordingActionsMenu(file)}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
                 {playback.file && (
                   <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -2098,9 +2098,9 @@ export default function HiDockManagerPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="live" className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+        <TabsContent value="live" className="min-w-0 space-y-6">
+          <div className="grid min-w-0 gap-6 lg:grid-cols-2">
+            <Card className="min-w-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Radio className="h-5 w-5 text-red-500" />
@@ -2113,7 +2113,7 @@ export default function HiDockManagerPage() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <div className="overflow-hidden rounded-lg border bg-muted/30 p-5">
-                  <div className="flex min-w-0 items-center justify-between gap-4">
+                  <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-muted-foreground">
                         {recordingStatus.recording ? "Recording" : "Ready"}
@@ -2168,7 +2168,7 @@ export default function HiDockManagerPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-0">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Activity className="h-5 w-5 text-emerald-500" />
@@ -2182,7 +2182,7 @@ export default function HiDockManagerPage() {
               </CardHeader>
               <CardContent className="space-y-5">
                 <Meter label="Input level" value={monitor.rms} />
-                <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
                   <StatusCard
                     label="Elapsed"
                     value={formatElapsed(monitor.elapsedSec)}
@@ -2194,7 +2194,7 @@ export default function HiDockManagerPage() {
                   />
                 </div>
                 {activity === "realtime-monitor" ? (
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <Button
                       className="flex-1"
                       variant="outline"
@@ -2243,9 +2243,9 @@ export default function HiDockManagerPage() {
                 {localMonitorRecording && (
                   <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
+                      <div className="min-w-0">
                         <p className="font-medium">Local monitor recording</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="break-all text-sm text-muted-foreground">
                           {localMonitorRecording.filename} ·{" "}
                           {formatBytes(localMonitorRecording.bytes)}
                         </p>
@@ -2256,7 +2256,7 @@ export default function HiDockManagerPage() {
                       </Button>
                     </div>
                     <audio
-                      className="w-full"
+                      className="w-full max-w-full"
                       controls
                       src={localMonitorRecording.url}
                     />
@@ -2268,7 +2268,7 @@ export default function HiDockManagerPage() {
         </TabsContent>
 
         <TabsContent value="configurations" className="space-y-6">
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="flex flex-row items-start justify-between gap-4">
               <div>
                 <CardTitle>Configurations</CardTitle>
@@ -2454,7 +2454,7 @@ export default function HiDockManagerPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tools" className="space-y-6">
+        <TabsContent value="tools" className="min-w-0 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Details</CardTitle>
@@ -2462,14 +2462,14 @@ export default function HiDockManagerPage() {
                 Raw operation output and device snapshots.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <pre className="max-h-[32rem] overflow-auto rounded-md border bg-muted/50 p-4 text-xs leading-6">
+            <CardContent className="min-w-0">
+              <pre className="max-h-[32rem] min-w-0 max-w-full overflow-auto whitespace-pre-wrap break-all rounded-md border bg-muted/50 p-4 text-xs leading-6">
                 {details || "No details yet."}
               </pre>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle className="text-lg">Device Actions</CardTitle>
               <CardDescription>
@@ -2480,7 +2480,7 @@ export default function HiDockManagerPage() {
             <CardContent className="space-y-4">
               <fieldset
                 disabled={deviceActivityLocked}
-                className="grid gap-2 md:grid-cols-2 xl:grid-cols-5"
+                className="grid min-w-0 gap-2 md:grid-cols-2 xl:grid-cols-5"
                 title={
                   deviceActivityLocked
                     ? "Device tools are paused while recording, transferring, or monitoring."
@@ -2828,13 +2828,6 @@ export default function HiDockManagerPage() {
                   label="Playback Key"
                 />
                 <ActionButton
-                  disabled={busy || !connected || destructiveLocked}
-                  unavailableReason={lockedReason}
-                  icon={Trash2}
-                  onClick={requestDeleteFirstSelected}
-                  label="Delete One"
-                />
-                <ActionButton
                   disabled={
                     busy ||
                     !connected ||
@@ -2997,7 +2990,7 @@ function MiniWaveform({
     <div
       className={`min-w-0 items-center justify-center gap-0.5 overflow-hidden ${
         large
-          ? "flex h-20 w-40 max-w-[45%] shrink"
+          ? "flex h-20 w-full max-w-full shrink sm:w-40 sm:max-w-[45%]"
           : "hidden h-10 w-28 max-w-[30%] shrink sm:flex"
       }`}
       aria-label={active ? "Live audio waveform" : "Audio waveform idle"}
