@@ -52,7 +52,9 @@ export function estimateHiDockDurationSec(
   else if (version === 8) durationMs = Math.max(0, fileLength - 44) / 32
   else if (version === 9) durationMs = Math.max(0, fileLength - 44) / 64
   else if (/^\d{14}REC\d+\.wav$/i.test(filename)) durationMs = fileLength / 32
-  else if (/^(\d{2})?(\d{2})(\w{3})(\d{2})-\d{6}-.*\.(hda|wav)$/i.test(filename)) {
+  else if (
+    /^(\d{2})?(\d{2})(\w{3})(\d{2})-\d{6}-.*\.(hda|wav)$/i.test(filename)
+  ) {
     durationMs = fileLength / 8
   }
   return Math.floor(durationMs / 1000)
@@ -382,6 +384,127 @@ export function parseRealtimeStatus(body: Uint8Array): RealtimeStatus {
     rest: readUint32BE(body),
     muted: readUint32BE(body, 4) === 1,
     dataLength: body.length,
-    data: body.slice(),
+    audioData: body.slice(8),
   }
+}
+
+export function decodeRealtimePcm16(audio: Uint8Array): {
+  left: Float32Array
+  right: Float32Array
+  rmsLeft: number
+  rmsRight: number
+} {
+  const frameCount = Math.floor(audio.length / 4)
+  const left = new Float32Array(frameCount)
+  const right = new Float32Array(frameCount)
+  const view = new DataView(audio.buffer, audio.byteOffset, audio.byteLength)
+  let leftSquares = 0
+  let rightSquares = 0
+
+  for (let index = 0; index < frameCount; index += 1) {
+    const offset = index * 4
+    const leftSample = view.getInt16(offset, true) / 32768
+    const rightSample = view.getInt16(offset + 2, true) / 32768
+    left[index] = leftSample
+    right[index] = rightSample
+    leftSquares += leftSample * leftSample
+    rightSquares += rightSample * rightSample
+  }
+
+  return {
+    left,
+    right,
+    rmsLeft: frameCount === 0 ? 0 : Math.sqrt(leftSquares / frameCount),
+    rmsRight: frameCount === 0 ? 0 : Math.sqrt(rightSquares / frameCount),
+  }
+}
+
+export type RealtimeNoiseState = {
+  noiseFloor: number
+  previousInput: number
+  previousOutput: number
+}
+
+export function suppressRealtimeNoise(
+  left: Float32Array,
+  right: Float32Array,
+  initialState: RealtimeNoiseState,
+): { mono: Float32Array; rms: number; state: RealtimeNoiseState } {
+  const length = Math.min(left.length, right.length)
+  const mono = new Float32Array(length)
+  let noiseFloor = Math.max(0.001, initialState.noiseFloor)
+  let previousInput = initialState.previousInput
+  let previousOutput = initialState.previousOutput
+  let squares = 0
+
+  for (let index = 0; index < length; index += 1) {
+    const input =
+      Math.abs(left[index]) >= Math.abs(right[index])
+        ? left[index]
+        : right[index]
+    const highPassed = 0.995 * (previousOutput + input - previousInput)
+    previousInput = input
+    previousOutput = highPassed
+    const magnitude = Math.abs(highPassed)
+
+    if (magnitude < 0.08) {
+      noiseFloor = noiseFloor * 0.995 + magnitude * 0.005
+    }
+    const gate = Math.max(0.012, noiseFloor * 2.2)
+    const output =
+      magnitude <= gate
+        ? 0
+        : Math.sign(highPassed) * Math.min(1, magnitude - gate)
+    mono[index] = output
+    squares += output * output
+  }
+
+  return {
+    mono,
+    rms: length === 0 ? 0 : Math.sqrt(squares / length),
+    state: { noiseFloor, previousInput, previousOutput },
+  }
+}
+
+export function encodeMonoPcm16Wav(
+  chunks: Float32Array[],
+  sampleRate: number,
+): Blob {
+  const sampleCount = chunks.reduce((total, chunk) => total + chunk.length, 0)
+  const bytes = new Uint8Array(44 + sampleCount * 2)
+  const view = new DataView(bytes.buffer)
+  const writeAscii = (offset: number, value: string) => {
+    for (let index = 0; index < value.length; index += 1) {
+      bytes[offset + index] = value.charCodeAt(index)
+    }
+  }
+
+  writeAscii(0, "RIFF")
+  view.setUint32(4, 36 + sampleCount * 2, true)
+  writeAscii(8, "WAVE")
+  writeAscii(12, "fmt ")
+  view.setUint32(16, 16, true)
+  view.setUint16(20, 1, true)
+  view.setUint16(22, 1, true)
+  view.setUint32(24, sampleRate, true)
+  view.setUint32(28, sampleRate * 2, true)
+  view.setUint16(32, 2, true)
+  view.setUint16(34, 16, true)
+  writeAscii(36, "data")
+  view.setUint32(40, sampleCount * 2, true)
+
+  let offset = 44
+  for (const chunk of chunks) {
+    for (const sample of chunk) {
+      const clamped = Math.max(-1, Math.min(1, sample))
+      view.setInt16(
+        offset,
+        clamped < 0 ? Math.round(clamped * 32768) : Math.round(clamped * 32767),
+        true,
+      )
+      offset += 2
+    }
+  }
+
+  return new Blob([bytes], { type: "audio/wav" })
 }

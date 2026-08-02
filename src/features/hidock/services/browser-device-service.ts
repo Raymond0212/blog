@@ -16,6 +16,7 @@ import type {
   RealtimeStatus,
   RecordingQuality,
   RecordingStatus,
+  TransferRecordingResult,
   DeviceConnectionState,
 } from "@/features/hidock/types/device"
 
@@ -43,7 +44,9 @@ export class BrowserDeviceService implements DeviceService {
     return this.fail()
   }
 
-  async listFiles(onPartial?: (files: HiDockFile[]) => void): Promise<HiDockFile[]> {
+  async listFiles(
+    onPartial?: (files: HiDockFile[]) => void,
+  ): Promise<HiDockFile[]> {
     void onPartial
     return this.fail()
   }
@@ -51,10 +54,19 @@ export class BrowserDeviceService implements DeviceService {
   async downloadFiles(
     files: HiDockFile[],
     destination: string,
-    onProgress: (progress: DownloadProgress) => void
+    onProgress: (progress: DownloadProgress) => void,
   ): Promise<DownloadReport> {
     void files
     void destination
+    void onProgress
+    return this.fail()
+  }
+
+  async transferRecording(
+    file: HiDockFile,
+    onProgress: (progress: DownloadProgress) => void,
+  ): Promise<TransferRecordingResult> {
+    void file
     void onProgress
     return this.fail()
   }
@@ -69,6 +81,11 @@ export class BrowserDeviceService implements DeviceService {
   }
 
   async formatCard(confirmed: boolean): Promise<GenericResult> {
+    void confirmed
+    return this.fail()
+  }
+
+  async factoryReset(confirmed: boolean): Promise<GenericResult> {
     void confirmed
     return this.fail()
   }
@@ -184,11 +201,6 @@ export class BrowserDeviceService implements DeviceService {
   }
 
   async getAudioInputDevice(): Promise<{ device: AudioInputDevice }> {
-    return this.fail()
-  }
-
-  async setAudioInputDevice(device: AudioInputDevice): Promise<GenericResult> {
-    void device
     return this.fail()
   }
 

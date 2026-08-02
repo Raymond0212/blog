@@ -3,6 +3,24 @@ import { describe, expect, it } from "vitest"
 import { getCapabilities } from "@/features/hidock/jensen/capability-policy"
 
 describe("Jensen capability policy", () => {
+  it("gates P1 Mini recording control at the HiNotes firmware threshold", () => {
+    const supported = getCapabilities(
+      { model: "hidock-p1:mini", versionNumber: 131840 },
+      { busy: false, liveMode: false, listingFiles: false },
+    ) as ReturnType<typeof getCapabilities> & {
+      recordingControl?: { allowed: boolean; reason?: string }
+    }
+    const oldFirmware = getCapabilities(
+      { model: "hidock-p1:mini", versionNumber: 131839 },
+      { busy: false, liveMode: false, listingFiles: false },
+    ) as ReturnType<typeof getCapabilities> & {
+      recordingControl?: { allowed: boolean; reason?: string }
+    }
+
+    expect(supported.recordingControl?.allowed).toBe(true)
+    expect(oldFirmware.recordingControl?.allowed).toBe(false)
+  })
+
   it("applies H1 firmware thresholds", () => {
     const old = getCapabilities(
       { model: "hidock-h1", versionNumber: 327704 },

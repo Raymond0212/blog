@@ -13,6 +13,7 @@ import type {
   GenericResult,
   HiDockFile,
   RealtimeStatus,
+  TransferRecordingResult,
   RecordingQuality,
   RecordingStatus,
   DeviceConnectionState,
@@ -28,11 +29,17 @@ export interface DeviceService {
     files: HiDockFile[],
     destination: string,
     onProgress: (progress: DownloadProgress) => void,
-    options?: DownloadOptions
+    options?: DownloadOptions,
   ): Promise<DownloadReport>
+  transferRecording(
+    file: HiDockFile,
+    onProgress: (progress: DownloadProgress) => void,
+    options?: DownloadOptions,
+  ): Promise<TransferRecordingResult>
   deleteFile(filename: string): Promise<DeleteResult>
   getCardInfo(): Promise<CardInfo>
   formatCard(confirmed: boolean): Promise<GenericResult>
+  factoryReset(confirmed: boolean): Promise<GenericResult>
   getRecordingFile(): Promise<{ name: string; status: string } | null>
   getBatteryStatus(): Promise<BatteryStatus | null>
   getDeviceTime(): Promise<{ time: string }>
@@ -59,7 +66,6 @@ export interface DeviceService {
   getRecordingQuality(): Promise<{ quality: RecordingQuality }>
   setRecordingQuality(quality: RecordingQuality): Promise<GenericResult>
   getAudioInputDevice(): Promise<{ device: AudioInputDevice }>
-  setAudioInputDevice(device: AudioInputDevice): Promise<GenericResult>
   startRealtime(mode: number): Promise<GenericResult | null>
   stopRealtime(): Promise<GenericResult>
   pauseRealtime(): Promise<GenericResult>

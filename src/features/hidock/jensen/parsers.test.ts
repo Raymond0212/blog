@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
 
+import * as parsers from "@/features/hidock/jensen/parsers"
+
 import {
   estimateHiDockDurationSec,
   parseBluetoothDevices,
@@ -47,11 +49,7 @@ describe("Jensen response parsers", () => {
 
   it("converts a physical P1 Mini version-8 WAV file duration to seconds", () => {
     expect(
-      estimateHiDockDurationSec(
-        286_520,
-        8,
-        "2026Jul29-111519-Rec34.wav",
-      ),
+      estimateHiDockDurationSec(286_520, 8, "2026Jul29-111519-Rec34.wav"),
     ).toBe(8)
   })
 
@@ -249,7 +247,97 @@ describe("Jensen response parsers", () => {
       rest: 7,
       muted: true,
       dataLength: 9,
-      data: new Uint8Array([0, 0, 0, 7, 0, 0, 0, 1, 9]),
+      audioData: new Uint8Array([9]),
     })
+  })
+
+  it("decodes interleaved realtime PCM into stereo samples and RMS levels", () => {
+    const decodeRealtimePcm16 = (
+      parsers as typeof parsers & {
+        decodeRealtimePcm16?: (audio: Uint8Array) => {
+          left: Float32Array
+          right: Float32Array
+          rmsLeft: number
+          rmsRight: number
+        }
+      }
+    ).decodeRealtimePcm16
+
+    expect(typeof decodeRealtimePcm16).toBe("function")
+    if (!decodeRealtimePcm16) return
+
+    const decoded = decodeRealtimePcm16(
+      new Uint8Array([0x00, 0x40, 0x00, 0xc0, 0x00, 0x20, 0x00, 0xe0]),
+    )
+
+    expect(Array.from(decoded.left)).toEqual([0.5, 0.25])
+    expect(Array.from(decoded.right)).toEqual([-0.5, -0.25])
+    expect(decoded.rmsLeft).toBeCloseTo(0.3953, 4)
+    expect(decoded.rmsRight).toBeCloseTo(0.3953, 4)
+  })
+
+  it("merges device framing into one noise-suppressed monitor channel", () => {
+    const suppressRealtimeNoise = (
+      parsers as typeof parsers & {
+        suppressRealtimeNoise?: (
+          left: Float32Array,
+          right: Float32Array,
+          state: {
+            noiseFloor: number
+            previousInput: number
+            previousOutput: number
+          },
+        ) => {
+          mono: Float32Array
+          rms: number
+          state: {
+            noiseFloor: number
+            previousInput: number
+            previousOutput: number
+          }
+        }
+      }
+    ).suppressRealtimeNoise
+
+    expect(typeof suppressRealtimeNoise).toBe("function")
+    if (!suppressRealtimeNoise) return
+
+    const processed = suppressRealtimeNoise(
+      new Float32Array([0.002, 0.45, -0.45]),
+      new Float32Array([0.001, 0, 0]),
+      { noiseFloor: 0.005, previousInput: 0, previousOutput: 0 },
+    )
+
+    expect(processed.mono[0]).toBe(0)
+    expect(processed.mono[1]).toBeGreaterThan(0.2)
+    expect(processed.mono[2]).toBeLessThan(-0.2)
+    expect(processed.rms).toBeGreaterThan(0.2)
+  })
+
+  it("encodes captured monitor samples as a mono 16 kHz PCM WAV", async () => {
+    const encodeMonoPcm16Wav = (
+      parsers as typeof parsers & {
+        encodeMonoPcm16Wav?: (
+          chunks: Float32Array[],
+          sampleRate: number,
+        ) => Blob
+      }
+    ).encodeMonoPcm16Wav
+
+    expect(typeof encodeMonoPcm16Wav).toBe("function")
+    if (!encodeMonoPcm16Wav) return
+
+    const wav = encodeMonoPcm16Wav([new Float32Array([-1, 0, 1])], 16_000)
+    const bytes = new Uint8Array(await wav.arrayBuffer())
+    const view = new DataView(bytes.buffer)
+
+    expect(new TextDecoder().decode(bytes.slice(0, 4))).toBe("RIFF")
+    expect(new TextDecoder().decode(bytes.slice(8, 12))).toBe("WAVE")
+    expect(view.getUint16(22, true)).toBe(1)
+    expect(view.getUint32(24, true)).toBe(16_000)
+    expect(view.getUint32(40, true)).toBe(6)
+    expect(view.getInt16(44, true)).toBe(-32_768)
+    expect(view.getInt16(46, true)).toBe(0)
+    expect(view.getInt16(48, true)).toBe(32_767)
   })
 })

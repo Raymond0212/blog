@@ -36,6 +36,7 @@ import {
   parseRealtimeStatus,
   parseSettings,
 } from "@/features/hidock/jensen/parsers"
+import { getRecordingMimeType } from "@/features/hidock/local-workspace"
 import type {
   AudioInputDevice,
   BatteryStatus,
@@ -54,6 +55,7 @@ import type {
   RealtimeStatus,
   RecordingQuality,
   RecordingStatus,
+  TransferRecordingResult,
   DeviceConnectionState,
 } from "@/features/hidock/types/device"
 
@@ -552,11 +554,10 @@ export class WebUsbDeviceService implements DeviceService {
     files: HiDockFile[],
     _destination: string,
     onProgress: (progress: DownloadProgress) => void,
-    _options?: DownloadOptions,
+    options?: DownloadOptions,
   ): Promise<DownloadReport> {
     this.assertCapability("fileList")
     void _destination
-    void _options
     const aggregateTotal = files.reduce((s, f) => s + f.fileLength, 0)
     let aggregateDone = 0
     const results: DownloadFileResult[] = []
@@ -572,46 +573,24 @@ export class WebUsbDeviceService implements DeviceService {
         | "disconnected"
         | "short_read"
         | "exception" = "none"
-      const chunks: ArrayBuffer[] = []
-
       try {
-        const startBody = new TextEncoder().encode(file.filename)
-        await this.scheduler.send<number>(
-          JensenCommand.TransferFile,
-          startBody,
-          {
-            timeoutMs: 12000,
-            streamIdleTimeoutMs: 2500,
-            acceptCommandStream: true,
-            responsePolicy: (message) => {
-              if (message.body.length > 0) {
-                const remaining = Math.max(0, file.fileLength - offset)
-                const chunk = message.body.slice(0, remaining)
-                chunks.push(
-                  chunk.buffer.slice(
-                    chunk.byteOffset,
-                    chunk.byteOffset + chunk.byteLength,
-                  ) as ArrayBuffer,
-                )
-                offset += chunk.length
-                aggregateDone += chunk.length
-                onProgress({
-                  filename: file.filename,
-                  done: offset,
-                  total: file.fileLength,
-                  aggregateDone,
-                  aggregateTotal,
-                })
-              }
-              return offset >= file.fileLength
-                ? { done: true, value: offset }
-                : { done: false }
-            },
+        const baseDone = aggregateDone
+        const transfer = await this.transferRecording(
+          file,
+          (progress) => {
+            offset = progress.done
+            aggregateDone = baseDone + progress.done
+            onProgress({
+              ...progress,
+              aggregateDone,
+              aggregateTotal,
+            })
           },
+          options,
         )
 
-        if (offset > 0 || file.fileLength === 0) {
-          const blob = new Blob(chunks, { type: "application/octet-stream" })
+        if (transfer.bytesRead > 0 || file.fileLength === 0) {
+          const blob = transfer.blob
           const url = URL.createObjectURL(blob)
           const anchor = document.createElement("a")
           anchor.href = url
@@ -634,6 +613,7 @@ export class WebUsbDeviceService implements DeviceService {
             failureReason === "none" ? "empty_response" : failureReason
         }
       } catch (e) {
+        if ((e as Error).name === "AbortError") throw e
         status = "failed"
         err = (e as Error).message
         const lower = (err ?? "").toLowerCase()
@@ -667,6 +647,80 @@ export class WebUsbDeviceService implements DeviceService {
     return {
       files: results,
       totalBytesWritten: results.reduce((s, r) => s + r.bytesWritten, 0),
+    }
+  }
+
+  async transferRecording(
+    file: HiDockFile,
+    onProgress: (progress: DownloadProgress) => void,
+    options?: DownloadOptions,
+  ): Promise<TransferRecordingResult> {
+    this.assertCapability("fileList")
+    if (options?.signal?.aborted)
+      throw new DOMException("Aborted", "AbortError")
+
+    const mimeType =
+      getRecordingMimeType(file.filename) ?? "application/octet-stream"
+
+    let offset = 0
+    const chunks: ArrayBuffer[] = []
+    try {
+      await this.scheduler.send<number>(
+        JensenCommand.TransferFile,
+        new TextEncoder().encode(file.filename),
+        {
+          timeoutMs: 12000,
+          streamIdleTimeoutMs: 2500,
+          acceptCommandStream: true,
+          responsePolicy: (message) => {
+            if (options?.signal?.aborted) return { done: true, value: offset }
+            if (message.body.length > 0) {
+              const remaining = Math.max(0, file.fileLength - offset)
+              const chunk = message.body.slice(0, remaining)
+              chunks.push(
+                chunk.buffer.slice(
+                  chunk.byteOffset,
+                  chunk.byteOffset + chunk.byteLength,
+                ) as ArrayBuffer,
+              )
+              offset += chunk.length
+              onProgress({
+                filename: file.filename,
+                done: offset,
+                total: file.fileLength,
+                aggregateDone: offset,
+                aggregateTotal: file.fileLength,
+              })
+              if (options?.signal?.aborted) return { done: true, value: offset }
+            }
+            return offset >= file.fileLength
+              ? { done: true, value: offset }
+              : { done: false }
+          },
+        },
+      )
+    } catch (error) {
+      if (offset > 0 && offset < file.fileLength) {
+        logger.error("webusb", "recording transfer ended early", error)
+        throw new Error(
+          `Short read: expected ${file.fileLength} bytes, got ${offset}`,
+        )
+      }
+      throw error
+    }
+
+    if (options?.signal?.aborted)
+      throw new DOMException("Aborted", "AbortError")
+
+    if (offset < file.fileLength)
+      throw new Error(
+        `Short read: expected ${file.fileLength} bytes, got ${offset}`,
+      )
+
+    return {
+      blob: new Blob(chunks, { type: mimeType }),
+      mimeType,
+      bytesRead: offset,
     }
   }
 
@@ -723,6 +777,18 @@ export class WebUsbDeviceService implements DeviceService {
     if (!msg) return { result: "failed", error: "No response" }
     const code = msg.body[0] ?? 1
     return { result: code === 0 ? "success" : "failed", code }
+  }
+
+  async factoryReset(confirmed: boolean): Promise<GenericResult> {
+    if (!confirmed)
+      return {
+        result: "failed",
+        error: "factory reset requires explicit confirmation",
+      }
+    this.assertCapability("factoryReset")
+    return genericResult(
+      await this.sendCommand(JensenCommand.FactoryReset, new Uint8Array(), 60),
+    )
   }
 
   async getRecordingFile(): Promise<{ name: string; status: string } | null> {
@@ -1028,17 +1094,6 @@ export class WebUsbDeviceService implements DeviceService {
     )
     const code = msg && msg.body.length >= 4 ? readUint32BE(msg.body) : 0
     return { device: code === 0 ? "bt-mic" : "mic" }
-  }
-
-  async setAudioInputDevice(device: AudioInputDevice): Promise<GenericResult> {
-    const code = device === "bt-mic" ? 0 : 1
-    return genericResult(
-      await this.sendCommand(
-        JensenCommand.SetAudioInputDevice,
-        new Uint8Array(writeUint32BE(code)),
-        5,
-      ),
-    )
   }
 
   async startRealtime(mode: number): Promise<GenericResult | null> {

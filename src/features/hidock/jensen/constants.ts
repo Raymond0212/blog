@@ -44,7 +44,6 @@ export const JensenCommand = {
   GetBluetoothScanResults: 4102,
   GetPairedBluetoothDevices: 4103,
   ClearPairedBluetoothDevices: 4104,
-  SetAudioInputDevice: 4105,
   GetAudioInputDevice: 4106,
   FactoryReset: 61451,
   EnterMassStorageMode: 61455,

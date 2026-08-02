@@ -36,6 +36,7 @@ class FakeUsbDevice implements USBDevice {
   readonly writes: number[] = []
   readonly setupCalls: string[] = []
   firmwareBytes = [0, 5, 1, 8]
+  transferBytes = new Uint8Array([1, 2, 3, 4])
   private chunks: Uint8Array[] = []
   private readers: Array<(result: USBInTransferResult) => void> = []
 
@@ -117,6 +118,10 @@ class FakeUsbDevice implements USBDevice {
       settings[3] = 1
       this.enqueue(encodeJensenFrame(command, sequence, settings))
     } else if (command === JensenCommand.GetWebUsbTimeout) {
+      this.enqueue(encodeJensenFrame(command, sequence, new Uint8Array([0])))
+    } else if (command === JensenCommand.TransferFile) {
+      this.enqueue(encodeJensenFrame(command, sequence, this.transferBytes))
+    } else if (command === JensenCommand.FactoryReset) {
       this.enqueue(encodeJensenFrame(command, sequence, new Uint8Array([0])))
     }
     return { status: "ok", bytesWritten: bytes.length }
@@ -324,6 +329,154 @@ describe("WebUsbDeviceService Jensen integration", () => {
     await expect(service.connect()).rejects.toThrow("Interface claim failed")
     expect(states.at(-1)).toBe("idle")
     expect(device.opened).toBe(false)
+    service.dispose()
+  })
+
+  it("transfers a recording into a temporary browser blob without downloading it", async () => {
+    const device = new FakeUsbDevice()
+    vi.stubGlobal("navigator", { usb: new FakeUsb(device) })
+    const service = new WebUsbDeviceService()
+    await service.connect()
+    const transferRecording = (
+      service as WebUsbDeviceService & {
+        transferRecording?: (
+          file: {
+            filename: string
+            fileLength: number
+            createdAtRaw: string
+            durationSec: number
+            durationLabel: string
+          },
+          onProgress: (progress: {
+            filename: string
+            done: number
+            total: number
+            aggregateDone: number
+            aggregateTotal: number
+          }) => void,
+        ) => Promise<{ blob: Blob; mimeType: string; bytesRead: number }>
+      }
+    ).transferRecording
+
+    expect(typeof transferRecording).toBe("function")
+    if (!transferRecording) return
+
+    const progress: number[] = []
+    const result = await transferRecording.call(
+      service,
+      {
+        filename: "sample.hda",
+        fileLength: 4,
+        createdAtRaw: "2026-08-02 09:00:00",
+        durationSec: 1,
+        durationLabel: "00:01",
+      },
+      (event) => progress.push(event.done),
+    )
+
+    expect(result.bytesRead).toBe(4)
+    expect(result.mimeType).toBe("audio/mpeg")
+    expect(Array.from(new Uint8Array(await result.blob.arrayBuffer()))).toEqual(
+      [1, 2, 3, 4],
+    )
+    expect(progress).toEqual([4])
+    service.dispose()
+  })
+
+  it("rejects an already-cancelled playback transfer before writing to USB", async () => {
+    const device = new FakeUsbDevice()
+    vi.stubGlobal("navigator", { usb: new FakeUsb(device) })
+    const service = new WebUsbDeviceService()
+    await service.connect()
+    const controller = new AbortController()
+    controller.abort()
+
+    await expect(
+      service.transferRecording(
+        {
+          filename: "sample.wav",
+          fileLength: 4,
+          createdAtRaw: "2026-08-02 09:00:00",
+          durationSec: 1,
+          durationLabel: "00:01",
+        },
+        () => undefined,
+        { signal: controller.signal },
+      ),
+    ).rejects.toMatchObject({ name: "AbortError" })
+    expect(device.writes).not.toContain(JensenCommand.TransferFile)
+    service.dispose()
+  })
+
+  it("cancels a playback transfer when its progress handler aborts the final frame", async () => {
+    const device = new FakeUsbDevice()
+    vi.stubGlobal("navigator", { usb: new FakeUsb(device) })
+    const service = new WebUsbDeviceService()
+    await service.connect()
+    const controller = new AbortController()
+
+    await expect(
+      service.transferRecording(
+        {
+          filename: "sample.wav",
+          fileLength: 4,
+          createdAtRaw: "2026-08-02 09:00:00",
+          durationSec: 1,
+          durationLabel: "00:01",
+        },
+        () => controller.abort(),
+        { signal: controller.signal },
+      ),
+    ).rejects.toMatchObject({ name: "AbortError" })
+    expect(device.writes).toContain(JensenCommand.TransferFile)
+    service.dispose()
+  })
+
+  it("reports a short playback transfer with the received byte count", async () => {
+    const device = new FakeUsbDevice()
+    device.transferBytes = new Uint8Array([1, 2])
+    vi.stubGlobal("navigator", { usb: new FakeUsb(device) })
+    const service = new WebUsbDeviceService()
+    await service.connect()
+
+    await expect(
+      service.transferRecording(
+        {
+          filename: "sample.wav",
+          fileLength: 4,
+          createdAtRaw: "2026-08-02 09:00:00",
+          durationSec: 1,
+          durationLabel: "00:01",
+        },
+        () => undefined,
+      ),
+    ).rejects.toThrow("Short read: expected 4 bytes, got 2")
+    service.dispose()
+  }, 4_000)
+
+  it("requires confirmation before sending the factory reset command", async () => {
+    const device = new FakeUsbDevice()
+    vi.stubGlobal("navigator", { usb: new FakeUsb(device) })
+    const service = new WebUsbDeviceService()
+    await service.connect()
+    const factoryReset = (
+      service as WebUsbDeviceService & {
+        factoryReset?: (confirmed: boolean) => Promise<{ result: string }>
+      }
+    ).factoryReset
+
+    expect(typeof factoryReset).toBe("function")
+    if (!factoryReset) return
+
+    await expect(factoryReset.call(service, false)).resolves.toMatchObject({
+      result: "failed",
+    })
+    expect(device.writes).not.toContain(JensenCommand.FactoryReset)
+
+    await expect(factoryReset.call(service, true)).resolves.toMatchObject({
+      result: "success",
+    })
+    expect(device.writes).toContain(JensenCommand.FactoryReset)
     service.dispose()
   })
 })

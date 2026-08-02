@@ -45,6 +45,13 @@ export type DownloadProgress = {
 
 export type DownloadOptions = {
   destinationPath?: string
+  signal?: AbortSignal
+}
+
+export type TransferRecordingResult = {
+  blob: Blob
+  mimeType: string
+  bytesRead: number
 }
 
 export type CardInfo = {
@@ -112,7 +119,7 @@ export type RealtimeStatus = {
   rest: number
   muted: boolean
   dataLength: number
-  data: Uint8Array
+  audioData: Uint8Array
 }
 
 export type DeviceConnectionState =

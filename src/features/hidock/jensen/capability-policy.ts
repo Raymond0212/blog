@@ -18,6 +18,7 @@ export type JensenCapabilities = {
   bluetoothPromptSetting: CapabilityDecision
   fileList: CapabilityDecision
   startRealtime: CapabilityDecision
+  recordingControl: CapabilityDecision
   webUsbTimeout: CapabilityDecision
 }
 
@@ -106,6 +107,12 @@ export function getCapabilities(
     startRealtime: decision(
       idle && !runtime.listingFiles && !runtime.liveMode,
       "Realtime cannot start while another command, file listing, or live session is active.",
+    ),
+    recordingControl: decision(
+      model === "hidock-p1:mini" && version >= 131840 && notLive,
+      runtime.liveMode
+        ? "Recording controls are unavailable in realtime monitor mode."
+        : "P1 Mini recording controls require firmware 2.3.0 or newer.",
     ),
     webUsbTimeout: decision(
       knownModel && model !== "hidock-p1:mini",
