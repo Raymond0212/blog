@@ -1,0 +1,201 @@
+# AI News Report - 08 Aug 2026
+
+**Report period:** 02 Aug 2026 to 08 Aug 2026  
+**Generated on:** 08 Aug 2026  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This week’s AI news cycle was dominated by production controls rather than frontier model launches. Anthropic focused on governable enterprise deployment for Claude and Claude Code, while OpenAI concentrated on real-world product usage, cybersecurity preparedness, education workflows, and realtime interaction infrastructure. The clearest pattern is that both companies are moving AI deeper into operational environments where admin controls, evaluation rigor, and deployment boundaries matter as much as raw capability.
+
+**Key updates:**
+
+- OpenAI disclosed that its upcoming Astra model may approach the Preparedness Framework’s critical cyber threshold, triggering tighter internal safeguards and development constraints.
+- Anthropic made Claude Code auto mode its default on paid plans and paired that rollout with production case studies and stronger security framing.
+- Anthropic launched inference hooks for Claude Enterprise, adding inline prompt and tool-result governance through customer-controlled security services.
+- OpenAI expanded education-specific workflows in ChatGPT Work and Codex, signaling a stronger push into institution-managed academic use cases.
+- Anthropic introduced self-hosted Claude Code sessions, giving enterprises more control over network access, environment customization, and compliance boundaries.
+
+**Key trends:**
+
+- AI vendors are prioritizing deployability, governance, and measurable safeguards as models move into higher-trust production workflows.
+- Cost control is becoming a product surface in its own right, with model routing, effort controls, caching, and admin analytics presented as core operational levers.
+- Security discussions are shifting from abstract safety principles to concrete system boundaries such as data loss prevention, tool approvals, cyber capability evaluations, and managed execution environments.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [Responding to the next frontier of critical cyber capabilities](https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/)
+**Published:** 2026-08-07
+
+OpenAI says recent Astra evaluations showed enough progress in agentic coding and cybersecurity that it can no longer rule out the model reaching its critical cyber threshold. The announcement is primarily a governance update: OpenAI is tightening access controls, monitoring, and development requirements before further capability work proceeds. It also signals a more public posture on preparedness decisions and external safety validation.
+
+---
+
+### [From asking to doing: How the world is putting ChatGPT to work](https://openai.com/index/how-the-world-is-putting-chatgpt-to-work/)
+**Published:** 2026-08-06
+
+OpenAI uses new Signals data to argue that ChatGPT usage is shifting from general Q&A toward practical work completion, especially in professional contexts. The post emphasizes geographic adoption growth, broader age participation, and stronger use of multimodal workflows. It is mainly a market and product-positioning update about how AI is becoming embedded in everyday work behavior.
+
+---
+
+### [New ways to learn and teach with ChatGPT](https://openai.com/index/learn-teach-chatgpt-work-codex/)
+**Published:** 2026-08-04
+
+OpenAI introduced three education-focused plugins for ChatGPT Work and Codex aimed at K-12 educators, college educators, and college students. The announcement frames education as an institution-managed workflow where course materials, calendars, and approved apps can be connected to reduce setup friction. It supports OpenAI’s broader strategy around ChatGPT Edu, training, and more advanced academic use cases.
+
+---
+
+### [Apple is getting this wrong](https://openai.com/index/apple-is-getting-this-wrong/)
+**Published:** 2026-08-03
+
+OpenAI uses this post to publicly dispute Apple’s trade-secret claims and argue that the underlying access issues were caused by Apple’s own offboarding failures rather than misconduct by OpenAI. The piece is mainly about legal risk, corporate process, and public positioning. It also reinforces OpenAI’s claim that it does not want or rely on competitors’ confidential information.
+
+---
+
+### [Millennium and Anthropic are building a digital risk analyst with Claude](https://claude.com/blog/millennium-and-anthropic-are-building-a-digital-risk-analyst-with-claude)
+**Published:** 2026-08-06
+
+Anthropic says it is co-developing a digital risk analyst with Millennium to help risk teams interpret portfolio exposure using proprietary financial data and Claude’s reasoning. The emphasis is on workflow acceleration and explainability rather than a broad product launch. It presents Claude as infrastructure for high-trust operational decision support with humans still responsible for final approval.
+
+---
+
+### [A guide to cost visibility and control in Claude](https://claude.com/blog/a-guide-to-cost-visibility-and-control-in-claude)
+**Published:** 2026-08-04
+
+Anthropic explains how organizations should manage Claude spend in terms of business outcomes instead of raw token totals. The post highlights admin controls, analytics, entitlements, and model-selection strategies for enterprise buyers, while also discussing engineering levers like caching and batch processing. It is both a pricing-operations guide and a product-management argument for treating AI cost governance as a first-class capability.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [Third-party evaluation of frontier cyber capabilities](https://openai.com/index/third-party-evaluation-of-frontier-cyber-capabilities/)
+**Published:** 2026-08-07
+
+OpenAI explains how outside evaluators are assessing frontier model cyber capability under more realistic, agentic conditions than older chatbot-style tests. The post argues that meaningful evaluations depend heavily on harness design, tool access, budgets, and validation methodology. It is a technical note about how to measure advanced model behavior without over- or under-stating real capability.
+
+---
+
+### [Improving GPT-5.6 Sol in ChatGPT-and expanding access to GPT-5.6 Luna for free users](https://openai.com/index/improving-gpt-5-6-sol-in-chatgpt/)
+**Published:** 2026-08-06
+
+OpenAI says it retuned GPT-5.6 Sol inside ChatGPT to produce more focused answers, fewer mistakes, and more consistent behavior across lightweight and deeper reasoning flows. The update also expands GPT-5.6 Luna access for Free and Go users and adds a reasoning slider for paid users. The main engineering theme is practical model tuning inside a consumer product rather than a new base-model release.
+
+---
+
+### [New ways to learn and teach with ChatGPT](https://openai.com/index/learn-teach-chatgpt-work-codex/)
+**Published:** 2026-08-04
+
+This post is also relevant technically because the new education workflows connect ChatGPT Work and Codex to documents, calendars, and approved apps in more structured ways. OpenAI is effectively packaging institution-aware agentic workflows rather than just exposing a generic chatbot. That makes the announcement relevant for teams building managed, context-rich knowledge tools.
+
+---
+
+### [Continuous voice interaction with GPT Live](https://openai.com/index/continuous-voice-interaction-with-gpt-live/)
+**Published:** 2026-08-03
+
+OpenAI describes how ChatGPT Voice was rebuilt on GPT-Live’s full-duplex architecture so the system can listen and speak simultaneously instead of waiting for strict turn boundaries. The article covers low-latency media handling, model handoffs, asynchronous reasoning, context compaction, and transport optimizations such as WARP and Instant Connect. It is one of the week’s clearest infrastructure deep dives.
+
+---
+
+### [Auto mode is now the default in Claude Code for Pro, Max, and Team plans](https://claude.com/blog/auto-mode-default-in-claude-code)
+**Published:** 2026-08-07
+
+Anthropic announced that new Claude Code sessions on paid plans will default to auto mode starting August 14, 2026. The post combines product rollout details with evidence from internal testing, red-teaming, and prompt-injection studies to argue that classifier-mediated approval can outperform manual click-through reviews. It is both a tooling update and a systems-design statement about safer long-running coding sessions.
+
+---
+
+### [Running Auto mode in production](https://claude.com/blog/auto-mode-in-production)
+**Published:** 2026-08-07
+
+Anthropic profiles production use of Claude Code auto mode at Nuro, Gusto, and Garner Health. The piece focuses on how classifier-based approvals, denied command classes, MCP governance, and human review points let teams extend session autonomy without losing control. It gives concrete implementation context for how auto mode behaves in real engineering environments.
+
+---
+
+### [Run Claude Code sessions on your own compute](https://claude.com/blog/run-claude-code-sessions-on-your-own-compute)
+**Published:** 2026-08-06
+
+Anthropic launched a public beta for self-hosted Claude Code environments so Team and Enterprise customers can run sessions on infrastructure they control. The post explains runner modes, isolated checkouts, custom internal tooling, and compliance-driven deployment needs. It is a straightforward engineering and platform announcement for organizations that need Claude Code inside their own network boundaries.
+
+---
+
+### [Inference hooks: inline data loss prevention for Claude Enterprise](https://claude.com/blog/claude-enterprise-inference-hooks)
+**Published:** 2026-08-05
+
+Anthropic introduced inference hooks, which send each governed prompt to an organization’s own security service before inference is allowed to run. The feature can also inspect tool-call results before they are returned to the model, creating a centralized inline control layer across Claude chat and coding workflows. The supporting docs make this a substantive enterprise integration update rather than a lightweight feature note.
+
+---
+
+### [A guide to cost visibility and control in Claude](https://claude.com/blog/a-guide-to-cost-visibility-and-control-in-claude)
+**Published:** 2026-08-04
+
+The cost-visibility post is also an engineering article because it lays out practical cost levers such as prompt caching, batch processing, effort controls, and model escalation patterns. Anthropic is effectively documenting how to tune application economics without changing budgets or degrading outcomes. That makes it relevant to teams operating AI systems at production scale.
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Responding to the next frontier of critical cyber capabilities](https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/)
+**Published:** 2026-08-07
+
+This is the week’s most direct security announcement. OpenAI says Astra may be approaching its critical cyber threshold, which triggered stronger internal restrictions, isolated environments, tighter tool and network access, broader monitoring, and pauses on work that does not meet the upgraded requirements. The supporting Preparedness Framework makes clear that this is about offensive cyber capability containment and staged deployment discipline.
+
+---
+
+### [Third-party evaluation of frontier cyber capabilities](https://openai.com/index/third-party-evaluation-of-frontier-cyber-capabilities/)
+**Published:** 2026-08-07
+
+OpenAI frames external cyber evaluations as necessary for both capability measurement and safeguard testing. The article stresses that security conclusions depend on realistic harnesses, tool availability, time budgets, and validity checks rather than simplified benchmark setups. It is useful as a security methodology note for teams evaluating advanced agent behavior.
+
+---
+
+### [Apple is getting this wrong](https://openai.com/index/apple-is-getting-this-wrong/)
+**Published:** 2026-08-03
+
+Although legal in tone, this post is also a security and governance article because it centers on access revocation, data custody, and trade-secret handling. OpenAI argues the dispute reflects Apple’s residual-access failure rather than theft of confidential material. The linked court filing and attached exhibits push the issue into concrete information-security process territory.
+
+---
+
+### [Auto mode is now the default in Claude Code for Pro, Max, and Team plans](https://claude.com/blog/auto-mode-default-in-claude-code)
+**Published:** 2026-08-07
+
+Anthropic explicitly presents auto mode as a security improvement over manual approvals. The article cites prompt-injection evaluations, red-team results, hard-deny actions for exfiltration-like behavior, and managed controls for enterprise admins. Its core claim is that policy-mediated autonomy can reduce both user friction and risky human approval habits.
+
+---
+
+### [Running Auto mode in production](https://claude.com/blog/auto-mode-in-production)
+**Published:** 2026-08-07
+
+This customer case-study post focuses on security guardrails in practice: blocked command classes, governed MCP proxies, session telemetry, and human checkpoints for higher-risk actions. Anthropic uses production examples to argue that safer autonomy is achievable when the control plane is explicit. It is effectively a deployment-security reference for Claude Code teams.
+
+---
+
+### [Millennium and Anthropic are building a digital risk analyst with Claude](https://claude.com/blog/millennium-and-anthropic-are-building-a-digital-risk-analyst-with-claude)
+**Published:** 2026-08-06
+
+The Millennium partnership matters for security because Anthropic highlights auditability, sandboxed action testing, and supervised decision-making in a sensitive financial-risk workflow. The post is less about broad AI capability than about how Claude can be used under tight control in a regulated environment. It positions secure reasoning traces and human oversight as part of the product value.
+
+---
+
+### [Run Claude Code sessions on your own compute](https://claude.com/blog/run-claude-code-sessions-on-your-own-compute)
+**Published:** 2026-08-06
+
+Self-hosted Claude Code is security-relevant because it gives customers more control over network access, internal services, repository artifacts, and secret-handling boundaries. At the same time, Anthropic is clear that prompts, responses, and tool results still go to Anthropic for inference and transcript storage. That makes the post important for teams drawing precise lines around compliance and data residency assumptions.
+
+---
+
+### [Inference hooks: inline data loss prevention for Claude Enterprise](https://claude.com/blog/claude-enterprise-inference-hooks)
+**Published:** 2026-08-05
+
+Inference hooks are a direct security feature: each governed prompt can be inspected by a customer-controlled service before inference, and tool-call results can also be screened. The documentation adds signed webhooks, rollout modes, and fail-open versus fail-closed behavior, which are the exact details security teams will care about. This is one of the week’s clearest examples of inline AI governance becoming a productized control surface.
