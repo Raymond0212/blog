@@ -76,7 +76,6 @@ export function CopyWithClassNames({
   value,
   classNames,
   className,
-  ...props
 }: CopyWithClassNamesProps) {
   const [hasCopied, setHasCopied] = React.useState(false)
 

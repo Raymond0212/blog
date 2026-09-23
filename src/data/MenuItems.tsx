@@ -13,9 +13,14 @@ import {
   Captions,
   Orbit,
   PanelsTopLeft,
+  GitBranch,
   type LucideIcon,
 } from "lucide-react";
 import PageNotFound from "@/error_pages/404";
+
+const SemanticIfPage = React.lazy(
+  () => import("@/features/semantic-if/SemanticIfPage"),
+);
 
 export type MenuNode = {
   id: string;
@@ -106,6 +111,13 @@ const staticMenuItems: MenuNode[] = [
     url: "#",
   },
   {
+    id: "semantic-if",
+    label: "Semantic If",
+    source: "static",
+    kind: "root",
+    url: "#",
+  },
+  {
     id: "epaper-designer",
     label: "E-Paper Designer",
     source: "static",
@@ -138,6 +150,20 @@ const menuComponentItemsById: Record<string, MenuComponentItem> = {
   "epaper-designer": {
     icon: PanelsTopLeft,
     component: <EpaperDesignerPage />,
+  },
+  "semantic-if": {
+    icon: GitBranch,
+    component: (
+      <React.Suspense
+        fallback={
+          <div className="text-sm text-muted-foreground">
+            Loading Semantic If…
+          </div>
+        }
+      >
+        <SemanticIfPage />
+      </React.Suspense>
+    ),
   },
 };
 
