@@ -1,4 +1,5 @@
 import { useId, useLayoutEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { buildMenuIndex, type MenuNode } from "@/data/MenuItems";
@@ -72,22 +73,21 @@ function MenuItemRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="swiss-menu-disclosure"
+            className="swiss-menu-disclosure hover:bg-transparent hover:text-inherit"
             aria-label={`${isExpanded ? "Collapse" : "Expand"} ${item.label}`}
             aria-expanded={isExpanded}
             aria-controls={childrenId}
+            data-active={isActive}
             onClick={() => onToggle(item.id)}
           >
-            <span
+            <ChevronRight
               aria-hidden="true"
               className={
                 isExpanded
                   ? "swiss-menu-chevron is-expanded"
                   : "swiss-menu-chevron"
               }
-            >
-              &gt;
-            </span>
+            />
           </Button>
         ) : null}
       </div>

@@ -371,7 +371,9 @@
   }
 
   .swiss-menu-link:hover,
-  .swiss-menu-link[data-active="true"] {
+  .swiss-menu-link[data-active="true"],
+  .swiss-menu-row:hover .swiss-menu-link,
+  .swiss-menu-row:focus-within .swiss-menu-link {
     color: hsl(var(--primary));
     text-decoration-color: currentColor;
   }
@@ -400,7 +402,13 @@
   .swiss-menu-item[data-depth="2"] > .swiss-menu-row .swiss-menu-link:hover,
   .swiss-menu-item[data-depth="2"]
     > .swiss-menu-row
-    .swiss-menu-link[data-active="true"] {
+    .swiss-menu-link[data-active="true"],
+  .swiss-menu-item[data-depth="2"]
+    > .swiss-menu-row:hover
+    .swiss-menu-link,
+  .swiss-menu-item[data-depth="2"]
+    > .swiss-menu-row:focus-within
+    .swiss-menu-link {
     color: hsl(var(--primary));
   }
 
@@ -958,7 +966,9 @@
     font-size: clamp(32px, 4vw, 56px);
     font-weight: 400;
     line-height: 1.12;
-    color: hsl(var(--muted-foreground));
+    color: hsl(var(--foreground));
+    background-color: transparent;
+    transition: color 160ms ease;
   }
 
   .swiss-menu-item[data-depth="1"] > .swiss-menu-row .swiss-menu-disclosure {
@@ -969,14 +979,22 @@
   .swiss-menu-item[data-depth="2"] > .swiss-menu-row .swiss-menu-disclosure {
     font-size: clamp(15px, 1.5vw, 18px);
     line-height: 1.45;
+    color: hsl(var(--muted-foreground));
   }
 
-  .swiss-menu-disclosure:hover {
+  .swiss-menu-row:hover .swiss-menu-disclosure,
+  .swiss-menu-row:focus-within .swiss-menu-disclosure,
+  .swiss-menu-disclosure[data-active="true"] {
     color: hsl(var(--primary));
+    background-color: transparent;
   }
 
-  .swiss-menu-chevron {
-    display: inline-block;
+  .swiss-menu-disclosure .swiss-menu-chevron {
+    display: block;
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    stroke-width: 1.5;
     transform-origin: center;
     transition: transform 180ms ease;
   }
