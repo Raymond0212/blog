@@ -32,10 +32,12 @@ Living architecture reference for agents and contributors working in this standa
 
 - `src/main.tsx` mounts `<App />` and global styles.
 - `src/App.tsx` wraps `ThemeProvider` and `MenuItemProvider`.
-- `src/Page.tsx` composes the sidebar shell and main workspace.
+- `src/Page.tsx` owns the default-closed full-screen navigation Sheet, Ctrl/Cmd+B shortcut, and main workspace shell.
+- `src/components/app-sidebar.tsx` renders the accessible full-screen menu, while `src/components/sidenav-arrowdropdown.tsx` recursively renders page links and article disclosures from the shared menu tree.
+- `src/components/site-brand.tsx` shares the original illustrated logo and RuaMond wordmark between the page header and menu; `src/components/menu-toggle-icon.tsx` draws the animated three-bar/cross control.
 - `src/data/MenuItems.tsx` defines static menu nodes plus build-time article discovery (`src/content/articles/**/*.mdx`), id-based component/icon resolution, and index/visibility helper functions.
 - `src/MyComponents/MainContentComponents/MainContent.tsx` renders the selected menu component through the MDX provider.
-- The app shell uses a Swiss typographic system: Helvetica-family system fonts, ruled layouts, square accents, and CSS geometry. `src/index.css` owns shell/home styling and shared color tokens (pure white light theme, blue-black dark theme); `src/mdx.css` scopes editorial typography to `.reading-page` so interactive tools retain their own layouts. Radix and the existing shared primitives continue to provide interaction and accessibility.
+- The app shell uses a Swiss typographic system: Helvetica-family system fonts, ruled layouts, square accents, and CSS geometry. `src/index.css` owns shell/home/navigation styling and shared color tokens (pure white light theme, blue-black dark theme); `src/mdx.css` scopes editorial typography to `.reading-page` so interactive tools retain their own layouts. Radix Sheet provides full-screen menu focus handling, Escape dismissal, and body scroll locking.
 - `src/Home.tsx` supplies the latest three AI News entries from the existing menu registry to `homeContent.mdx`. Home links use the menu provider's selection action, so article discovery, lazy loading, and selection persistence also apply to the home page. `src/data/MenuItemContext.ts` defines the context and consumer hook independently of the provider and runtime registry, avoiding a circular dependency through Home and keeping context identity stable during content refreshes. The provider re-exports the hook for existing consumers.
 
 ## 5. Key Folders
@@ -56,11 +58,12 @@ Living architecture reference for agents and contributors working in this standa
 ## 6. State And Data Flow
 
 - Local UI state is held in React component state.
-- Menu state is held in `MenuItemProvider` as immutable runtime state (`selectedId`, `expandedIds`) and persisted in `localStorage` under `menu-context`.
+- The Radix Sheet open state is local to `src/Page.tsx`, defaults to closed, and is not persisted. Ctrl/Cmd+B toggles the same state.
+- `MenuItemProvider` holds the selected page and its existing persisted menu state under `menu-context`. Full-screen menu disclosures use temporary local state: opening the menu expands the selected page's ancestors and leaves other groups collapsed.
 - Article pages are discovered via `import.meta.glob` and merged into a dynamic top-level `Articles` menu node at startup.
 - Article menu ids are path-based (`article:<relative-path-without-ext>`) so selection persistence survives label changes.
 - Article ordering: dated files using `ddmmyy-` prefix sort newest-first within a folder; undated files sort alphabetically.
-- Sidebar rows are derived from menu tree + expanded state as a flattened visible list to avoid nested rerender costs on long menus.
+- Full-screen navigation links are rendered recursively from the menu tree; article folders and pages remain discoverable through independent disclosure buttons.
 - Persisted menu state is validated against current menu ids; invalid selections fall back to `Home`.
 - Theme state is persisted by the theme provider.
 - The Embedding Demo downloads and caches `onnx-community/all-MiniLM-L6-v2-ONNX`, independently embeds up to eight user-provided sentences with its paired tokenizer and quantized transformer in a Web Worker, reduces all contextual token and sentence vectors to one shared three-dimensional PCA projection, and finds the three nearest user tokens by Euclidean distance in that displayed space; it has no predefined comparison vocabulary or backend dependency.

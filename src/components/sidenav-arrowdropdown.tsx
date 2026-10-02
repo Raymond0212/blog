@@ -1,102 +1,165 @@
-"use client";
-
-import React from "react";
+import { useId, useLayoutEffect, useMemo, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { type VisibleMenuNode } from "@/data/MenuItems";
+import { Button } from "@/components/ui/button";
+import { buildMenuIndex, type MenuNode } from "@/data/MenuItems";
 import { useMenuItem } from "@/data/MenuItemProvider";
-import SidebarMenuIcon from "@/MyComponents/SidebarComponents/SidebarMenuIcon";
 
-type MenuRowProps = {
-  item: VisibleMenuNode;
-  selectedId: string;
-  onSelect: (id: string) => void;
-  onToggle: (id: string) => void;
+type NavMainProps = {
+  open: boolean;
+  onNavigate: () => void;
 };
 
-const MenuRow = React.memo(function MenuRow({
+function getAncestorIds(
+  selectedId: string,
+  parentById: Map<string, string | null>,
+): Set<string> {
+  const ancestors = new Set<string>();
+  let parentId = parentById.get(selectedId) ?? null;
+
+  while (parentId) {
+    ancestors.add(parentId);
+    parentId = parentById.get(parentId) ?? null;
+  }
+
+  return ancestors;
+}
+
+type MenuItemRowProps = {
+  item: MenuNode;
+  depth: number;
+  selectedId: string;
+  activeIds: Set<string>;
+  expandedIds: Set<string>;
+  onSelect: (id: string) => void;
+  onToggle: (id: string) => void;
+  onNavigate: () => void;
+};
+
+function MenuItemRow({
   item,
+  depth,
   selectedId,
+  activeIds,
+  expandedIds,
   onSelect,
   onToggle,
-}: MenuRowProps) {
-  const handleClick = () => {
-    if (!item.hasChildren) {
-      onSelect(item.id);
-      return;
-    }
+  onNavigate,
+}: MenuItemRowProps) {
+  const children = item.items ?? [];
+  const hasChildren = children.length > 0;
+  const isExpanded = expandedIds.has(item.id);
+  const isActive = activeIds.has(item.id);
+  const childrenId = `navigation-children-${useId()}`;
 
-    if (selectedId === item.id) {
-      onToggle(item.id);
-      return;
-    }
+  return (
+    <li className="swiss-menu-item" data-depth={depth}>
+      <div className="swiss-menu-row">
+        <a
+          className="swiss-menu-link"
+          href={item.url ?? "#"}
+          aria-current={selectedId === item.id ? "page" : undefined}
+          data-active={isActive}
+          onClick={(event) => {
+            event.preventDefault();
+            onSelect(item.id);
+            onNavigate();
+          }}
+        >
+          {item.label}
+        </a>
+        {hasChildren ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="swiss-menu-disclosure"
+            aria-label={`${isExpanded ? "Collapse" : "Expand"} ${item.label}`}
+            aria-expanded={isExpanded}
+            aria-controls={childrenId}
+            onClick={() => onToggle(item.id)}
+          >
+            <ChevronRight
+              aria-hidden="true"
+              className={
+                isExpanded
+                  ? "swiss-menu-chevron is-expanded"
+                  : "swiss-menu-chevron"
+              }
+            />
+          </Button>
+        ) : null}
+      </div>
+      {hasChildren ? (
+        <ul id={childrenId} className="swiss-menu-sublist" hidden={!isExpanded}>
+          {children.map((child) => (
+            <MenuItemRow
+              key={child.id}
+              item={child}
+              depth={depth + 1}
+              selectedId={selectedId}
+              activeIds={activeIds}
+              expandedIds={expandedIds}
+              onSelect={onSelect}
+              onToggle={onToggle}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </ul>
+      ) : null}
+    </li>
+  );
+}
 
-    onSelect(item.id);
-    if (!item.isExpanded) {
-      onToggle(item.id);
+export function NavMain({ open, onNavigate }: NavMainProps) {
+  const { menuItems, selectedId, selectItem } = useMenuItem();
+  const { parentById } = useMemo(() => buildMenuIndex(menuItems), [menuItems]);
+  const [expandedIds, setExpandedIds] = useState(() =>
+    getAncestorIds(selectedId, parentById),
+  );
+  const activeIds = useMemo(
+    () => new Set([selectedId, ...getAncestorIds(selectedId, parentById)]),
+    [parentById, selectedId],
+  );
+
+  useLayoutEffect(() => {
+    if (open) {
+      setExpandedIds(getAncestorIds(selectedId, parentById));
     }
+  }, [open, parentById, selectedId]);
+
+  const toggleItem = (id: string) => {
+    setExpandedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   return (
-    <SidebarMenuItem className="swiss-nav-item" data-depth={item.depth}>
-      <SidebarMenuButton
-        asChild
-        tooltip={item.label}
-        isActive={item.isActive}
-        onClick={handleClick}
-      >
-        <a
-          href={item.url ?? "#"}
-          aria-current={item.isActive ? "page" : undefined}
-          style={{ paddingInlineStart: `${item.depth * 12 + 12}px` }}
-        >
-          <SidebarMenuIcon menuId={item.id} />
-          <span>{item.label}</span>
-        </a>
-      </SidebarMenuButton>
-      {item.hasChildren ? (
-        <SidebarMenuAction
-          aria-label={`Toggle ${item.label}`}
-          aria-expanded={item.isExpanded}
-          className={item.isExpanded ? "rotate-90" : ""}
-          onClick={() => onToggle(item.id)}
-        >
-          <ChevronRight />
-          <span className="sr-only">Toggle</span>
-        </SidebarMenuAction>
-      ) : null}
-    </SidebarMenuItem>
-  );
-});
-
-export function NavMain() {
-  const { visibleMenuItems, selectedId, selectItem, toggleItemCollapsed } =
-    useMenuItem();
-
-  return (
-    <SidebarGroup className="swiss-nav">
-      <SidebarGroupLabel>
+    <nav className="swiss-nav" aria-label="Main navigation">
+      <p className="swiss-nav-label">
         <span className="swiss-accent">01</span> / Explore
-      </SidebarGroupLabel>
-      <SidebarMenu>
-        {visibleMenuItems.map((item) => (
-          <MenuRow
+      </p>
+      <ul className="swiss-menu-list">
+        {menuItems.map((item) => (
+          <MenuItemRow
             key={item.id}
             item={item}
+            depth={0}
             selectedId={selectedId}
+            activeIds={activeIds}
+            expandedIds={expandedIds}
             onSelect={selectItem}
-            onToggle={toggleItemCollapsed}
+            onToggle={toggleItem}
+            onNavigate={onNavigate}
           />
         ))}
-      </SidebarMenu>
-    </SidebarGroup>
+      </ul>
+    </nav>
   );
 }
