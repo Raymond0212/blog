@@ -6,9 +6,9 @@ import MainFooter from "./MainFooter";
 
 const MainWorkspace: React.FC = () => {
   return (
-    <SidebarInset>
+    <SidebarInset className="swiss-workspace">
       <MainHeader />
-      <div className="flex min-w-0 flex-1 flex-col gap-4 p-4">
+      <div className="swiss-workspace-body flex min-w-0 flex-1 flex-col">
         <MainContent />
       </div>
       <MainFooter />

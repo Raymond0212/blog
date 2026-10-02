@@ -35,6 +35,8 @@ Living architecture reference for agents and contributors working in this standa
 - `src/Page.tsx` composes the sidebar shell and main workspace.
 - `src/data/MenuItems.tsx` defines static menu nodes plus build-time article discovery (`src/content/articles/**/*.mdx`), id-based component/icon resolution, and index/visibility helper functions.
 - `src/MyComponents/MainContentComponents/MainContent.tsx` renders the selected menu component through the MDX provider.
+- The app shell uses a Swiss typographic system: Helvetica-family system fonts, ruled layouts, square accents, and CSS geometry. `src/index.css` owns shell/home styling and shared color tokens (pure white light theme, blue-black dark theme); `src/mdx.css` scopes editorial typography to `.reading-page` so interactive tools retain their own layouts. Radix and the existing shared primitives continue to provide interaction and accessibility.
+- `src/Home.tsx` supplies the latest three AI News entries from the existing menu registry to `homeContent.mdx`. Home links use the menu provider's selection action, so article discovery, lazy loading, and selection persistence also apply to the home page. `src/data/MenuItemContext.ts` defines the context and consumer hook independently of the provider and runtime registry, avoiding a circular dependency through Home and keeping context identity stable during content refreshes. The provider re-exports the hook for existing consumers.
 
 ## 5. Key Folders
 

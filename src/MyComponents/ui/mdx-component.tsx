@@ -44,7 +44,7 @@ function MdxPre({
   const codeToCopy = React.useMemo(() => readTextContent(children).trimEnd(), [children])
 
   return (
-    <div className="relative mb-4 mt-6 w-full max-w-full rounded-lg border bg-zinc-100 text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
+    <div className="swiss-code-block relative mb-4 mt-6 w-full max-w-full border">
       <pre
         className={cn(
           "w-full max-w-full overflow-hidden bg-transparent p-4",
@@ -57,7 +57,7 @@ function MdxPre({
       {codeToCopy ? (
         <CopyButton
           value={codeToCopy}
-          className="absolute right-3 top-3 z-20 bg-zinc-800/80 text-zinc-100 hover:bg-zinc-700"
+          className="absolute right-3 top-3 z-20 bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
         />
       ) : null}
     </div>
@@ -76,6 +76,7 @@ export const components = {
     <h1
       className={cn(
         "font-heading mt-2 scroll-m-20 text-4xl font-bold",
+        readTextContent(props.children) === "Description" && "swiss-description-heading",
         className
       )}
       {...props}

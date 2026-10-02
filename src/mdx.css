@@ -1,124 +1,287 @@
 [data-theme="light"] {
-    display: block;
-  }
-  
-  [data-theme="dark"] {
-    display: none;
-  }
-  
-  .dark [data-theme="light"] {
-    display: none;
-  }
-  
-  .dark [data-theme="dark"] {
-    display: block;
-  }
-  
-  [data-rehype-pretty-code-fragment] {
-    @apply relative text-white;
-  }
-  
-  [data-rehype-pretty-code-fragment] code {
-    @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0;
-    counter-reset: line;
-    box-decoration-break: clone;
-  }
-  
-  [data-rehype-pretty-code-fragment] .line {
-    @apply px-4 min-h-[1rem] py-0.5 w-full inline-block;
-  }
-  
-  [data-rehype-pretty-code-fragment] [data-line-numbers] .line {
-    @apply px-2;
-  }
-  
-  [data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
-    @apply text-zinc-50/40 text-xs;
-    counter-increment: line;
-    content: counter(line);
-    display: inline-block;
-    width: 1.8rem;
-    margin-right: 1.4rem;
-    text-align: right;
-  }
-  
-  [data-rehype-pretty-code-fragment] .line--highlighted {
-    @apply bg-zinc-700/50;
-  }
-  
-  [data-rehype-pretty-code-fragment] .line-highlighted span {
-    @apply relative;
-  }
-  
-  [data-rehype-pretty-code-fragment] .word--highlighted {
-    @apply rounded-md bg-zinc-700/50 border-zinc-700/70 p-1;
-  }
-  
-  .dark [data-rehype-pretty-code-fragment] .word--highlighted {
-    @apply bg-zinc-900;
-  }
-  
-  [data-rehype-pretty-code-title] {
-    @apply mt-2 pt-6 px-4 text-sm font-medium text-foreground;
-  }
-  
-  [data-rehype-pretty-code-title] + pre {
-    @apply mt-2;
-  }
-  
-  .mdx > .steps:first-child > h3:first-child {
-    @apply mt-0;
-  }
-  
-  .steps > h3 {
-    @apply mt-8 mb-4 text-base font-semibold;
+  display: block;
+}
+
+[data-theme="dark"] {
+  display: none;
+}
+
+.dark [data-theme="light"] {
+  display: none;
+}
+
+.dark [data-theme="dark"] {
+  display: block;
+}
+
+[data-rehype-pretty-code-fragment] {
+  @apply relative text-white;
+}
+
+[data-rehype-pretty-code-fragment] code {
+  @apply grid min-w-full break-words rounded-none border-0 bg-transparent p-0;
+  counter-reset: line;
+  box-decoration-break: clone;
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  @apply px-4 min-h-[1rem] py-0.5 w-full inline-block;
+}
+
+[data-rehype-pretty-code-fragment] [data-line-numbers] .line {
+  @apply px-2;
+}
+
+[data-rehype-pretty-code-fragment] [data-line-numbers] > .line::before {
+  @apply text-zinc-50/40 text-xs;
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1.8rem;
+  margin-right: 1.4rem;
+  text-align: right;
+}
+
+[data-rehype-pretty-code-fragment] .line--highlighted {
+  @apply bg-zinc-700/50;
+}
+
+[data-rehype-pretty-code-fragment] .line-highlighted span {
+  @apply relative;
+}
+
+[data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply rounded-md bg-zinc-700/50 border-zinc-700/70 p-1;
+}
+
+.dark [data-rehype-pretty-code-fragment] .word--highlighted {
+  @apply bg-zinc-900;
+}
+
+[data-rehype-pretty-code-title] {
+  @apply mt-2 pt-6 px-4 text-sm font-medium text-foreground;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  @apply mt-2;
+}
+
+.mdx > .steps:first-child > h3:first-child {
+  @apply mt-0;
+}
+
+.steps > h3 {
+  @apply mt-8 mb-4 text-base font-semibold;
+}
+
+.mdx pre code.hljs {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  display: block;
+  max-width: 100%;
+  background: transparent;
+}
+
+.dark .mdx pre code.hljs {
+  color: #e6edf3;
+}
+
+.dark .mdx pre code.hljs .hljs-comment,
+.dark .mdx pre code.hljs .hljs-quote {
+  color: #8b949e;
+}
+
+.dark .mdx pre code.hljs .hljs-keyword,
+.dark .mdx pre code.hljs .hljs-selector-tag,
+.dark .mdx pre code.hljs .hljs-subst {
+  color: #ff7b72;
+}
+
+.dark .mdx pre code.hljs .hljs-string,
+.dark .mdx pre code.hljs .hljs-attr,
+.dark .mdx pre code.hljs .hljs-template-variable {
+  color: #a5d6ff;
+}
+
+.dark .mdx pre code.hljs .hljs-number,
+.dark .mdx pre code.hljs .hljs-literal,
+.dark .mdx pre code.hljs .hljs-symbol,
+.dark .mdx pre code.hljs .hljs-bullet {
+  color: #79c0ff;
+}
+
+.dark .mdx pre code.hljs .hljs-title,
+.dark .mdx pre code.hljs .hljs-section,
+.dark .mdx pre code.hljs .hljs-function .hljs-title {
+  color: #d2a8ff;
+}
+
+.dark .mdx pre code.hljs .hljs-variable,
+.dark .mdx pre code.hljs .hljs-name,
+.dark .mdx pre code.hljs .hljs-params {
+  color: #ffa657;
+}
+
+/* Editorial typography is scoped to authored pages, leaving interactive labs free to lay out their controls. */
+.reading-page {
+  max-width: 960px;
+  padding-top: 18px;
+  overflow-wrap: anywhere;
+}
+
+.reading-page > h1 {
+  max-width: 900px;
+  margin: 0 0 32px;
+  font-size: clamp(36px, 4.8vw, 68px);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.reading-page > h1::before {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 4px;
+  margin-bottom: 24px;
+  background: hsl(var(--primary));
+}
+
+.reading-page > h1 ~ h1 {
+  margin-top: 48px;
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.15;
+  font-weight: 500;
+}
+
+.reading-page > .swiss-description-heading {
+  margin: 0 0 10px;
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.reading-page > .swiss-description-heading::before {
+  display: none;
+}
+
+.reading-page > .swiss-description-heading + p {
+  margin: 0 0 32px;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.reading-page > .swiss-description-heading + p + h1 {
+  margin-top: 32px;
+  font-size: clamp(36px, 4.8vw, 68px);
+  line-height: 1.04;
+  font-weight: 700;
+}
+
+.reading-page h2 {
+  margin-top: 48px;
+  padding-bottom: 14px;
+  border-color: hsl(var(--border));
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+}
+
+.reading-page h3 {
+  margin-top: 32px;
+  font-size: 21px;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+
+.reading-page p,
+.reading-page li {
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.reading-page > p {
+  max-width: 72ch;
+  margin-top: 20px;
+}
+
+.reading-page > h1 + p {
+  font-size: 17px;
+  color: hsl(var(--muted-foreground));
+}
+
+.reading-page > ul,
+.reading-page > ol {
+  max-width: 72ch;
+}
+
+.reading-page li::marker {
+  color: hsl(var(--primary));
+}
+
+.reading-page a {
+  text-decoration-color: hsl(var(--primary));
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color 150ms;
+}
+
+.reading-page a:hover {
+  color: hsl(var(--primary));
+}
+
+.reading-page blockquote {
+  margin-block: 32px;
+  padding-left: 24px;
+  border-left: 3px solid hsl(var(--primary));
+  font-style: normal;
+  color: hsl(var(--muted-foreground));
+}
+
+.reading-page table {
+  border-top: 1px solid hsl(var(--foreground));
+  line-height: 1.65;
+}
+
+.reading-page th {
+  padding-block: 14px;
+  background: hsl(var(--secondary));
+  font-weight: 500;
+}
+
+.reading-page td {
+  padding-block: 14px;
+}
+
+.mdx .swiss-code-block {
+  border-radius: 0;
+  background: hsl(var(--secondary));
+  color: hsl(var(--foreground));
+}
+
+@media (max-width: 767px) {
+  .reading-page {
+    padding-top: 4px;
   }
 
-  .mdx pre code.hljs {
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    display: block;
-    max-width: 100%;
-    background: transparent;
+  .reading-page p,
+  .reading-page li {
+    font-size: 14px;
   }
 
-  .dark .mdx pre code.hljs {
-    color: #e6edf3;
+  .reading-page > h1 + p {
+    font-size: 16px;
   }
 
-  .dark .mdx pre code.hljs .hljs-comment,
-  .dark .mdx pre code.hljs .hljs-quote {
-    color: #8b949e;
+  .reading-page th,
+  .reading-page td {
+    min-width: 120px;
+    padding-inline: 12px;
+    vertical-align: top;
   }
-
-  .dark .mdx pre code.hljs .hljs-keyword,
-  .dark .mdx pre code.hljs .hljs-selector-tag,
-  .dark .mdx pre code.hljs .hljs-subst {
-    color: #ff7b72;
-  }
-
-  .dark .mdx pre code.hljs .hljs-string,
-  .dark .mdx pre code.hljs .hljs-attr,
-  .dark .mdx pre code.hljs .hljs-template-variable {
-    color: #a5d6ff;
-  }
-
-  .dark .mdx pre code.hljs .hljs-number,
-  .dark .mdx pre code.hljs .hljs-literal,
-  .dark .mdx pre code.hljs .hljs-symbol,
-  .dark .mdx pre code.hljs .hljs-bullet {
-    color: #79c0ff;
-  }
-
-  .dark .mdx pre code.hljs .hljs-title,
-  .dark .mdx pre code.hljs .hljs-section,
-  .dark .mdx pre code.hljs .hljs-function .hljs-title {
-    color: #d2a8ff;
-  }
-
-  .dark .mdx pre code.hljs .hljs-variable,
-  .dark .mdx pre code.hljs .hljs-name,
-  .dark .mdx pre code.hljs .hljs-params {
-    color: #ffa657;
-  }
+}

@@ -16,17 +16,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="swiss-sidebar-header">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="lg" asChild className="swiss-brand">
               <a href={websiteLink}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-white text-sidebar-primary-foreground">
-                  <img src="/panic_sad.svg" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">RuaMond</span>
-                  <span className="truncate text-xs">
+                <span className="swiss-brand-mark" aria-hidden="true" />
+                <div className="grid flex-1 text-left">
+                  <span className="swiss-brand-name">
+                    RuaMond<span className="swiss-accent">.</span>
+                  </span>
+                  <span className="swiss-brand-caption">
                     It's okay not to be okay
                   </span>
                 </div>
@@ -35,7 +35,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="swiss-sidebar-content">
         <NavMain />
       </SidebarContent>
       <MainFooter></MainFooter>

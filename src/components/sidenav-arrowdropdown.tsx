@@ -46,7 +46,7 @@ const MenuRow = React.memo(function MenuRow({
   };
 
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem className="swiss-nav-item" data-depth={item.depth}>
       <SidebarMenuButton
         asChild
         tooltip={item.label}
@@ -55,7 +55,8 @@ const MenuRow = React.memo(function MenuRow({
       >
         <a
           href={item.url ?? "#"}
-          style={{ paddingInlineStart: `${item.depth * 12 + 8}px` }}
+          aria-current={item.isActive ? "page" : undefined}
+          style={{ paddingInlineStart: `${item.depth * 12 + 12}px` }}
         >
           <SidebarMenuIcon menuId={item.id} />
           <span>{item.label}</span>
@@ -63,6 +64,8 @@ const MenuRow = React.memo(function MenuRow({
       </SidebarMenuButton>
       {item.hasChildren ? (
         <SidebarMenuAction
+          aria-label={`Toggle ${item.label}`}
+          aria-expanded={item.isExpanded}
           className={item.isExpanded ? "rotate-90" : ""}
           onClick={() => onToggle(item.id)}
         >
@@ -79,8 +82,10 @@ export function NavMain() {
     useMenuItem();
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Intro</SidebarGroupLabel>
+    <SidebarGroup className="swiss-nav">
+      <SidebarGroupLabel>
+        <span className="swiss-accent">01</span> / Explore
+      </SidebarGroupLabel>
       <SidebarMenu>
         {visibleMenuItems.map((item) => (
           <MenuRow

@@ -11,7 +11,7 @@ export function ThemeToggle() {
       themeProvider.setTheme(
         window.matchMedia("(prefers-color-scheme: dark)").matches
           ? "light"
-          : "dark"
+          : "dark",
       );
     } else if (themeProvider.theme == "dark") {
       themeProvider.setTheme("light");
@@ -23,11 +23,16 @@ export function ThemeToggle() {
   return (
     <Button
       variant="outline"
-      size="icon"
+      size="sm"
+      className="swiss-theme-toggle"
+      aria-label="Toggle color theme"
+      title="Toggle color theme"
       onClick={() => themeHandler(themeProvider)}
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <Sun className="size-4 dark:hidden" aria-hidden="true" />
+      <Moon className="hidden size-4 dark:block" aria-hidden="true" />
+      <span className="dark:hidden">Light</span>
+      <span className="hidden dark:inline">Dark</span>
     </Button>
   );
 }

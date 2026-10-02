@@ -4,7 +4,7 @@ import HiDockManagerPage from "@/features/hidock/HiDockManagerPage";
 import EmbeddingDemoPage from "@/features/embedding/EmbeddingDemoPage";
 import EpaperDesignerPage from "@/features/epaper-designer/EpaperDesignerPage";
 import WhisperXUI from "@/WhisperX-UI";
-import Home from "../Home";
+import Home from "@/Home";
 import {
   HardDrive,
   House,

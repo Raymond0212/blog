@@ -6,10 +6,10 @@ import {
 
 export default function SideFooter() {
   return (
-    <footer className="border-t border-border py-2 dark:border-border md:px-4 md:py-0">
-      <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
+    <footer className="swiss-sidebar-footer">
+      <div className="flex items-center">
         <HoverCard>
-          <div className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+          <div className="text-xs leading-loose text-muted-foreground">
             Built by{" "}
             <HoverCardTrigger asChild>
               <a

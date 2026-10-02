@@ -15,12 +15,12 @@ import React from "react";
 const MainHeader: React.FC = () => {
   const { selectedItem, selectedParentPathLabels } = useMenuItem();
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b px-2">
-      <div className="flex items-center gap-2 px-4">
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
+    <header className="swiss-header">
+      <div className="flex min-w-0 items-center gap-3">
+        <SidebarTrigger className="shrink-0" />
+        <Separator orientation="vertical" className="h-4 shrink-0" />
         <Breadcrumb>
-          <BreadcrumbList>
+          <BreadcrumbList className="swiss-breadcrumb">
             {selectedParentPathLabels.map((path, index) => (
               <React.Fragment key={`${path}-${index}`}>
                 <BreadcrumbItem key={path} className="hidden md:block">
@@ -35,7 +35,10 @@ const MainHeader: React.FC = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex flex-1 justify-end px-4">
+      <div className="ml-auto flex shrink-0 items-center gap-6">
+        <span className="swiss-header-caption hidden lg:block">
+          A personal journal
+        </span>
         <ThemeToggle />
       </div>
     </header>

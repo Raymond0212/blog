@@ -4,7 +4,7 @@ import MainWorkspace from "./MyComponents/MainContentComponents/MainWorkspace";
 
 export default function Page() {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="swiss-shell">
       <AppSidebar />
       <MainWorkspace />
     </SidebarProvider>

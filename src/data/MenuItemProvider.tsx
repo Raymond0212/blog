@@ -8,13 +8,18 @@ import {
   type VisibleMenuNode,
 } from "@/data/MenuItems";
 import {
-  createContext,
   useCallback,
-  useContext,
   useMemo,
   useReducer,
   type ReactNode,
 } from "react";
+import {
+  MenuItemProviderContext,
+  type MenuItemProviderInterface,
+} from "@/data/MenuItemContext";
+
+export { useMenuItem } from "@/data/MenuItemContext";
+export type { MenuItemProviderInterface } from "@/data/MenuItemContext";
 
 type MenuState = {
   selectedId: string;
@@ -42,21 +47,7 @@ type MenuAction =
   | { type: "select"; id: string; ancestors: string[] }
   | { type: "toggle"; id: string; descendantsToCollapse: string[] };
 
-export interface MenuItemProviderInterface {
-  menuItems: MenuNode[];
-  visibleMenuItems: VisibleMenuNode[];
-  selectedItem: MenuNode;
-  selectedParentPathLabels: string[];
-  selectedId: string;
-  selectItem: (id: string) => void;
-  toggleItemCollapsed: (id: string) => void;
-}
-
 const storageKeyDefault = "menu-context";
-
-const MenuItemProviderContext = createContext<MenuItemProviderInterface | null>(
-  null
-);
 
 function menuReducer(state: MenuState, action: MenuAction): MenuState {
   if (action.type === "select") {
@@ -343,12 +334,4 @@ export const MenuItemProvider = ({
       {children}
     </MenuItemProviderContext.Provider>
   );
-};
-
-export const useMenuItem = () => {
-  const context = useContext(MenuItemProviderContext);
-  if (!context) {
-    throw new Error("useMenuItem must be used within a MenuItemProvider");
-  }
-  return context;
 };

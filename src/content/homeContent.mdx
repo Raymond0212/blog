@@ -1,17 +1,53 @@
-## Welcome
+<div className="swiss-home">
+  <section className="swiss-hero" aria-labelledby="home-title">
+    <div className="swiss-hero-topline swiss-eyebrow">
+      <span><span className="swiss-status-dot" /> RuaMond / Personal journal</span>
+      <span>Notes on making things</span>
+    </div>
+    <div className="swiss-hero-grid">
+      <h1 id="home-title" className="swiss-hero-title">Code.<br />Curiosity.<br /><span className="swiss-accent">Everything<br />between.</span></h1>
+      <div className="swiss-poster" aria-hidden="true">
+        <div className="swiss-poster-grid" />
+        <div className="swiss-poster-circle" />
+        <div className="swiss-poster-bar" />
+        <span className="swiss-poster-plus">+</span>
+        <span className="swiss-poster-caption">An ongoing exploration.<br />Always a work in progress.</span>
+      </div>
+    </div>
+    <div className="swiss-hero-bottom">
+      <p className="swiss-intro">Hi, I'm RuaMond. A software developer working with Java and Python for {props.exp} years. This is where I share what I learn, what I build, and what catches my attention.</p>
+      <button type="button" className="swiss-text-link" onClick={() => props.onNavigate("about")}>More about me <span aria-hidden="true">↗</span></button>
+    </div>
+  </section>
 
-Hi, This is RuaMond. Welcome to my website.
+  <section className="swiss-writing" aria-labelledby="writing-title">
+    <div className="swiss-section-heading">
+      <h2 id="writing-title"><span className="swiss-section-number">01 /</span> Latest writing</h2>
+      <button type="button" className="swiss-text-link" onClick={() => props.onNavigate("articles")}>All articles <span aria-hidden="true">↗</span></button>
+    </div>
+    <div className="swiss-writing-list">{props.latestWriting}</div>
+  </section>
 
-I'm a passionate software developer with a strong background in Java and Python. Over the past {props.exp} years, I've honed my skills in developing robust and scalable applications, focusing on delivering high-quality code and innovative solutions.
-
-This website serves as the foundation of my new personal projects. Here, I will share my insights, experiences, and projects related to software development, technology trends, and best practices. Whether you're a fellow developer, a tech enthusiast, or just curious about the world of programming, I hope you find something valuable here.
-
-## Website Features
-
-- **Home**: A quick introduction and latest highlights.
-- **About**: About myself.
-- **Articles**
-  * **AI News**: Summary of recent news and articles posted by OpenAI and Anthropic.
-  * **Useful Prompts**: A private collection of useful prompts for AI workflow.
-- **HiDock Manager**: Tools for managing and working with HiDock devices.
-- **Slippery Button**: A small interactive UI playground/demo page.
+  <section className="swiss-explore" aria-labelledby="explore-title">
+    <div className="swiss-section-heading">
+      <h2 id="explore-title"><span className="swiss-section-number">02 /</span> Elsewhere in this journal</h2>
+    </div>
+    <div className="swiss-explore-grid">
+      <button type="button" className="swiss-explore-item" onClick={() => props.onNavigate("article:useful-prompts")}>
+        <span className="swiss-eyebrow">Words that work / 01</span>
+        <span className="swiss-explore-title">Useful<br />Prompts<span className="swiss-accent">↗</span></span>
+        <span className="swiss-explore-description">Reusable prompts for thoughtful AI workflows.</span>
+      </button>
+      <button type="button" className="swiss-explore-item" onClick={() => props.onNavigate("embedding-demo")}>
+        <span className="swiss-eyebrow">A hands-on experiment / 02</span>
+        <span className="swiss-explore-title">Embedding<br />Demo<span className="swiss-accent">↗</span></span>
+        <span className="swiss-explore-description">Explore how a model sees the words in your sentences.</span>
+      </button>
+      <button type="button" className="swiss-explore-item" onClick={() => props.onNavigate("epaper-designer")}>
+        <span className="swiss-eyebrow">Small screen, big ideas / 03</span>
+        <span className="swiss-explore-title">E-Paper<br />Designer<span className="swiss-accent">↗</span></span>
+        <span className="swiss-explore-description">A little canvas for monochrome interface ideas.</span>
+      </button>
+    </div>
+  </section>
+</div>
