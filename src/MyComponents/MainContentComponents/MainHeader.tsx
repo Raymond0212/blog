@@ -41,8 +41,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({ menuOpen }) => {
           orientation="vertical"
           className="swiss-header-separator hidden h-5 shrink-0 md:block"
         />
-        <Breadcrumb className="hidden min-w-0 md:block">
-          <BreadcrumbList className="swiss-breadcrumb">
+        <Breadcrumb className="hidden min-w-0 flex-1 md:block">
+          <BreadcrumbList className="swiss-breadcrumb flex-nowrap">
             {selectedParentPathLabels.map((path, index) => (
               <React.Fragment key={`${path}-${index}`}>
                 <BreadcrumbItem key={path} className="hidden md:block">

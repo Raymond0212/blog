@@ -404,28 +404,6 @@
     color: hsl(var(--primary));
   }
 
-  .swiss-menu-disclosure {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
-    border-radius: 0;
-    color: hsl(var(--muted-foreground));
-  }
-
-  .swiss-menu-disclosure:hover {
-    color: hsl(var(--primary));
-  }
-
-  .swiss-menu-disclosure > svg {
-    width: 22px;
-    height: 22px;
-    transition: transform 180ms ease;
-  }
-
-  .swiss-menu-disclosure > .swiss-menu-chevron.is-expanded {
-    transform: rotate(90deg);
-  }
-
   .swiss-menu-sublist {
     display: grid;
     gap: 9px;
@@ -445,17 +423,6 @@
     gap: 8px;
     font-size: 11px;
     line-height: 1.5;
-  }
-
-  .swiss-breadcrumb > li:last-child {
-    min-width: 0;
-  }
-
-  .swiss-breadcrumb [aria-current="page"] {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
   }
 
   .swiss-header-caption,
@@ -954,6 +921,70 @@
 }
 
 @layer utilities {
+  .swiss-header-leading {
+    flex: 1 1 auto;
+  }
+
+  .swiss-breadcrumb > li:not(:last-child) {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  .swiss-breadcrumb > li:not(:last-child) a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .swiss-breadcrumb > li:last-child {
+    min-width: 0;
+    flex: 1 1 0%;
+  }
+
+  .swiss-breadcrumb [aria-current="page"] {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .swiss-menu-disclosure {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    padding: 0;
+    border-radius: 0;
+    font-family: inherit;
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 400;
+    line-height: 1.12;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .swiss-menu-item[data-depth="1"] > .swiss-menu-row .swiss-menu-disclosure {
+    font-size: clamp(22px, 2.2vw, 28px);
+    line-height: 1.25;
+  }
+
+  .swiss-menu-item[data-depth="2"] > .swiss-menu-row .swiss-menu-disclosure {
+    font-size: clamp(15px, 1.5vw, 18px);
+    line-height: 1.45;
+  }
+
+  .swiss-menu-disclosure:hover {
+    color: hsl(var(--primary));
+  }
+
+  .swiss-menu-chevron {
+    display: inline-block;
+    transform-origin: center;
+    transition: transform 180ms ease;
+  }
+
+  .swiss-menu-chevron.is-expanded {
+    transform: rotate(90deg);
+  }
+
   .swiss-menu[data-state="open"] {
     animation: swiss-menu-enter 180ms ease-out both;
   }
