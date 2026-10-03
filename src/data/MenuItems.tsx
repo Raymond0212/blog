@@ -23,6 +23,7 @@ export type MenuNode = {
   source: "static" | "article";
   kind: "root" | "group" | "page";
   url?: string;
+  external?: boolean;
   items?: MenuNode[];
 };
 
@@ -83,6 +84,14 @@ const staticMenuItems: MenuNode[] = [
     label: "About",
     source: "static",
     kind: "root",
+  },
+  {
+    id: "photography",
+    label: "Photography",
+    source: "static",
+    kind: "root",
+    url: "https://photo.ruamond.dev/",
+    external: true,
   },
   {
     id: "hidock-manager",

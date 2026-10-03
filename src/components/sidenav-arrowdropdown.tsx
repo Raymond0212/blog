@@ -58,9 +58,20 @@ function MenuItemRow({
         <a
           className="swiss-menu-link"
           href={item.url ?? "#"}
-          aria-current={selectedId === item.id ? "page" : undefined}
-          data-active={isActive}
+          target={item.external ? "_blank" : undefined}
+          rel={item.external ? "noopener noreferrer" : undefined}
+          aria-label={
+            item.external ? `${item.label} (opens in a new tab)` : undefined
+          }
+          aria-current={
+            !item.external && selectedId === item.id ? "page" : undefined
+          }
+          data-active={item.external ? false : isActive}
           onClick={(event) => {
+            if (item.external) {
+              onNavigate();
+              return;
+            }
             event.preventDefault();
             onSelect(item.id);
             onNavigate();
