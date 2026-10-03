@@ -38,11 +38,6 @@ The week produced 14 qualifying publications: five from Anthropic and nine from 
 
 This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
 
-### [Customize Claude Code with mods](https://claude.com/blog/claude-code-mods)
-**Published:** 2026-10-01
-
-Anthropic introduced Claude Code mods: TypeScript functions packaged in plugins that can intercept events, rewrite prompts or tool calls, modify the UI, and replace built-in features such as `/diff` across the CLI and desktop app. The architecture supports plugin ordering, validation, state, testing, and hot reload, while enterprise controls include marketplace governance and the `sec-default` mod. Because mods have the same machine access as Claude Code and are unsandboxed, trusted distribution and administrative policy are central to adoption.
-
 ### [Claude for Government is now generally available](https://claude.com/blog/claude-for-government-is-now-generally-available)
 **Published:** 2026-09-30
 
@@ -57,16 +52,6 @@ Anthropic says its opt-in buying agent handles thousands of inbound conversation
 **Published:** 2026-09-29
 
 Asana uses Claude-powered AI teammates inside its Work Graph, assigning agents defined roles, scoped permissions, shared memory, and visible activity so humans can collaborate with and coach them. The agents support product-question triage, renewal-risk briefings, and engineering-cycle planning through Command by Asana, while human administrators retain control over permanent memory and access. Supporting materials describe permission inheritance, inspectable memory, action logs, approval gates, and MCP-based access to Work Graph data.
-
-### [Giving companies more control over their AI agents, with NVIDIA](https://claude.com/blog/giving-companies-more-control-over-their-ai-agents-with-nvidia)
-**Published:** 2026-09-28
-
-Anthropic announced a collaboration with NVIDIA combining Claude Managed Agents with NVIDIA OpenShell to give enterprises controls outside the model. Managed Agents separates the agent loop from its sandbox, protects credentials through vaults, and provides audit trails; OpenShell adds default-deny, policy-based controls over files, network access, processes, credentials, and inference. NVIDIA's broader Open Agent Safety Platform also includes Sentry and BlueField-4 for out-of-band monitoring and rapid quarantine.
-
-### [A model guide for the GPT-6 family](https://openai.com/index/practical-guide-building-gpt-6/)
-**Published:** 2026-10-02
-
-OpenAI's guide frames GPT-6 deployment as a production workflow problem: choose a model, reasoning level, and speed profile for the workload, then measure success, latency, and cost. It recommends prompt caching, compaction, monitoring, data controls, steering, asynchronous tools, delegation, and clear decision boundaries for long-running agent work. The guide also points to GPT-6 Astra, GPT-6.1 Sol, and GPT-6 Luna as differentiated choices rather than a single default model.
 
 ### [The eternal complement](https://openai.com/index/the-eternal-complement/)
 **Published:** 2026-10-01
@@ -104,81 +89,10 @@ This section covers articles relevant to APIs, models, SDKs, developer tools, in
 
 Mods provide a middleware-style TypeScript extension point for Claude Code events, with hooks that can run before, after, instead of, or around an event. Official architecture material describes access to tools, prompts, UI rendering, plugin ordering, validation, state, and hot reload. Mods ship inside plugins and work in both the CLI and desktop application.
 
-### [Claude for Government is now generally available](https://claude.com/blog/claude-for-government-is-now-generally-available)
-**Published:** 2026-09-30
-
-The government offering packages commercial-parity Claude capabilities with administrative controls for departmental use, including SSO/SCIM, model access limits, audit logs, prepaid budgets, local history, and ATO support. Claude Code CLI and Claude for Microsoft 365 are in early access, extending the deployment surface beyond the core Claude interface.
-
-### [How Anthropic's sales team rebuilt inbound with Claude Managed Agents](https://claude.com/blog/how-anthropics-sales-team-rebuilt-inbound-with-claude-managed-agents)
-**Published:** 2026-09-30
-
-The buying agent runs across web, Claude.ai, and email using Managed Agents' stateful sessions, tools, sandboxed execution, and permission policies. Anthropic's documentation notes token-based billing plus an active-session charge, and that sessions persist until deleted and are not currently eligible for zero-data-retention or HIPAA BAA coverage. Those details are important implementation constraints for similar customer-facing agents.
-
-### [Agents you can coach: how Asana builds human-agent teams with Claude](https://claude.com/blog/agents-you-can-coach-how-asana-builds-human-agent-teams-with-claude)
-**Published:** 2026-09-29
-
-Asana's design combines role-specific agents, permission-aware access to the Work Graph, shared but inspectable memory, visible action logs, and approval gates. Its MCP server provides authenticated access to Work Graph data, while Command by Asana coordinates agent work for product and engineering workflows. The implementation treats human coaching and observability as core system functions rather than after-the-fact review.
-
-### [Giving companies more control over their AI agents, with NVIDIA](https://claude.com/blog/giving-companies-more-control-over-their-ai-agents-with-nvidia)
-**Published:** 2026-09-28
-
-OpenShell adds policy enforcement for files, network access, processes, credentials, and inference around Claude Managed Agents, with formal policy verification and default-deny behavior. Managed Agents contributes session and sandbox separation, vault-based credential handling, and audit trails; NVIDIA's Sentry and BlueField-4 extend monitoring and quarantine outside the agent runtime.
-
 ### [A model guide for the GPT-6 family](https://openai.com/index/practical-guide-building-gpt-6/)
 **Published:** 2026-10-02
 
 The guide recommends caching stable instructions and reference material, using compaction for long conversations, and measuring cost per successful task rather than token price alone. It also describes steering, asynchronous tool calling, delegation, computer use, and explicit boundaries for agent autonomy. The production advice is intended to keep multi-step work moving without sacrificing monitoring or data controls.
-
-### [How Albertsons Companies is reimagining retail from the inside out](https://openai.com/index/albertsons-reimagining-retail/)
-**Published:** 2026-10-01
-
-The Albertsons deployment uses ChatGPT Enterprise and the OpenAI API to support retail technology, recommendations, promotions, store operations, and a Safeway shopping experience in ChatGPT. The rollout is structured around focused use cases that can be evaluated, refined, and expanded into repeatable organizational practices.
-
-### [DevDay 2026 Recap](https://openai.com/index/devday-2026-recap/)
-**Published:** 2026-09-29
-
-The recap highlights a broad developer surface spanning Codex, the API, models, plugins, and agent-based workflows. Its technical direction is to let developers build native experiences into a shared ChatGPT surface while giving agents ongoing responsibilities and people ways to collaborate with and review them.
-
-### [GPT-6.1 Sol](https://openai.com/index/introducing-gpt-6-1-sol/)
-**Published:** 2026-09-29
-
-GPT-6.1 Sol targets coding, document-heavy professional work, computer use, and multi-step business workflows with a lower-cost capability profile. OpenAI reports that it matches GPT-6 Astra on a complex software-engineering benchmark at roughly one-fifth the cost, and that it improves over GPT-6 Sol on the tested reasoning settings. The article links to the DeepSWE, GDP.pdf, and AutomationBench evaluations used for those comparisons.
-
-### [Addendum to GPT-6 Astra System Card: GPT-6.1 Sol](https://deploymentsafety.openai.com/gpt-6-1-sol)
-**Published:** 2026-09-29
-
-The safety addendum extends the GPT-6 Astra system card with evaluations of GPT-6.1 Sol across safe completions, jailbreaks, prompt injection, health, hallucinations, alignment, monitorability, and preparedness. It also covers biological and chemical capabilities, cybersecurity, self-improvement, and safeguard training, with a linked PDF for the full report. This is the primary technical companion for evaluating Sol's deployment claims.
-
-### [Introducing dots](https://openai.com/index/introducing-dots/)
-**Published:** 2026-09-29
-
-Dots combine GPT-6 Astra with a dedicated cloud computer and plugin-based connections to external applications. They can work continuously, receive feedback, and act through ChatGPT, Slack, or Teams, with permission controls and review steps for consequential actions. The design is an implementation of persistent agent workflows rather than a single-turn assistant interface.
-
----
-
-## Security
-
-This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
-
-### [Customize Claude Code with mods](https://claude.com/blog/claude-code-mods)
-**Published:** 2026-10-01
-
-Mods run with the same machine access as Claude Code and are not sandboxed, so installing them creates a meaningful supply-chain and local-privilege boundary. Anthropic's supporting materials describe marketplace governance and a `sec-default` mod that loads first to preserve managed permission-denial rules and other enterprise restrictions.
-
-### [Claude for Government is now generally available](https://claude.com/blog/claude-for-government-is-now-generally-available)
-**Published:** 2026-09-30
-
-Claude for Government is delivered through a FedRAMP High-authorized environment with controls for SSO/SCIM, departmental administration, model limits, usage caps, audit logs, local history, and ATO support. Anthropic points agencies to secure-configuration and authorization materials in its Trust Center; access and documentation remain subject to the relevant government deployment scope.
-
-### [How Anthropic's sales team rebuilt inbound with Claude Managed Agents](https://claude.com/blog/how-anthropics-sales-team-rebuilt-inbound-with-claude-managed-agents)
-**Published:** 2026-09-30
-
-Managed Agents provides sandboxed execution and permission policies for the buying agent, but its documentation says sessions persist until deletion and are excluded from zero-data-retention and HIPAA BAA coverage. Those retention and compliance boundaries should be evaluated before using the same pattern for sensitive customer conversations.
-
-### [Agents you can coach: how Asana builds human-agent teams with Claude](https://claude.com/blog/agents-you-can-coach-how-asana-builds-human-agent-teams-with-claude)
-**Published:** 2026-09-29
-
-Asana's AI teammates inherit scoped permissions, expose their actions, and use approval gates for sensitive work. Human administrators retain control over permanent memory and access, while permission-aware retrieval and MCP authentication help limit the data available to each agent.
 
 ### [Giving companies more control over their AI agents, with NVIDIA](https://claude.com/blog/giving-companies-more-control-over-their-ai-agents-with-nvidia)
 **Published:** 2026-09-28
@@ -190,20 +104,10 @@ The Claude–NVIDIA control stack uses default-deny policies, credential brokeri
 
 OpenAI described a coordinated campaign to extract protected reasoning through manipulated model interactions rather than by breaking encryption, compromising a database, or directly accessing stored conversations. The company reported 16,000 requests across more than 4,000 users during a high-volume phase, related activity across a cluster of more than 15,000 users, and disruption by July 28. OpenAI shared the assessment through the Frontier Model Forum and says mitigation and investigation continue.
 
-### [GPT-6.1 Sol](https://openai.com/index/introducing-gpt-6-1-sol/)
-**Published:** 2026-09-29
-
-The model announcement links to a deployment-safety addendum rather than treating capability and price as the whole release story. OpenAI's accompanying evaluations cover safe completions, adversarial robustness, alignment, monitorability, and preparedness, including cybersecurity and biological/chemical capability assessments.
-
 ### [Addendum to GPT-6 Astra System Card: GPT-6.1 Sol](https://deploymentsafety.openai.com/gpt-6-1-sol)
 **Published:** 2026-09-29
 
 The addendum documents safety and preparedness evaluations for GPT-6.1 Sol, including prompt injection, jailbreaks, hallucinations, deceptive interactions, monitor evasion, cyber capability, and safeguard training. Its structure makes the model release auditable against a broad set of deployment risks, while the linked evaluations remain OpenAI's reported evidence.
-
-### [Introducing dots](https://openai.com/index/introducing-dots/)
-**Published:** 2026-09-29
-
-Dots are designed with built-in safeguards, scoped access and permissions, and action review or approval for consequential tasks. Because they can operate continuously across a cloud computer and external apps, the safety model depends on clear authorization, inspectability, and user control over what an agent may do on the user's behalf.
 
 ### [Towards safety cases for frontier AI training](https://openai.com/index/towards-safety-cases-for-frontier-ai-training/)
 **Published:** 2026-09-28

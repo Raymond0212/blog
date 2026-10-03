@@ -33,13 +33,6 @@ This week’s AI news cycle was dominated by production controls rather than fro
 
 This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
 
-### [Responding to the next frontier of critical cyber capabilities](https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/)
-**Published:** 2026-08-07
-
-OpenAI says recent Astra evaluations showed enough progress in agentic coding and cybersecurity that it can no longer rule out the model reaching its critical cyber threshold. The announcement is primarily a governance update: OpenAI is tightening access controls, monitoring, and development requirements before further capability work proceeds. It also signals a more public posture on preparedness decisions and external safety validation.
-
----
-
 ### [From asking to doing: How the world is putting ChatGPT to work](https://openai.com/index/how-the-world-is-putting-chatgpt-to-work/)
 **Published:** 2026-08-06
 
@@ -79,24 +72,10 @@ Anthropic explains how organizations should manage Claude spend in terms of busi
 
 This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
 
-### [Third-party evaluation of frontier cyber capabilities](https://openai.com/index/third-party-evaluation-of-frontier-cyber-capabilities/)
-**Published:** 2026-08-07
-
-OpenAI explains how outside evaluators are assessing frontier model cyber capability under more realistic, agentic conditions than older chatbot-style tests. The post argues that meaningful evaluations depend heavily on harness design, tool access, budgets, and validation methodology. It is a technical note about how to measure advanced model behavior without over- or under-stating real capability.
-
----
-
 ### [Improving GPT-5.6 Sol in ChatGPT-and expanding access to GPT-5.6 Luna for free users](https://openai.com/index/improving-gpt-5-6-sol-in-chatgpt/)
 **Published:** 2026-08-06
 
 OpenAI says it retuned GPT-5.6 Sol inside ChatGPT to produce more focused answers, fewer mistakes, and more consistent behavior across lightweight and deeper reasoning flows. The update also expands GPT-5.6 Luna access for Free and Go users and adds a reasoning slider for paid users. The main engineering theme is practical model tuning inside a consumer product rather than a new base-model release.
-
----
-
-### [New ways to learn and teach with ChatGPT](https://openai.com/index/learn-teach-chatgpt-work-codex/)
-**Published:** 2026-08-04
-
-This post is also relevant technically because the new education workflows connect ChatGPT Work and Codex to documents, calendars, and approved apps in more structured ways. OpenAI is effectively packaging institution-aware agentic workflows rather than just exposing a generic chatbot. That makes the announcement relevant for teams building managed, context-rich knowledge tools.
 
 ---
 
@@ -135,17 +114,6 @@ Anthropic introduced inference hooks, which send each governed prompt to an orga
 
 ---
 
-### [A guide to cost visibility and control in Claude](https://claude.com/blog/a-guide-to-cost-visibility-and-control-in-claude)
-**Published:** 2026-08-04
-
-The cost-visibility post is also an engineering article because it lays out practical cost levers such as prompt caching, batch processing, effort controls, and model escalation patterns. Anthropic is effectively documenting how to tune application economics without changing budgets or degrading outcomes. That makes it relevant to teams operating AI systems at production scale.
-
----
-
-## Security
-
-This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
-
 ### [Responding to the next frontier of critical cyber capabilities](https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/)
 **Published:** 2026-08-07
 
@@ -159,43 +127,3 @@ This is the week’s most direct security announcement. OpenAI says Astra may be
 OpenAI frames external cyber evaluations as necessary for both capability measurement and safeguard testing. The article stresses that security conclusions depend on realistic harnesses, tool availability, time budgets, and validity checks rather than simplified benchmark setups. It is useful as a security methodology note for teams evaluating advanced agent behavior.
 
 ---
-
-### [Apple is getting this wrong](https://openai.com/index/apple-is-getting-this-wrong/)
-**Published:** 2026-08-03
-
-Although legal in tone, this post is also a security and governance article because it centers on access revocation, data custody, and trade-secret handling. OpenAI argues the dispute reflects Apple’s residual-access failure rather than theft of confidential material. The linked court filing and attached exhibits push the issue into concrete information-security process territory.
-
----
-
-### [Auto mode is now the default in Claude Code for Pro, Max, and Team plans](https://claude.com/blog/auto-mode-default-in-claude-code)
-**Published:** 2026-08-07
-
-Anthropic explicitly presents auto mode as a security improvement over manual approvals. The article cites prompt-injection evaluations, red-team results, hard-deny actions for exfiltration-like behavior, and managed controls for enterprise admins. Its core claim is that policy-mediated autonomy can reduce both user friction and risky human approval habits.
-
----
-
-### [Running Auto mode in production](https://claude.com/blog/auto-mode-in-production)
-**Published:** 2026-08-07
-
-This customer case-study post focuses on security guardrails in practice: blocked command classes, governed MCP proxies, session telemetry, and human checkpoints for higher-risk actions. Anthropic uses production examples to argue that safer autonomy is achievable when the control plane is explicit. It is effectively a deployment-security reference for Claude Code teams.
-
----
-
-### [Millennium and Anthropic are building a digital risk analyst with Claude](https://claude.com/blog/millennium-and-anthropic-are-building-a-digital-risk-analyst-with-claude)
-**Published:** 2026-08-06
-
-The Millennium partnership matters for security because Anthropic highlights auditability, sandboxed action testing, and supervised decision-making in a sensitive financial-risk workflow. The post is less about broad AI capability than about how Claude can be used under tight control in a regulated environment. It positions secure reasoning traces and human oversight as part of the product value.
-
----
-
-### [Run Claude Code sessions on your own compute](https://claude.com/blog/run-claude-code-sessions-on-your-own-compute)
-**Published:** 2026-08-06
-
-Self-hosted Claude Code is security-relevant because it gives customers more control over network access, internal services, repository artifacts, and secret-handling boundaries. At the same time, Anthropic is clear that prompts, responses, and tool results still go to Anthropic for inference and transcript storage. That makes the post important for teams drawing precise lines around compliance and data residency assumptions.
-
----
-
-### [Inference hooks: inline data loss prevention for Claude Enterprise](https://claude.com/blog/claude-enterprise-inference-hooks)
-**Published:** 2026-08-05
-
-Inference hooks are a direct security feature: each governed prompt can be inspected by a customer-controlled service before inference, and tool-call results can also be screened. The documentation adds signed webhooks, rollout modes, and fail-open versus fail-closed behavior, which are the exact details security teams will care about. This is one of the week’s clearest examples of inline AI governance becoming a productized control surface.
