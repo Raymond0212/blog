@@ -243,6 +243,187 @@
   color: hsl(var(--muted-foreground));
 }
 
+.swiss-about .about-topline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 44px;
+}
+
+.about-intro-grid,
+.about-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: clamp(28px, 5vw, 72px);
+}
+
+.about-intro-grid {
+  align-items: end;
+  padding-bottom: 44px;
+  border-bottom: 1px solid hsl(var(--foreground));
+}
+
+.swiss-about h1 {
+  margin: 0;
+  font-size: clamp(56px, 7.4vw, 100px);
+  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: -0.07em;
+}
+
+.swiss-about p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.swiss-about .about-intro p {
+  font-size: 19px;
+  line-height: 1.65;
+  letter-spacing: -0.02em;
+}
+
+.about-disciplines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 24px;
+}
+
+.about-disciplines span::before {
+  content: "+";
+  margin-right: 7px;
+  color: hsl(var(--primary));
+}
+
+.about-section {
+  padding-block: 36px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.about-section-label {
+  position: relative;
+  padding-left: 38px;
+}
+
+.about-section-label > .swiss-section-number {
+  position: absolute;
+  top: 5px;
+  left: 0;
+}
+
+.swiss-about h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.08;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.about-photography-copy {
+  display: grid;
+  gap: 20px;
+}
+
+.swiss-about a {
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary));
+  text-underline-offset: 4px;
+  white-space: nowrap;
+}
+
+.swiss-about a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 5px;
+}
+
+.about-link-arrow {
+  color: hsl(var(--primary));
+}
+
+.about-viewfinder {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 62px;
+  margin-top: 26px;
+  border: 1px solid hsl(var(--border));
+  background: linear-gradient(
+    90deg,
+    transparent 49.5%,
+    hsl(var(--border)) 49.5%,
+    hsl(var(--border)) 50.5%,
+    transparent 50.5%
+  );
+}
+
+.about-viewfinder span {
+  width: 30px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+}
+
+.about-signoff {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 16px clamp(28px, 5vw, 72px);
+  padding-top: 28px;
+}
+
+.swiss-about .about-signoff p {
+  max-width: 48ch;
+  font-size: 14px;
+  color: hsl(var(--muted-foreground));
+}
+
+.about-signature {
+  grid-column: 2;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.07em;
+}
+
+@media (max-width: 639px) {
+  .about-intro-grid,
+  .about-section,
+  .about-signoff {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .swiss-about .about-topline {
+    margin-bottom: 32px;
+  }
+
+  .about-intro-grid {
+    padding-bottom: 32px;
+  }
+
+  .swiss-about .about-intro p {
+    font-size: 17px;
+  }
+
+  .swiss-about p {
+    font-size: 15px;
+  }
+
+  .about-section {
+    padding-block: 28px;
+  }
+
+  .about-viewfinder {
+    display: none;
+  }
+
+  .about-signature {
+    grid-column: 1;
+  }
+}
+
 .reading-page table {
   border-top: 1px solid hsl(var(--foreground));
   line-height: 1.65;
