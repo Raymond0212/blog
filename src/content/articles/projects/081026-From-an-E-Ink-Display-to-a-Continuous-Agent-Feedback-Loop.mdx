@@ -1,0 +1,77 @@
+# From an E-Ink Display to a Continuous Agent Feedback Loop
+
+> The Spinning Jenny moved textile workers from spinning threads to tending machines. AI is moving developers from writing code to guiding the systems that write it.
+
+The Spinning Jenny let one operator spin several threads at once. As textile production became mechanized, the work around it changed too. I can see a similar shift starting in software. When an AI agent takes on more of the implementation, I spend more time figuring out how it should work and how I'll know whether it's done a good job.
+
+A small e-ink project brought this home. I wanted a screen that showed my Codex quota. I ended up spending much of my effort building the tools and feedback that would let an agent keep working without waiting for me at every step.
+
+## Started with a Quota Display
+
+In early 2026, I picked up a Waveshare ESP32-S3-Touch-ePaper-1.54 and started with a simple prototype. The backend ran on my own Linux server. My AI agent already worked on other projects on that same PC, so it made sense for the device to connect to it and fetch its data there.
+
+The idea sounded straightforward: get the quota, send it to the device, and put it on the screen. As the project grew, so did the number of things that had to work together. There was firmware, a backend, a network connection, and a physical display. The agent could write code for those pieces, but it couldn't automatically see everything that happened once they were running.
+
+I kept having to fill in the gaps. I'd check the screen, verify a device interaction, or investigate why a connection wasn't working. Those interruptions gradually became the main engineering problem I wanted to solve.
+
+## Tests Helped until the Agent Needed Me
+
+I started with specification-driven development and test-driven development. The specifications gave the agent an idea of what I wanted. Tests turned some of those expectations into checks it could run, and compilation caught problems before the code reached the device.
+
+That helped, but a successful build couldn't tell me whether the screen looked right. A test could pass while missing an assumption I'd never written down. Even good host-side tests couldn't reproduce every detail of the hardware.
+
+So I'd end up checking things manually again. Sometimes I didn't have access to the device. This deviates from the concept of agentic development. Too much manual work, too little autonomy. I wondered whether the agent could make progress in the repository, then autonomously take a photo and confirm what had happened. My availability should not become a dependency in the development process.
+
+I started thinking more carefully about the harness around the agent: the tools, checks, instructions, and permissions it needed to work on the project. Each time it got stuck waiting for me, there was usually a missing way to act or a missing way to observe the result.
+
+## Giving the Agent a Virtual Hand
+
+For device testing, I built a USB command testing suite. It gave the agent a repeatable way to exercise simulated device flows and inspect the responses. I no longer had to perform each of those interactions by hand.
+
+That also made it easier to revisit a problem. After changing the code, the agent could run the same flow again and compare what happened. The suite only covered the interactions I'd exposed, but those interactions were now available inside its working environment.
+
+For a few weeks, that was enough. The agent could make changes, run the tests, and report back. I could see what it had done and whether it had passed the checks. It still needed me to look at the screen, but I was starting to see how to reduce those interruptions.
+
+## Bring Visual Feedback Into the Loop
+
+The next gap was obvious: the agent needed to see the screen. Software can report that it's drawn an image while the display in front of you shows something unexpected. For this project, the visible output was part of what needed testing.
+
+I connected a webcam and added a skill explaining how to take photos and inspect visible changes. That gave the agent a way to compare the expected screen state with the actual device. Taking a photo could become a normal verification step, instead of another request for me to walk over and look.
+
+Camera images still needed to be read alongside test results and device responses. A poorly positioned camera could hide a problem, and a photo wouldn't explain every internal failure. Even so, it gave the agent access to evidence it previously had to ask me for.
+
+## Making the Design Checkable Too
+
+The e-paper designer for my blog, blog.ruamond.dev, follows the same idea. I've built a visual designer that can import and export a fixed XML format for 200-by-200 monochrome layouts. The visual interface lets me work on what I want the screen to look like, while the XML gives the agent a concrete description to implement.
+
+That's useful because a visual idea can leave a lot open to interpretation. With a defined format, I can make the structure explicit and check parts of the result programmatically. The project includes an XSD schema and an implementation guide for agents, so there's a shared contract between the design and the code that renders it.
+
+XML validation covers structure and types. Geometry, behavior, and the final pixels still need their own checks. The workflow I'm aiming for is to design visually, export the XML, validate it, render it, and compare the result with the intended layout. Once it's on the device, the webcam gives me another check against the physical screen.
+
+This gives the agent more precise feedback than asking it to make something look roughly like a reference. If an output breaks the format or fails a rendering check, there's a specific problem to correct. I can spend more attention on the design itself while the repeatable checks handle what can be verified mechanically.
+
+## Marching the Last Mile Through the Network
+
+The device is ready, but without a backend, it's useless. However, with such sensitive information on my quota dashboard, security becomes the most important topic. My setup utilises mTLS, local Nginx, and Cloudflare. mTLS handled encrypted communication and authentication on both sides, but I still had to work out whether the whole path was configured correctly and reachable. This kind of testing is usually done by me, but I wanted the agent to be able to check the network path too.
+
+Alongside the local Nginx setup, I gave the agent access to Cloudflare through MCP so it could investigate connectivity issues using the tools available there. That reduced the amount of information I had to carry between the agent and another system.
+
+It also made me more deliberate about access. The agent needed enough visibility to narrow down a problem, with clear limits on changes that could affect the infrastructure. Giving it more tools was useful when those tools answered a real question in the debugging process.
+
+## “In my beginning is my end. In my end is my beginning.”
+
+By this point, the project had become an exercise in connecting the steps. The agent needed to understand the intended result, make a change, run the relevant checks, inspect what happened, and decide what to do next. A failure needed to feed into another attempt or a clear request for help.
+
+USB commands gave it a way to act on the device. The webcam let it inspect visible output. The XML format made design requirements easier to check. Infrastructure access helped it investigate problems outside the codebase. Each addition removed a particular place where work had stopped for a manual handoff.
+
+That's what I mean by a continuous agent feedback loop. I want the agent to have enough evidence to make its next decision responsibly. When it says something works, I want to know what it tested and what it actually observed. If it couldn't check the hardware or reach a service, that needs to remain visible.
+
+## Taking the Same Approach into Work
+
+I'm also bringing this thinking into my professional work, where I'm trying to build feedback loops and quality gates for long-running agent workflows. The device project gave me a practical starting point. At each stage, I need to define what good enough means and what evidence allows the work to move forward.
+
+A failed check should lead to diagnosis and another verified attempt, within the task's limits. If the agent can't proceed, it should explain the blocker. Longer workflows also need a reliable record of what's been attempted and what's passed, so later steps don't quietly treat an assumption as a fact.
+
+I'm still working on how to apply this well. An agent staying busy for hours doesn't tell me much by itself. I care about whether the result holds up when it's checked, and whether I can understand how it got there.
+
+That's where the Spinning Jenny comparison feels useful to me. Mechanization changed how much work one person could do and how that work was organized. AI could release us from a growing amount of repetitive human labor, including the checking and coordination that took up so much of this project. If we build reliable ways for agents to act and learn from the results, more people could have the time and capacity to try things they couldn't have attempted before. At a larger scale, I think that could amount to another industrial revolution. How widely its benefits are shared will matter. For now, this small screen has given me a concrete reason to be optimistic: I can see how less time spent repeating routine work could leave more room for deciding what I actually want to build.

@@ -20,9 +20,24 @@
     </div>
   </section>
 
+  <section className="swiss-writing" aria-labelledby="featured-title">
+    <div className="swiss-section-heading">
+      <h2 id="featured-title"><span className="swiss-section-number">01 /</span> Featured article</h2>
+    </div>
+    <button type="button" className="swiss-writing-row" onClick={() => props.onNavigate("article:projects/081026-From-an-E-Ink-Display-to-a-Continuous-Agent-Feedback-Loop")}>
+      <span className="swiss-row-number swiss-accent" aria-hidden="true">↗</span>
+      <span className="swiss-writing-info">
+        <span className="swiss-eyebrow">Projects / 08 Oct 2026</span>
+        <span className="swiss-writing-title">From an E-Ink Display to a Continuous Agent Feedback Loop</span>
+        <span className="swiss-explore-description">How a small quota display became an experiment in giving an AI agent the tools and feedback to keep working.</span>
+      </span>
+      <span className="swiss-row-arrow" aria-hidden="true">↗</span>
+    </button>
+  </section>
+
   <section className="swiss-writing" aria-labelledby="writing-title">
     <div className="swiss-section-heading">
-      <h2 id="writing-title"><span className="swiss-section-number">01 /</span> Latest writing</h2>
+      <h2 id="writing-title"><span className="swiss-section-number">02 /</span> Latest writing</h2>
       <button type="button" className="swiss-text-link" onClick={() => props.onNavigate("articles")}>All articles <span aria-hidden="true">↗</span></button>
     </div>
     <div className="swiss-writing-list">{props.latestWriting}</div>
@@ -30,7 +45,7 @@
 
   <section className="swiss-explore" aria-labelledby="explore-title">
     <div className="swiss-section-heading">
-      <h2 id="explore-title"><span className="swiss-section-number">02 /</span> Elsewhere in this journal</h2>
+      <h2 id="explore-title"><span className="swiss-section-number">03 /</span> Elsewhere in this journal</h2>
     </div>
     <div className="swiss-explore-grid">
       <button type="button" className="swiss-explore-item" onClick={() => props.onNavigate("article:useful-prompts")}>
