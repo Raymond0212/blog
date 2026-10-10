@@ -1,0 +1,226 @@
+# AI News Report - 10 Oct 2026
+
+**Report period:** 2026-10-04 to 2026-10-10  
+**Generated on:** 2026-10-10  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This report covers 18 publications: 10 from Claude's article index and eight from OpenAI News. Each article appears in one category, based on its main subject.
+
+**Key updates:**
+
+- Anthropic introduced Haiku 5.5 with lower-cost high-volume inference and migration changes; OpenAI began rolling out GPT-6 and interactive interfaces in ChatGPT.
+- Claude expanded business workflows through dashboards, animations, and Google Workspace integration; OpenAI and Atlassian announced deeper enterprise integration.
+- New engineering guidance focuses on reliable scheduled agents, cloud coding sessions, and model evaluation in production workflows.
+- Anthropic expanded verified access for security professionals; OpenAI documented both GPT-6 safety improvements and regressions and disrupted two covert influence operations.
+- OpenAI released mathematical research artifacts for community scrutiny and announced new teen-learning and advertising initiatives.
+
+**Key trends:**
+
+- Agent deployment is becoming an operational discipline: shared context, explicit verification, scoped credentials, and human approval matter alongside model capability.
+- AI work is moving into existing business surfaces, including Google Workspace, enterprise knowledge systems, and interactive documents.
+- Wider access to capable models is accompanied by more differentiated safety controls, identity verification, and provenance requirements.
+
+> [!note] Reporting scope
+> Dates cover seven calendar days inclusive, through the run time on October 10 (Asia/Singapore). “Automating eval design and hillclimbing with Claude” was excluded: its article dates publication to September 28, despite an October 7 index entry. Older linked materials were reviewed as background, not counted as new articles.
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [Build live dashboards and animate explainers with Claude](https://claude.com/resources/articles/dashboards-and-motion)
+
+**Published:** 2026-10-08
+
+Anthropic launched Claude Dashboards in beta on paid plans and Claude Motion in beta for Team and Enterprise, while bringing Docs, Slides, and Design out of beta to all plans. Dashboards connect to business data with inspectable queries and refresh timestamps; Motion produces editable, code-based animations that export to MP4. Enterprise administrators control rollout, and users of standalone Claude Design should migrate design systems and preserve chats and comments before its December 14, 2026 closure.
+
+Supporting reading: [Supporting material 1](https://support.claude.com/en/articles/17440474-migrate-from-standalone-claude-design-to-claude); [Supporting material 2](https://claude.com/resources/articles/cowork-is-now-claude).
+
+---
+
+### [Helping teens learn, plan, and shape the future of AI](https://openai.com/index/teens-learn-and-plan/)
+
+**Published:** 2026-10-07
+
+OpenAI announced a forthcoming College Planner for ChatGPT for Teens, initially aimed at US students in grades 10–12 applying to four-year colleges, alongside flashcards, improved quizzes and multi-page note capture on iOS. It is funding College Advising Corps expansion and an AI fellowship, and supporting Boston Children’s Hospital’s independent Student Advisory Council for three years to feed youth perspectives into product and safety decisions. Reported learning usage and responses to break reminders are early company observations, rather than proof of improved educational outcomes.
+
+Supporting reading: [Supporting material 1](https://openai.com/index/chatgpt-for-teens/); [Supporting material 2](https://openai.com/index/why-teens-deserve-access-safe-ai/); [Supporting material 3](https://digitalwellnesslab.org/student-advisory-council/).
+
+---
+
+### [Claude now works with Google Docs, Sheets, and Slides](https://claude.com/resources/articles/claude-now-works-in-google-docs-sheets-and-slides)
+
+**Published:** 2026-10-06
+
+Anthropic launched a paid-plan public beta of Claude for Google Workspace, bringing in-place document editing, spreadsheet analysis, and slide creation into a sidebar, alongside separate connectors for creating and editing Google files from Claude. The add-on defaults to approval before edits and supports existing enterprise controls; the connectors respect Google sharing permissions and require organizational enablement on Team and Enterprise plans. Rollout planning should account for beta limits: the add-on operates only on the open file, while connector-based live previews require Chrome or the desktop built-in browser.
+
+Supporting reading: [Supporting material 1](https://support.claude.com/en/articles/10166901-use-google-workspace-connectors); [Supporting material 2](https://support.claude.com/en/articles/16951679-use-claude-in-google-docs-sheets-and-slides).
+
+---
+
+### [We’re expanding the Claude Startups program to help founders build](https://claude.com/resources/articles/were-expanding-the-claude-startups-program-to-help-founders-build)
+
+**Published:** 2026-10-06
+
+Anthropic expanded Claude Startups with an announced package of up to $7,000 in Claude Team access and API credits, up to $45,000 in partner offers, Applied AI office hours, and Marketplace submission support. The launch targeted startups founded within five years or funded within two, positioning the program as both a cost subsidy and a route to technical advice and distribution. The linked program FAQ now says demand exceeded capacity for the free Team year and $1,000 API offer and applications will be re-reviewed, so founders should confirm current availability before budgeting around those launch benefits.
+
+Supporting reading: [Supporting material 1](https://claude.com/programs/startups); [Supporting material 2](https://www.anthropic.com/legal/credit-terms).
+
+---
+
+### [Atlassian and OpenAI expand partnership to turn enterprise knowledge into action](https://openai.com/index/atlassian-partnership/)
+
+**Published:** 2026-10-06
+
+Atlassian and OpenAI expanded their agreement to pair OpenAI frontier models with Rovo and the Teamwork Graph, grounding agents in enterprise projects, documentation, and decisions. Atlassian reports more than 3,000 developers using Codex; its linked plugin announcement details Jira, Confluence, and people mentions plus a Home view, with access governed by existing permissions. Deeper Jira integrations for assigning and tracking agent work, alongside DX productivity measurement, remain exploratory rather than announced delivery commitments.
+
+Supporting reading: [Supporting material 1](https://community.atlassian.com/forums/discussion/3288784/bring-your-atlassian-work-into-chatgpt-and-codex).
+
+---
+
+### [Building advertising for the way people use AI](https://openai.com/index/new-chatgpt-ads-format-and-measurement/)
+
+**Published:** 2026-10-05
+
+OpenAI announced visual ads that will begin testing during image generation for US Free and Go users later in October, alongside expanded attribution and conversion-measurement partnerships. Its supporting measurement article distinguishes click and view-through attribution from early geo-based incrementality experiments, an important distinction when evaluating campaign returns. Brand-suitability pilots with DoubleVerify and IAS will evaluate safeguards in controlled environments without access to private conversations; OpenAI says ads remain separate from generated images and do not influence answers.
+
+Supporting reading: [Supporting material 1](https://ads.openai.com/blog/more-ways-to-measure); [Supporting material 2](https://openai.com/policies/ad-policies/).
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [Building effective agent automations](https://claude.dev/blog/building-effective-agent-automations/)
+
+**Published:** 2026-10-08
+
+Anthropic published a reference implementation for a scheduled Claude Managed Agents brief that reads Slack and GitHub, tracks changes, and posts to one destination. Its reliability guidance covers per-source bookmarks, explicit source-failure reporting, live status checks before publishing, and updating state only after delivery is confirmed. The linked deployment and memory documentation supports separating read-only preferences from writable run state, with scoped credentials and per-run spending limits.
+
+Supporting reading: [Using agent memory](https://platform.claude.com/docs/en/managed-agents/memory); [Scheduled deployments](https://platform.claude.com/docs/en/managed-agents/scheduled-deployments).
+
+---
+
+### [How Block orchestrates Claude Fable across thousands of pull requests](https://claude.com/resources/articles/how-block-orchestrates-claude-fable-across-thousands-of-pull-requests)
+
+**Published:** 2026-10-08
+
+Block describes using Claude Fable 5 to plan and coordinate company-wide migrations spanning thousands of pull requests, with smaller Opus and Sonnet agents editing files and running tests in its Buzz workspace. The team benchmarks both model and effort level to improve cost efficiency, while retaining human control of merges and production deployments, security checks, and dual approval. Its experience highlights shared organizational context and visible multi-agent coordination as prerequisites for scaling agent-assisted engineering.
+
+Supporting reading: [Supporting material 1](https://claude.com/resources/articles/building-effective-human-agent-teams); [Supporting material 2](https://www.anthropic.com/news/claude-fable-5-mythos-5).
+
+---
+
+### [Introducing Claude Haiku 5.5](https://www.anthropic.com/claude-haiku-5-5)
+
+**Published:** 2026-10-07
+
+Anthropic launched Haiku 5.5 for high-volume tasks, browser use and narrowly scoped subagents, adding adjustable effort and reporting roughly 75% lower average operating cost than Haiku 4.5. Prompts up to 100,000 tokens cost $0.10 per million input tokens and $0.50 per million output tokens; Sonnet 5.5 cache-read pricing also halved. The linked migration guide makes clear that upgrading requires more than a model-ID swap: teams should recount tokens, adopt adaptive thinking, remove incompatible sampling and prefill settings, and update computer-use integrations. Python and TypeScript SDKs now provide beta browser/computer toolsets, while developers still supply the environment, policies and approval callbacks.
+
+Supporting reading: [Supporting material 1](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide); [Supporting material 2](https://platform.claude.com/docs/en/agents-and-tools/tool-use/browser-use-sdk).
+
+---
+
+### [GPT-6 and Intelligent UI for everyone](https://openai.com/index/gpt-6-for-everyone/)
+
+**Published:** 2026-10-07
+
+OpenAI began rolling out GPT-6 with Intelligent UI in ChatGPT, combining text with interactive diagrams, forms, charts, and task-specific tools through native streamable components and a compiler. The model can interleave reasoning with answers; OpenAI reports that web-search responses begin 44% sooner on average than GPT-5.6 Instant. Paid Chat tiers use GPT-6 Sol and Free/Go use GPT-6 Luna, while this release leaves Work and Codex models unchanged. The linked system card reports stronger jailbreak resistance and factuality alongside regressions in some safety evaluations, with additional system-level safeguards.
+
+Supporting reading: [GPT-6 Sol and GPT-6 Luna: October 2026 update](https://deploymentsafety.openai.com/gpt-6-october).
+
+---
+
+### [Claude Code in the cloud: a field guide to cloud sessions](https://claude.dev/blog/claude-code-in-the-cloud/)
+
+**Published:** 2026-10-06
+
+This practical guide explains when to move Claude Code work into isolated cloud sessions, using parallel bug fixes, documentation updates, and logging changes to demonstrate the workflow. Each task receives its own machine and branch; the guide stresses explicit verification commands, repository-level configuration, reliable environment setup, and deliberate merge ordering. Linked documentation details configurable network access and proxy-held credentials, while the article highlights terminal handoffs, pull-request auto-fixes, and triggered routines as ways to keep work moving across devices.
+
+Supporting reading: [Supporting material 1](https://code.claude.com/docs/en/cloud-environments); [Supporting material 2](https://code.claude.com/docs/en/claude-code-on-the-web).
+
+---
+
+### [Sharing AI progress in mathematics](https://openai.com/index/sharing-ai-progress-in-mathematics/)
+
+**Published:** 2026-10-06
+
+OpenAI released a repository of mathematical manuscripts, Lean proof artifacts and selected reasoning summaries generated by an unreleased frontier model. The repository lists 719 manuscripts in 372 result families from approximately 4,000 attempted problems, with about 42% of top-line results formalized; it explicitly warns that unformalized results may contain issues. The release adds compute estimates and revision protocols, while the linked independent advisory guidance stresses human understanding, equitable access and community-led verification rather than treating AI output as settled mathematics.
+
+Supporting reading: [Supporting material 1](https://github.com/openai/math); [Supporting material 2](https://github.com/openai/math/blob/main/lean/ComparatorChallenges/README.md); [Supporting material 3](https://github.com/openai/math/blob/main/overview.tex).
+
+---
+
+### [How Cresta turned CX expertise into an agent builder on the Claude Agent SDK](https://claude.com/resources/articles/how-cresta-turned-cx-expertise-into-an-agent-builder-on-the-claude-agent-sdk)
+
+**Published:** 2026-10-05
+
+Cresta describes Conductor, an agent builder that combines the Claude Agent SDK’s execution tools with customer-experience data and domain-specific development practices. Its workflow produces reviewable blueprints, separates deterministic business rules from flexible conversations, and evaluates outcomes, execution paths, quality, and resource use whenever models or the framework change. Cresta reports roughly halving initial deployment time in early use; the linked product overview explains how business-specific tests, root-cause analysis, and production feedback support continued iteration.
+
+Supporting reading: [Supporting material 1](https://cresta.com/blog/cresta-conductor-the-agent-for-ai-agent-development).
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Disrupting AI-enabled “false front” operations](https://openai.com/index/disrupting-ai-enabled-false-front-operations/)
+
+**Published:** 2026-10-08
+
+OpenAI banned Russia-origin “Dark Clark” and Iran-origin “Bogus Bylines” influence operations that used ChatGPT alongside fake think tanks, journalist personas, forged materials, and traditional media outreach. OpenAI assessed their reach at Breakout Scale categories 5 and 4 respectively, while warning that operators exaggerated their own effectiveness and that reach does not establish persuasion. The cases show AI improving established deception workflows, with trusted intermediaries and legitimate publications providing more consequential distribution than low-engagement social media comments.
+
+Supporting reading: [Supporting material 1](https://www.brookings.edu/wp-content/uploads/2020/09/Nimmo_influence_operations_PDF.pdf); [Supporting material 2](https://about.fb.com/news/2020/09/august-2020-cib-report/).
+
+---
+
+### [GPT-6 Sol and GPT-6 Luna: October 2026 update](https://deploymentsafety.openai.com/gpt-6-october)
+
+**Published:** 2026-10-07
+
+OpenAI’s October system card reports stronger jailbreak resistance, factuality and disclosure of blocked tasks for the ChatGPT versions of GPT-6 Sol and Luna, alongside regressions in some sensitive-content and teen-safety evaluations. Both models are treated as High capability in cybersecurity and biological/chemical domains, with layered safeguards carried forward from GPT-5.6; neither reaches High capability in AI self-improvement. The accompanying PDF stresses that difficult benchmark failure rates do not represent ordinary usage, and that model-only results exclude production safeguards.
+
+Supporting reading: [Supporting material 1](https://deploymentsafety.openai.com/gpt-6-october/gpt-6-october.pdf); [Supporting material 2](https://deploymentsafety.openai.com/gpt-5-6).
+
+---
+
+### [How Comcast and Booz Allen use Claude Mythos to find exploit chains and secure their codebases](https://claude.com/resources/articles/how-comcast-booz-allen-use-claude-mythos-to-secure-their-codebases)
+
+**Published:** 2026-10-06
+
+Comcast and Booz Allen report using Mythos-class models through Project Glasswing to trace vulnerabilities across code, configuration, identity, and deployment boundaries. Comcast validated and remediated an authentication flaw during an assessment spanning 258 systems; Booz Allen says one analyst reviewed eight production systems across 138 repositories in twelve days. Both emphasize that human validation, deduplication, and ownership remain essential as faster discovery shifts the bottleneck toward triage and remediation. The linked Cyber Verification Program announcement explains how vetted defenders can apply for broader access under tier-specific controls.
+
+Supporting reading: [Supporting material 1](https://www.anthropic.com/glasswing); [Supporting material 2](https://www.anthropic.com/news/cyber-verification-program).
+
+---
+
+### [Expanding the Cyber Verification Program](https://www.anthropic.com/news/cyber-verification-program)
+
+**Published:** 2026-10-06
+
+Anthropic unified its Cyber Verification Program and Project Glasswing into Defense, Red Team, and Specialized Access tiers, pairing broader cyber capabilities with progressively stricter verification and controls. Its reported evaluation blocked 46 of 50 offensive trials under Defense Access, while Red Team Access completed 34 without classifier blocks; this is evidence from a limited benchmark, not a general safety guarantee. Supporting requirements make phishing-resistant MFA and short-lived credentials central to enrollment, with a December 15 transition deadline for Defense Access, while data retention remains required subject to specified exemptions and the planned Enterprise Frontier Safeguards rollout.
+
+Supporting reading: [Supporting material 1](https://support.claude.com/en/articles/14604842-cyber-verification-program); [Supporting material 2](https://support.claude.com/en/articles/17202708-cyber-verification-program-security-requirements); [Supporting material 3](https://www.anthropic.com/news/enterprise-frontier-safeguards).
+
+---
+
+### [Our approach to EU text provenance rules](https://openai.com/index/eu-text-provenance/)
+
+**Published:** 2026-10-05
+
+OpenAI introduced opt-in textGrain watermarking for selected API models worldwide and announced a phased rollout to eligible ChatGPT and Codex outputs in the EU in response to AI Act transparency obligations. Its linked technical report describes a statistical watermark that balances detectability with sampling diversity; detector access initially remains restricted to approved researchers and expert organizations. Detection becomes unreliable for short, constrained, or heavily edited passages, and a watermark establishes neither authorship nor factual accuracy, making it a limited provenance signal rather than proof of responsibility.
+
+Supporting reading: [Supporting material 1](https://cdn.openai.com/pdf/e9508624-d767-41b6-a26d-e34ca798ada6/textgrain-entropy-calibrated-watermarking-for-language-model-text.pdf); [Supporting material 2](https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content); [Supporting material 3](https://help.openai.com/en/articles/8912793-provenance-signals-in-openai-generated-content).
+
+---
+
