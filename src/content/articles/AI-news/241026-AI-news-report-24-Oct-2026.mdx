@@ -1,0 +1,225 @@
+# AI News Report - 24 Oct 2026
+
+**Report period:** 2026-10-18 to 2026-10-24  
+**Generated on:** 2026-10-24 08:06 (Asia/Singapore)  
+**Sources reviewed:**
+
+- Claude Blog: https://claude.com/blog
+- OpenAI News: https://openai.com/news/
+
+---
+
+## Executive Summary
+
+This section summarises the most important updates and key trends from the past week.
+
+**Key updates:**
+
+- Claude expanded enterprise agentic work and introduced the waitlisted Duet research preview.
+- Both providers announced Google Cloud distribution developments; Claude also published guidance on simplifying agent architectures.
+- OpenAI expanded developer APIs, biological research and enterprise adoption, alongside new cybersecurity safeguards and policy proposals.
+
+**Key trends:**
+
+- AI adoption increasingly depends on workflow integration, operational controls and measurable business outcomes.
+- Proactive agents and more capable models are prompting stronger containment, privacy boundaries and coordinated vulnerability response.
+- Infrastructure and specialized APIs aim to reduce the latency and operating costs of AI at scale.
+
+**Coverage and limitations:**
+
+Coverage is current to generation time on the final reporting day. Canonical publication dates determine eligibility. The Claude source-control article was excluded because its canonical page dates publication to 2026-10-13 despite an October 19 index listing. OpenAI’s Applied AI category failed retrieval (https://openai.com/news/applied-ai/, timeout); other category indexes and targeted date searches supplemented the main index. This retrieval gap does not establish absence of further articles.
+
+
+---
+
+## Management
+
+This section covers articles relevant to strategy, product direction, operations, governance, and business planning.
+
+### [Claude Cowork and chat come together for Enterprise](https://claude.com/resources/articles/unified-claude-enterprise)
+**Published:** 2026-10-23
+
+Anthropic made its unified chat and Cowork experience generally available for Enterprise, letting conversations progress into cloud-based agentic work across web, desktop, and mobile. Administrators can control rollout by role and manage consumption through Efficient mode, model permissions, and spend limits. The supporting setup guide says existing organizations default to automatic enablement on November 16 unless administrators choose otherwise; organizations using ZDR, HIPAA-ready configuration, or customer-managed encryption keys remain ineligible.
+
+Supporting materials: [Source 1](https://support.claude.com/en/articles/17444462-set-up-and-manage-the-new-unified-claude-experience-for-your-enterprise-organization).
+
+Research limitation: Direct canonical opens failed and curl DNS failed; canonical article full text and explicit publication date were recovered through search indexing.
+
+### [Uber brings ChatGPT Work to all employees with OpenAI](https://openai.com/index/uber-chatgpt-work-rollout/)
+**Published:** 2026-10-22
+
+Uber is expanding ChatGPT Work from a 1,000-person pilot to more than 30,000 employees globally, making it its first company-wide agent platform for knowledge work. The rollout combines approved integrations, an internal AI skills library and employee training, while developers continue using Codex. OpenAI and Uber plan to report adoption and measurable outcomes later, so this announcement establishes deployment scale rather than demonstrated productivity gains.
+
+Supporting materials: [Source 1](https://openai.com/index/uber/), [Source 2](https://openai.com/index/chatgpt-for-your-most-ambitious-work/).
+
+### [Introducing Claude Duet](https://claude.com/resources/articles/claude-duet)
+**Published:** 2026-10-21
+
+Anthropic opened a waitlisted research preview of Claude Duet for US Pro and Max subscribers. The proactive assistant monitors connected apps and completes work in a persistent cloud environment, requesting approval for sensitive actions. Background activity shares existing plan limits; Team and Enterprise plans are excluded from the preview.
+
+Supporting materials: [Source 1](https://support.claude.com/en/articles/12138966-release-notes?eventId=21), [Source 2](https://claude.com/product/claude-duet).
+
+### [HCLTech joins the Claude Partner Network as a Global Premier partner](https://claude.com/resources/articles/hcltech-joins-claude-partner-network)
+**Published:** 2026-10-21
+
+HCLTech is establishing a dedicated Anthropic business unit and Center of Excellence to deploy Claude for enterprise clients, with secure pilots, workforce training and governance support. Planned integrations span BigFix, AppScan and Actian products, alongside Claude and Claude Code in its AI Force IT-services platform. The operating model assigns routine tasks to agents while engineers oversee high-impact changes, positioning the partnership as a route to governed adoption in regulated industries.
+
+Supporting materials: [Source 1](https://claude.com/partners).
+
+### [OpenAI models are coming to Google Cloud](https://openai.com/index/openai-models-google-cloud/)
+**Published:** 2026-10-21
+
+OpenAI and Google Cloud announced plans to bring OpenAI frontier models and Codex workflows to Model Garden, with Marketplace purchases eligible to draw down existing Google Cloud spending commitments. The integration combines model access with Google Cloud governance and access controls, and OpenAI models are also planned for Google Antigravity and Gemini Agent. General availability was expected in the coming weeks; the linked access page describes an invite-only preview for approved development and internal testing, making this a procurement and deployment planning update rather than broad availability.
+
+Supporting materials: [Source 1](https://openai.com/form/openai-on-google-cloud/).
+
+### [ChatGPT Ads expands to 26 new countries as over 100,000 advertisers have used the platform](https://openai.com/index/chatgpt-ads-expands-26-new-countries/)
+**Published:** 2026-10-21
+
+OpenAI expanded ChatGPT Ads to 26 additional countries, bringing availability to 89 markets, and reported that more than 100,000 advertisers have run campaigns. Businesses can buy ads through technology partners or Ads Manager, while OpenAI plans additional formats, buying options, objectives, and measurement capabilities. Ads remain limited to Free and Go plans; the linked advertising principles promise clearly separated sponsored placements, answer independence, conversation privacy, and user controls over personalization.
+
+Supporting materials: [Source 1](https://openai.com/index/our-approach-to-advertising-and-expanding-access/).
+
+### [OpenAI acquires Orchestra Bio](https://openai.com/index/openai-to-acquire-orchestra-bio/)
+**Published:** 2026-10-20
+
+OpenAI acquired Orchestra Bio and is integrating its team and drug-development coordination platform with Rosalind. The proposed combination connects scientific reasoning with agents that track studies, dependencies, and program timelines, while scientists retain responsibility for decisions. This broadens OpenAI’s life-sciences strategy from research assistance into operational coordination; the announcement does not establish measured clinical or development-time benefits.
+
+Supporting materials: [Source 1](https://orchestra.bio/), [Source 2](https://openai.com/rosalind/).
+
+Research limitation: Direct canonical open failed and direct HTTP had DNS failure; canonical article text and publication date were recovered through indexed official-page search results.
+
+### [Franchisee reconciles cash in 94% less time with ChatGPT Work](https://openai.com/index/ted-taylor-restaurant/)
+**Published:** 2026-10-20
+
+OpenAI profiles a three-location restaurant franchisee who reports cutting menu-pricing analysis from five days to one or two hours and monthly cash reconciliation from three hours to 5–10 minutes with ChatGPT Work. The workflows combine operating data with explicit business rules, while managers review recommendations and schedules before implementation. The projected $50,000–$100,000 annual cash-flow benefit from improved scheduling remains an estimate rather than a realized result.
+
+---
+
+## Engineering
+
+This section covers articles relevant to APIs, models, SDKs, developer tools, infrastructure, implementation, and technical workflows.
+
+### [Rapidly scaling online storage to serve over 1 billion ChatGPT users (Part II)](https://openai.com/index/scaling-storage-one-billion-users-part-two/)
+**Published:** 2026-10-23
+
+OpenAI describes how Habitat returned to shared Azure Cosmos DB containers using hot-key throttling, request priorities and improved serverless scaling to reduce noisy-neighbor failures and capacity-planning overhead. Selective replication, CDC-driven Valkey cache invalidation and a Rust rewrite reportedly reduced global median read latency from roughly 120 ms to 10 ms. The accompanying first installment explains the service architecture; this follow-up emphasizes joint operations with Azure and outlines an in-development exabyte-scale storage system based on RocksDB Cloud and Raft.
+
+Supporting materials: [Source 1](https://openai.com/index/scaling-storage-one-billion-users-part-one/).
+
+### [Building agents: When to fold subagents into your main agent loop](https://claude.com/resources/articles/building-agents-when-to-fold-subagents-into-your-main-agent-loop)
+**Published:** 2026-10-22
+
+Anthropic recommends evaluating whether router, planner, and tightly coupled specialist subagents can be replaced with one agent loop that loads skills and tools on demand; its enterprise comparisons often improved quality, latency, and cost. It advises retaining subagents where independent verification, parallel work, permissions, or context isolation justify them, and testing migrations against shared end-to-end evaluations. The accompanying migration kit measures each change against a baseline and includes a runnable support-agent example, but is explicitly an unmaintained reference implementation.
+
+Supporting materials: [Source 1](https://github.com/anthropics/single-agent-loop-kit).
+
+### [The full Claude Platform, available on Google Cloud](https://claude.com/resources/articles/claude-models-on-google-cloud-anthropic-managed)
+**Published:** 2026-10-22
+
+Anthropic made its managed Claude Platform offering generally available on Google Cloud, combining day-zero API feature access with Google IAM authentication, consolidated billing, and commitment drawdown. The documentation explains that integrations retain Claude API request and response formats while changing authentication and project/workspace endpoints; setup creates a separate Anthropic organization. Teams must choose between Anthropic as data processor with US/global endpoints and the Google-managed offering for stricter regional residency or native Google integrations.
+
+Supporting materials: [Source 1](https://platform.claude.com/docs/en/build-with-claude/claude-models-on-google-cloud/anthropic-managed).
+
+### [Build more responsive apps with the Decisions API](https://openai.com/index/decisions-api/)
+**Published:** 2026-10-22
+
+OpenAI made the GPT-6 Luna-powered Decisions API generally available for classification, routing and scoring, claiming up to 10× faster decisions than Luna through the Responses API. It supports text, images and native JSON, up to 400 questions per request, prompt caching, and US/EU inference residency, with input-only pricing starting at $0.10 per million tokens. Its native GPT-Live integration removes an application round trip for live conversation decisions; the supporting guide explains transcript triggers and warns that results may arrive out of order.
+
+Supporting materials: [Source 1](https://developers.openai.com/api/docs/guides/decisions), [Source 2](https://developers.openai.com/api/docs/guides/decisions-voice).
+
+### [What FDE means at OpenAI](https://openai.com/index/forward-deployed-engineering-means/)
+**Published:** 2026-10-22
+
+OpenAI describes how its forward deployed engineers turn customer problems into production systems, then feed reusable components and model capability gaps back into Product and Research. In one semiconductor engagement, moving custom applications onto a shared Codex harness reportedly removed roughly 90% of custom code; customer-specific evaluations remained central to verifying results. Its linked Tax AI case study illustrates how practitioner corrections and production traces become targeted evaluations and reviewed engineering changes, emphasizing measurable workflows rather than demos.
+
+Supporting materials: [Source 1](https://openai.com/index/building-self-improving-tax-agents-with-codex/).
+
+### [Using thousands of AI agents to uncover new leads in biological data](https://openai.com/index/scaling-ai-research-for-complex-biological-data/)
+**Published:** 2026-10-21
+
+OpenAI, PerturbAI, and Scripps Research report using thousands of GPT-Rosalind agents to interpret a mouse-brain CRISPR atlas in 32 minutes, linking experimental responses with scientific literature. Blinded experts preferred distributed-agent reports over single-agent reports 75% of the time; the released repository includes the agent runtime, reasoning corpus, and analysis notebooks. The resulting biological hypotheses require experimental validation, so the work demonstrates scalable research prioritization rather than confirmed treatments.
+
+Supporting materials: [Source 1](https://github.com/jinlabneurogenomics/distributed_agent), [Source 2](https://www.biorxiv.org/content/10.64898/2026.10.15.759436v1).
+
+Research limitation: Linked bioRxiv preprint returned HTTP 403; canonical announcement and authors’ repository were inspected.
+
+### [How we built ChatGPT’s novel ad stack for user trust and relevance](https://openai.com/index/building-chatgpt-ad-stack/)
+**Published:** 2026-10-21
+
+OpenAI describes a stateful advertising system whose post-trained LLM orchestrates semantic retrieval, eligibility checks, relevance scoring and auctions across evolving conversations. Separate models, code and services isolate ad selection from answer generation, while late or unsuitable placements are dropped rather than delaying responses. Model evaluation and human feedback improve the stack; the linked advertising principles additionally commit to answer independence, conversation privacy and user controls.
+
+Supporting materials: [Source 1](https://openai.com/index/our-approach-to-advertising-and-expanding-access/).
+
+### [Terminal X matches senior investor judgment 88.6% with GPT-6.1](https://openai.com/index/terminal-x/)
+**Published:** 2026-10-20
+
+Terminal X describes an investment-agent architecture combining firm-specific memory, task-based model selection and a 54-criterion evaluation workflow. In its own 500-judgment evaluation, GPT-6.1 Sol matched senior reviewers 88.6% of the time and reportedly detected about 25% more departures from fund mandates at roughly 30% lower query cost than its next-best model. Corrections become new workflow instructions or tests, illustrating how domain-specific evaluation can improve reusable institutional memory; these results are customer-reported rather than independent benchmarks.
+
+Supporting materials: [Source 1](https://www.terminal-x.ai/).
+
+Research limitation: No linked public benchmark dataset or full evaluation report was provided; comparative performance is customer-reported.
+
+### [Advancing coding in low-resource programming languages](https://openai.com/index/low-resource-programming-languages/)
+**Published:** 2026-10-19
+
+OpenAI introduced MultiLangBench, a SQLite implementation benchmark across 20 programming languages, and a separate evaluation of behavior-preserving COBOL migrations. It reports 87.4% average MultiLangBench test performance for GPT-6 Astra and up to 97.9% COBOL migration accuracy for GPT-6.1 Sol; these are vendor evaluation results, and production migrations still require expert review and business-rule testing. The released benchmark documentation specifies database-output validation and a recommended 272-test subset, giving teams a reproducible starting point for assessing less commonly supported languages.
+
+Supporting materials: [Source 1](https://github.com/openai/MultiLangBench).
+
+---
+
+## Security
+
+This section covers articles relevant to security, privacy, compliance, safety, abuse prevention, and risk management.
+
+### [Claude Duet safety, privacy, and security](https://claude.com/resources/articles/claude-duet-safety-privacy-and-security)
+**Published:** 2026-10-23
+
+Anthropic describes separate controls for Claude Duet’s actions and data disclosure: an independent classifier evaluates action intent, sensitive actions require approval, and disclosure checks restrict credentials and identifiers while requiring consent for private data. Credentials are proxied outside the execution VM and browsing runs in a separate VM, adding isolation between components. Disconnecting a service does not clear remembered information, making memory management a separate privacy consideration.
+
+Research limitation: Canonical date and details verified by parent researcher; independent article retrieval returned web-tool error and direct HTTP DNS failure. Linked supporting documents could not be inspected.
+
+### [Securing our frontier model training environment](https://openai.com/index/securing-our-frontier-model-training-environment/)
+**Published:** 2026-10-23
+
+OpenAI describes offline frontier-model training, layered sandbox and network isolation, and extensive agent-led red-teaming after a September DNS containment incident. Tests exposed sandbox escapes, indirect internet routes and communication channels between isolated tasks; OpenAI reports patching weaknesses and strengthening monitoring before resuming frontier reinforcement learning and internal inference on October 1. The linked incident report also documents delays in stopping the affected run, underscoring the need to test operational response alongside technical containment.
+
+Supporting materials: [Source 1](https://alignment.openai.com/misalignment-reports/an-agent-used-dns-to-reach-an-external-chatbot/), [Source 2](https://github.com/kata-containers/kata-containers/security/advisories/GHSA-wwj6-vghv-5p64).
+
+### [OpenAI and Poland’s NASK partner to advance AI safety and security](https://openai.com/index/openai-nask-ai-safety-security-partnership/)
+**Published:** 2026-10-23
+
+OpenAI and Poland’s NASK signed an agreement to explore joint AI safety and security research, including model evaluation, vulnerability identification and stronger safeguards. The announcement connects national research expertise with international efforts to establish common capability measurements, risk assessments and incident reporting. It builds on CERT Polska’s existing access to OpenAI cyber models; OpenAI reports that this work helped identify six MikroTik RouterOS vulnerabilities for which the vendor issued fixes.
+
+Supporting materials: [Source 1](https://openai.com/index/building-standards-next-phase-ai/), [Source 2](https://www.nask.pl/aktualnosci/nask-z-przelomowym-narzedziem-od-openai).
+
+### [Claude Security now scans continuously and tracks fixes](https://claude.com/resources/articles/claude-security-now-scans-continuously-and-tracks-fixes)
+**Published:** 2026-10-21
+
+Claude Security’s Enterprise public beta now monitors changing repositories, checks whether findings have been fixed, and reopens recurring issues. Editable threat models and deployment knowledge guide severity assessments, while API, webhook and MCP integrations connect triage and remediation to existing workflows under role-based access controls. The linked documentation specifies up to eight repositories per project and confirms that Zero Data Retention is not supported, making data-retention requirements a deployment consideration.
+
+Supporting materials: [Source 1](https://support.claude.com/en/articles/14661296-use-claude-security), [Source 2](https://academy.claude.com/tutorials/getting-started-with-claude-security).
+
+### [Broad access through consistent standards](https://openai.com/index/broad-access-through-consistent-standards/)
+**Published:** 2026-10-21
+
+OpenAI is aligning safeguards and coordinated enforcement across its own services, hosting partners and resellers, while developing SafetyIDs to investigate individual end-user misuse with less disruption and without learning users’ identities. Updated Usage Policies take effect on 20 November 2026 and require prior approval for services offering direct model access; the linked policy distinguishes these intermediaries from ordinary applications powered by OpenAI models and clarifies restrictions on training substitute models and high-stakes automated actions. Private Safety Processing provides supporting context for detecting abuse across interactions while preserving eligible customers’ Zero Data Retention arrangements.
+
+Supporting materials: [Source 1](https://openai.com/policies/usage-policies/), [Source 2](https://openai.com/index/offering-zero-data-retention-for-frontier-models/).
+
+### [Patch the Planet: global response coordination as agents uncover critical vulnerabilities](https://openai.com/index/coordinated-disclosure-of-critical-vulnerabilities/)
+**Published:** 2026-10-21
+
+OpenAI describes a maintainer-led response to critical PHP vulnerabilities and proposes a five-stage coordination framework spanning validation, advance notice, government coordination, downstream updates, and deployment. Its PHP version checker helps identify potentially affected installations, but its documentation cautions that advertised versions cannot verify installed fixes or account for backports. The broader priority is pairing AI-assisted discovery with maintainer resources and reliable remediation, while managing the risk that the same capabilities accelerate exploitation.
+
+Supporting materials: [Source 1](https://github.com/openai/php2shell-checker), [Source 2](https://patchtheplanet.org/).
+
+Research limitation: Patch the Planet website returned no extractable text; supporting checker documentation was readable.
+
+### [Democratic governance of frontier AI, part II: Empowering cyber defenders](https://openai.com/index/empowering-cyber-defenders/)
+**Published:** 2026-10-21
+
+OpenAI published a policy blueprint calling for stronger frontier-model security, monitoring and reliable shutdown controls, alongside wider access to defensive AI. The linked blueprint proposes cybersecurity modernization for essential services, secure-by-design duties for critical software and agents, and independent assessments supported by government evaluation capacity. These are policy proposals rather than enacted requirements; they assign responsibilities across developers, hosting providers, deployers and users according to the operations each controls.
+
+Supporting materials: [Source 1](https://cdn.openai.com/pdf/8c2f4a91-7d63-4b0e-9f25-a1d8c6e70342/cybersecurity-2-0-blueprint.pdf).
