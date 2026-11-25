@@ -1,0 +1,58 @@
+# `mem0-decay`: Lessons from Trying to Make Memory System Forget
+
+When I manage production RAG systems and persistent user-agent memories for my users, I hit an uncomfortable wall very quickly: **append-only memory does not scale.**
+
+In an always-on personal assistant, every conversation, status update, and incidental remark steadily inflates the vector index. Over time, two things happen: storage footprint climbs continuously, and retrieval precision degrades as stale context crowds out what actually matters right now.
+
+My initial instinct for solving this didn't come from a database manual—it came from thinking about how human memory actually works, specifically the **Ebbinghaus forgetting curve**. People naturally forget things over time. Crucial facts stick around or get reinforced whenever we recall them, while trivial, unimportant details quietly fade away. I wanted my personal assistant to behave the same way: letting noise decay while keeping important context sharp.
+
+Looking at the ecosystem, frameworks like **Letta (formerly MemGPT)** tackle this by treating the LLM like an operating system—letting the agent actively manage its own context window via self-editing memory blocks and sliding-window summarization (Packer et al., 2023). While agent-driven compaction is powerful, delegating every memory lifecycle decision to LLM tool calls is expensive, slow, and token-heavy for a high-ingestion personal assistant. I wanted something more **mathematical, predictable, and cheap**—a deterministic lifecycle layer that could physically shrink disk usage and speed up retrieval without constant LLM overhead.
+
+On the other end of the spectrum, **Mem0** stood out for its developer ergonomics and fast vector retrieval. However, capabilities like managed memory decay and native graph connections are largely gated behind its hosted platform, while open-source deployments leave long-term lifecycle management up to the developer. So I started an experimental TypeScript project, **[`mem0-decay`](https://github.com/Raymond0212/mem0-decay)**, to test whether I could build a principled, local-first decay and compaction layer directly on top of Mem0 OSS and Qdrant.
+
+---
+
+### What the Experiment Taught Me
+
+Building `mem0-decay` started as a practical engineering hunch—define half-lives, compact old memories, and boost recalled ones—and gradually led me back to cognitive science architectures like **ACT-R (Adaptive Control of Thought—Rational)** (Anderson et al., 2004) and **Complementary Learning Systems (CLS)** (McClelland et al., 1995).
+
+Running 1,540 LoCoMo benchmark questions against the implementation gave me a sobering, concrete look at the trade-offs of making an agent forget:
+
+1. **Physical Compaction Works:** By sweeping aged memories from Tier 0 into embedding-clustered Tier 1 summaries (with source-lineage verification before retiring raw records), Qdrant's allocated disk space dropped by **31.2%** (replacing 4,958 raw memories with 1,711 summaries), cached p50 retrieval latency improved from **116 ms to 107 ms**, and overall benchmark accuracy shifted by only **−1.30 percentage points** (`90.06%` to `88.77%`). For an always-on system, trading ~1% accuracy for nearly a third less vector storage is a win.
+2. **Aggressive Temporal Ranking Breaks Top-<var>k</var> Precision:** In my initial ranking tests, applying a 30-day half-life with a `0.30` search floor tanked Top-50 retrieval accuracy from `90.45%` down to `76.62%`—even though Top-200 accuracy stayed identical at `90.52%`. The evidence wasn't gone; aggressive recency weighting had simply pushed older, high-value facts out of the Top-50 window in favor of recent chatter. Raising the search floor to `0.95` restored the lost coverage. **Decay works great for physical storage compaction, but as a retrieval multiplier, it needs tight guardrails.**
+
+I would have loved to run even more ablations and long-horizon sweeps across different decay curves, but—very sadly—I hit a hard practical wall: I burned through the entire $100 in OpenAI API credits allocated to my Pro subscription running the LoCoMo evaluations and compaction passes (Opps Gpt4o is expensive, maybe I should change to luna).
+
+---
+
+### Moving Beyond Decay: Three Pillars for the Next Iteration
+
+Looking honestly at my `mem0-decay` today, it solves **memory lifecycle management** (how memories age, sweep, and compact), but it is only one piece of **memory intelligence**. A robust, always-on personal agent needs three tightly integrated pillars:
+
+#### 1. Hybrid Fact + Semantic Retrieval (Bringing Back Structured Connections)
+
+Pure vector similarity struggles with multi-hop entity queries and state updates. Earlier open-source versions of Mem0 relied on external graph store integrations (like Neo4j or Kuzu) before Mem0 shifted toward a proprietary, built-in platform graph. To keep local deployments self-contained and fast, the core storage layer needs a hybrid approach: pairing Qdrant's dense embeddings with a lightweight local relational triple or graph store (`subject, predicate, object` with `valid_from` / `valid_to` intervals). When a user switches projects or updates a preference, explicit temporal superseding should invalidate the old fact rather than waiting weeks for decay to bury it.
+
+#### 2. Importance-Scaled Half-Life Compaction
+
+Not all memories should age at the same clock speed. Right now, `mem0-decay` supports policy-based half-lives (`ephemeral`, `standard`, `pinned`), but policies must be assigned explicitly. The next step is an upstream salience classifier that scores incoming memories at ingestion—giving enduring facts a long half-life while rapidly compacting transient noise—and always summarizing from raw source records (1-hop) so recursive compression never erodes exact numbers or entities.
+
+#### 3. Attribution-Gated Recall Promotion
+
+Human memory strengthens through spaced repetition (Anderson et al., 2004). While `mem0-decay` includes a `recordUse()` hook to reduce effective age, blindly boosting every memory returned in a top-<var>k</var> vector search creates a dangerous echo chamber: noisy false positives get reinforced and stay alive forever. Recall promotion needs **attribution gating**—only updating a memory's ACT-R cumulative activation history when the agent actually uses that memory in its generated response without user contradiction.
+
+---
+
+### What's Next
+
+`mem0-decay` proved that you don't need expensive, agent-driven LLM loops on every turn to keep vector storage lean and fast. Mathematical decay and lineage-verified compaction can cut disk usage by over 30% with minimal accuracy cost.
+
+The roadmap from here is clear: keep the core decay engine clean and predictable, while layering on **consolidated fact extraction**, **local graph/triple traversal**, **automatic importance routing**, and **attribution-gated recall** (ideally using local or low-cost models so my API budget survives the next round of benchmarks). For an always-on personal assistant, the real goal isn't just remembering everything—it's forgetting the right things cheaply while keeping truth instantly reachable.
+
+---
+
+### References
+
+- Anderson, J. R., Bothell, D., Byrne, M. D., Douglass, S., Lebiere, C., & Qin, Y. (2004). An integrated theory of the mind. *Psychological Review*, *111*(4), 1036–1060. [https://doi.org/10.1037/0033-295x.111.4.1036](https://doi.org/10.1037/0033-295x.111.4.1036)
+- McClelland, J. L., McNaughton, B. L., & O'Reilly, R. C. (1995). Why there are complementary learning systems in the hippocampus and neocortex: Insights from the successes and failures of connectionist models of learning and memory. *Psychological Review*, *102*(3), 419–457. [https://doi.org/10.1037/0033-295x.102.3.419](https://doi.org/10.1037/0033-295x.102.3.419)
+- Packer, C., Wooders, S., Lin, K., Fang, V., Patil, S. G., Stoica, I., & Gonzalez, J. E. (2023). MemGPT: Towards LLMs as operating systems. *arXiv*. [https://doi.org/10.48550/arXiv.2310.08560](https://doi.org/10.48550/arXiv.2310.08560)
